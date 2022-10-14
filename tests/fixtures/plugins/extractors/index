@@ -1,0 +1,14 @@
+{
+    "tap-github": {
+        "logo_url": "http://localhost:8000/assets/logos/extractors/github.png",
+        "default_variant": "singer-io",
+        "variants": {
+            "meltanolabs": {
+                "ref": "http://localhost:8000/meltano/api/v1/plugins/extractors/tap-github--meltanolabs"
+            },
+            "singer-io": {
+                "ref": "http://localhost:8000/meltano/api/v1/plugins/extractors/tap-github--singer-io"
+            }
+        }
+    }
+}
