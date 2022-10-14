@@ -46,6 +46,7 @@ class PluginSetting(BaseModel):
 
     name: str = Field(description="The setting name.", example="token")
     description: str = Field(
+        default="",
         description="The setting description.",
         example="The API token.",
     )
@@ -62,6 +63,7 @@ class BasePluginDetails(BaseModel):
 
     name: str = Field(description="The plugin name", example="tap-csv")
     description: str = Field(
+        default="",
         description="The plugin description",
         example="A Singer tap for CSV files.",
     )
