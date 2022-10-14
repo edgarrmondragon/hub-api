@@ -4,7 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["Edgar Ramírez Mondragón <edgarrm358@gmail.com>"]
 readme = "README.md"
-packages = [{include = "hub_api"}]
+packages = [{include = "app"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
