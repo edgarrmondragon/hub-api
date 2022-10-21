@@ -33,8 +33,6 @@ async def get_db() -> AsyncGenerator[aiosqlite.Connection, None]:
     db = await aiosqlite.connect(database_uri)
     db.row_factory = dict_factory  # type: ignore
 
-    await db.execute("CREATE TABLE foo (bar int, baz text);")
-    await db.execute("INSERT INTO foo (bar, baz) VALUES (?, ?);", (42, "hello"))
     await db.commit()
     try:
         yield db

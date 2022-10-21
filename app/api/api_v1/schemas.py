@@ -1,7 +1,7 @@
 """Response schemas for the API."""
 
 import enum
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -15,7 +15,7 @@ class VariantReference(BaseModel):
 class Plugin(BaseModel):
     """Plugin entry."""
 
-    logo_url: str = Field(description="URL to the plugin's logo")
+    # logo_url: str = Field(description="URL to the plugin's logo")
     default_variant: str = Field(description="The default variant of the plugin")
     variants: Dict[str, VariantReference] = Field(
         description="The variants of the plugin",
@@ -50,8 +50,8 @@ class PluginSetting(BaseModel):
         description="The setting description.",
         example="The API token.",
     )
-    label: str = Field(description="The setting label.", example="API Token")
-    kind: SettingKind = Field(
+    # label: str = Field(description="The setting label.", example="API Token")
+    kind: Optional[SettingKind] = Field(
         default=SettingKind.STRING,
         description="The setting kind.",
         example=SettingKind.PASSWORD,
@@ -67,7 +67,7 @@ class BasePluginDetails(BaseModel):
         description="The plugin description",
         example="A Singer tap for CSV files.",
     )
-    label: str = Field(description="The plugin label", example="CSV Tap")
+    # label: str = Field(description="The plugin label", example="CSV Tap")
     pip_url: str = Field(
         title="Pip URL",
         description=(
@@ -86,4 +86,17 @@ class BasePluginDetails(BaseModel):
         description="The plugin variant",
         example="meltanolabs",
     )
+    logo_url: Optional[str] = Field(
+        description="URL to the plugin's logo",
+        example="https://meltano.com/images/logo.png",
+    )
+    repo: str = Field(description="The plugin repository")
+    settings_group_validation: List[List[str]] = Field(
+        default_factory=list,
+        description="A list of lists of setting names that must be set together.",
+    )
     settings: List[PluginSetting]
+    capabilities: List[str]
+    keywords: List[str]
+
+    # maintenance_status: str = "active"
