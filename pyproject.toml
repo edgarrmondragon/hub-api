@@ -17,7 +17,7 @@ SQLAlchemy = { version = "^2.0.0b1", extras = ["asyncio"], allow-prereleases = t
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
-pytest-asyncio = "^0.19.0"
+pytest-asyncio = "^0.23.5"
 requests = "^2.31.0"
 sqlalchemy2-stubs = "^0.0.2a38"
 types-PyYAML = "^6.0.12"
