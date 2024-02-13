@@ -535,13 +535,13 @@ sqlcipher = ["sqlcipher3-binary"]
 
 [[package]]
 name = "sqlalchemy2-stubs"
-version = "0.0.2a29"
+version = "0.0.2a38"
 description = "Typing Stubs for SQLAlchemy 1.4"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "sqlalchemy2-stubs-0.0.2a29.tar.gz", hash = "sha256:1bbc6aebd76db7c0351a9f45cc1c4e8ac335ba150094c2af091e8b87b9118419"},
-    {file = "sqlalchemy2_stubs-0.0.2a29-py3-none-any.whl", hash = "sha256:ece266cdabf3797b13ddddba27561b67ae7dedc038942bf66e045e978a5e3a66"},
+    {file = "sqlalchemy2-stubs-0.0.2a38.tar.gz", hash = "sha256:861d722abeb12f13eacd775a9f09379b11a5a9076f469ccd4099961b95800f9e"},
+    {file = "sqlalchemy2_stubs-0.0.2a38-py3-none-any.whl", hash = "sha256:b62aa46943807287550e2033dafe07564b33b6a815fbaa3c144e396f9cc53bcb"},
 ]
 
 [package.dependencies]
@@ -634,4 +634,4 @@ standard = ["colorama (>=0.4)", "httptools (>=0.4.0)", "python-dotenv (>=0.13)",
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "d0dcb42340c2cb1ae7d9f9060274faf5131470705befd392d7d3ee2f94af1e8c"
+content-hash = "79797c438460c4c768c74e11e51116876e06dd4066a8ba96e1fa2a7f14070a62"
