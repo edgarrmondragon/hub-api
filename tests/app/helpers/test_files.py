@@ -1,4 +1,5 @@
 """Test files helper functions."""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -17,8 +18,8 @@ def test_get_files_default() -> None:
 def test_get_files_env(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test get_files."""
     get_files.cache_clear()
-    monkeypatch.setenv("PLUGINS_FILES_PATH", "/tmp")
-    assert get_files() == Path("/tmp")
+    monkeypatch.setenv("PLUGINS_FILES_PATH", "/tmp")  # noqa: S108
+    assert get_files() == Path("/tmp")  # noqa: S108
 
 
 def test_get_files_cache() -> None:

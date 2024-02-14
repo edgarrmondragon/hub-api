@@ -63,6 +63,4 @@ async def sdk() -> list[dict[str, str]]:
     db: AsyncSession
     async with SessionLocal() as db:
         hub = MeltanoHub(db)
-        plugins = await hub.get_sdk_plugins()
-
-        return plugins
+        return await hub.get_sdk_plugins()

@@ -24,9 +24,13 @@ types-PyYAML = "==6.0.12.12"
 
 [tool.ruff]
 line-length = 88
+preview = true
 target-version = "py310"
 
 [tool.ruff.lint]
+ignore = [
+    "COM812",
+]
 select = [
     "F",      # PyFlakes
     "W",      # pycodestyle (Warning)
@@ -38,10 +42,41 @@ select = [
     "YTT",    # flake8-2020
     "ANN",    # flake8-annotations
     "ASYNC",  # flake8-async
+    "TRIO",   # flake8-trio
+    "S",      # flake8-bandit
+    "BLE",    # flake8-blind-except
+    "B",      # flake8-bugbear
+    "A",      # flake8-builtins
+    "COM",    # flake8-commas
+    "C4",     # flake8-comprehensions
+    "DTZ",    # flake8-datetimez
+    "ICN",    # flake8-import-conventions
+    "PT",     # flake8-pytest-style
+    "RET",    # flake8-return
+    "SLF",    # flake8-self
+    "SIM",    # flake8-simplify
+    "PTH",    # flake8-use-pathlib
+    "PERF",   # Perflint
+    "FURB",   # refurb
+    "LOG",    # flake8-logging
+    "RUF",    # Ruff-specific rules
 ]
 
 [tool.ruff.lint.isort]
-required-imports = ["from __future__ import annotations"]
+required-imports = [
+    "from __future__ import annotations",
+]
+
+[tool.ruff.lint.flake8-import-conventions]
+banned-from = [
+    "sqlalchemy",
+]
+
+[tool.ruff.lint.flake8-import-conventions.extend-aliases]
+"sqlalchemy" = "sa"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]
 
 [build-system]
 requires = ["poetry-core"]
