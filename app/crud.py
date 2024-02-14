@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+import typing as t
+
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
@@ -35,10 +39,13 @@ def build_variant_url(
 
 
 class MeltanoHub:
-    def __init__(self, session: AsyncSession):
+    def __init__(self: MeltanoHub, session: AsyncSession) -> None:
         self.db_session = session
 
-    async def get_plugin_type_index(self, plugin_type: PluginType):
+    async def get_plugin_type_index(
+        self: MeltanoHub,
+        plugin_type: PluginType,
+    ) -> dict[str, dict[str, str]]:
         """Get all plugins of a given type.
 
         Args:
@@ -47,19 +54,19 @@ class MeltanoHub:
         Returns:
             Mapping of plugin name to variants.
         """
-        AliasedPlugin = aliased(PluginVariant, name="default_variant")
+        aliased_plugin = aliased(PluginVariant, name="default_variant")
         q = (
             select(
                 Plugin.name,
                 PluginVariant.name.label("variant"),
-                AliasedPlugin.name.label("default_variant"),
+                aliased_plugin.name.label("default_variant"),
             )
             .join(Plugin, Plugin.id == PluginVariant.plugin_id)
             .join(
-                AliasedPlugin,
+                aliased_plugin,
                 and_(
-                    Plugin.default_variant_id == AliasedPlugin.id,
-                    Plugin.id == AliasedPlugin.plugin_id,
+                    Plugin.default_variant_id == aliased_plugin.id,
+                    Plugin.id == aliased_plugin.plugin_id,
                 ),
             )
             .where(Plugin.plugin_type == plugin_type)
@@ -83,7 +90,7 @@ class MeltanoHub:
             for row in result.all()
         }
 
-    async def get_plugin_variant(self, variant_id: str):
+    async def get_plugin_variant(self: MeltanoHub, variant_id: str) -> dict[str, t.Any]:
         """Get a plugin variant.
 
         Args:
@@ -112,7 +119,10 @@ class MeltanoHub:
 
         return variant._asdict()
 
-    async def get_plugin_settings(self, variant_id: str):
+    async def get_plugin_settings(
+        self: MeltanoHub,
+        variant_id: str,
+    ) -> list[dict[str, t.Any]]:
         """Get all settings for a plugin variant.
 
         Args:
@@ -131,7 +141,7 @@ class MeltanoHub:
         result = await self.db_session.execute(q)
         return [row._asdict() for row in result.all()]
 
-    async def get_plugin_capabilities(self, variant_id: str):
+    async def get_plugin_capabilities(self: MeltanoHub, variant_id: str) -> list[str]:
         """Get all capabilities for a plugin variant.
 
         Args:
@@ -144,7 +154,7 @@ class MeltanoHub:
         result = await self.db_session.execute(q)
         return result.scalars().all()
 
-    async def get_plugin_keywords(self, variant_id: str):
+    async def get_plugin_keywords(self: MeltanoHub, variant_id: str) -> list[str]:
         """Get all keywords for a plugin variant.
 
         Args:
@@ -157,7 +167,7 @@ class MeltanoHub:
         result = await self.db_session.execute(q)
         return result.scalars().all()
 
-    async def get_sdk_plugins(self):
+    async def get_sdk_plugins(self: MeltanoHub) -> list[dict[str, t.Any]]:
         """Get all plugins with the sdk keyword.
 
         Returns:
@@ -183,4 +193,4 @@ class MeltanoHub:
         )
 
         result = await self.db_session.execute(q)
-        return [row._asdict() for row in result.all()]
+        return result.mappings().all()

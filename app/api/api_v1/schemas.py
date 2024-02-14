@@ -1,9 +1,9 @@
 """Response schemas for the API."""
+from __future__ import annotations
 
 import enum
-from typing import Dict, List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, RootModel
 
 
 class VariantReference(BaseModel):
@@ -17,15 +17,13 @@ class Plugin(BaseModel):
 
     # logo_url: str = Field(description="URL to the plugin's logo")
     default_variant: str = Field(description="The default variant of the plugin")
-    variants: Dict[str, VariantReference] = Field(
+    variants: dict[str, VariantReference] = Field(
         description="The variants of the plugin",
     )
 
 
-class PluginIndex(BaseModel):
+class PluginIndex(RootModel):
     """Plugin index model."""
-
-    __root__: Dict[str, Plugin]
 
 
 class SettingKind(str, enum.Enum):
@@ -44,30 +42,33 @@ class SettingKind(str, enum.Enum):
 class PluginSetting(BaseModel):
     """Plugin setting model."""
 
-    name: str = Field(description="The setting name.", example="token")
+    name: str = Field(
+        description="The setting name.",
+        json_schema_extra={"example": "token"},
+    )
     description: str = Field(
         default="",
         description="The setting description.",
-        example="The API token.",
+        examples=["The API token."],
     )
-    # label: str = Field(description="The setting label.", example="API Token")
-    kind: Optional[SettingKind] = Field(
+    # label: str = Field(description="The setting label.", examples=["API Token"])
+    kind: SettingKind | None = Field(
         default=SettingKind.STRING,
         description="The setting kind.",
-        example=SettingKind.PASSWORD,
+        examples=[SettingKind.PASSWORD],
     )
 
 
 class BasePluginDetails(BaseModel):
     """Base plugin details model."""
 
-    name: str = Field(description="The plugin name", example="tap-csv")
+    name: str = Field(description="The plugin name", examples=["tap-csv"])
     description: str = Field(
         default="",
         description="The plugin description",
-        example="A Singer tap for CSV files.",
+        examples=["A Singer tap for CSV files."],
     )
-    # label: str = Field(description="The plugin label", example="CSV Tap")
+    # label: str = Field(description="The plugin label", examples=["CSV Tap"])
     pip_url: str = Field(
         title="Pip URL",
         description=(
@@ -84,19 +85,19 @@ class BasePluginDetails(BaseModel):
     namespace: str
     variant: str = Field(
         description="The plugin variant",
-        example="meltanolabs",
+        examples=["meltanolabs"],
     )
-    logo_url: Optional[str] = Field(
-        description="URL to the plugin's logo",
-        example="https://meltano.com/images/logo.png",
-    )
+    # logo_url: str | None = Field(
+    #     description="URL to the plugin's logo",
+    #     examples=["https://meltano.com/images/logo.png"],
+    # )
     repo: str = Field(description="The plugin repository")
-    settings_group_validation: List[List[str]] = Field(
+    settings_group_validation: list[list[str]] = Field(
         default_factory=list,
         description="A list of lists of setting names that must be set together.",
     )
-    settings: List[PluginSetting]
-    capabilities: List[str]
-    keywords: List[str]
+    settings: list[PluginSetting]
+    capabilities: list[str]
+    keywords: list[str]
 
     # maintenance_status: str = "active"

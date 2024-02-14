@@ -1,12 +1,13 @@
 """Test FastAPI app."""
+from __future__ import annotations
 
+import pytest
 from fastapi.testclient import TestClient
-from pytest import MonkeyPatch
 
 from app.main import app
 
 
-def test_plugin_index(monkeypatch: MonkeyPatch):
+def test_plugin_index(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test app."""
     monkeypatch.setenv("PLUGINS_FILES_PATH", "tests/fixtures/plugins")
     client = TestClient(app)
@@ -15,7 +16,7 @@ def test_plugin_index(monkeypatch: MonkeyPatch):
     assert response.json()
 
 
-def test_plugin_details(monkeypatch: MonkeyPatch):
+def test_plugin_details(monkeypatch: pytest.MonkeyPatch) -> None:
     """Test app."""
     monkeypatch.setenv("PLUGINS_FILES_PATH", "tests/fixtures/plugins")
     client = TestClient(app)

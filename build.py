@@ -1,3 +1,6 @@
+from __future__ import annotations
+
+import typing as t
 from pathlib import Path
 
 import sqlalchemy as sa
@@ -8,8 +11,6 @@ from sqlalchemy.orm import sessionmaker
 from app.api.api_v1.endpoints.plugins import PluginType
 from app.models import Capability, EntityBase, Keyword, Plugin, PluginVariant, Setting
 
-PATH = Path("../hub/_data")
-
 
 def get_default_variants(path: Path) -> list[Path]:
     """Get default variants of a given plugin."""
@@ -17,29 +18,32 @@ def get_default_variants(path: Path) -> list[Path]:
         return yaml.safe_load(f)
 
 
-def get_plugin_variants(plugin_path: Path):
+def get_plugin_variants(plugin_path: Path) -> t.Generator[tuple[str, dict], None, None]:
     """Get plugin variants of a given type."""
     for plugin_file in plugin_path.glob("*.yml"):
         with open(plugin_file) as f:
             yield plugin_file.stem, yaml.safe_load(f)
 
 
-def get_plugins_of_type(base_path: Path, plugin_type: PluginType):
+def get_plugins_of_type(
+    base_path: Path,
+    plugin_type: PluginType,
+) -> t.Generator[tuple[str, dict], None, None]:
     """Get plugins of a given type."""
     for plugin_path in base_path.joinpath(plugin_type.value).glob("*"):
         yield from get_plugin_variants(plugin_path)
 
 
-def load_db(session: SessionBase):
+def load_db(path: Path, session: SessionBase) -> None:
     """Load database."""
 
-    default_variants = get_default_variants(PATH.joinpath("default_variants.yml"))
+    default_variants = get_default_variants(path.joinpath("default_variants.yml"))
 
     for plugin_type in PluginType:
-        for plugin_path in PATH.joinpath("meltano", plugin_type.value).glob("*"):
+        for plugin_path in path.joinpath("meltano", plugin_type.value).glob("*"):
             default_variant = default_variants[plugin_type.value].get(plugin_path.name)
             plugin_id = f"{plugin_type.value}.{plugin_path.name}"
-            default_variant_id = f"{plugin_id}.{default_variant}"
+            default_variant_id = f"{plugin_id}.{default_variant}"  # noqa: F841
 
             for variant, definition in get_plugin_variants(plugin_path):
                 variant_id = f"{plugin_id}.{variant}"
@@ -93,10 +97,14 @@ def load_db(session: SessionBase):
 
 
 if __name__ == "__main__":
+    import sys
+
     engine = sa.create_engine("sqlite:///plugins.db")
     SyncSession = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     session = SyncSession()
 
     EntityBase.metadata.drop_all(engine)
     EntityBase.metadata.create_all(engine)
-    load_db(session)
+
+    hub_data = sys.argv[1] if len(sys.argv) > 1 else "../../meltano/hub/_data"
+    load_db(Path(hub_data).resolve(), session)

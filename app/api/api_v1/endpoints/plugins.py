@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import aiosqlite
 from fastapi import APIRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -59,7 +58,7 @@ async def get_plugin_variant(
 
 
 @router.get("/test-sqlite/made-with-sdk")
-async def sdk() -> list[aiosqlite.Row]:
+async def sdk() -> list[dict[str, str]]:
     """Test sqlite plugin details."""
     db: AsyncSession
     async with SessionLocal() as db:

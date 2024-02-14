@@ -19,9 +19,7 @@ jobs:
         python-version: ["3.10"]
 
     steps:
-    - name: Check out the repository
-      uses: actions/checkout@v4.1.1
-
+    - uses: actions/checkout@v4.1.1
     - name: Setup Python
       uses: actions/setup-python@v5.0.0
       with:
@@ -42,7 +40,18 @@ jobs:
         pipx install poetry
         poetry --version
 
-    - name: Run Pytest
+    - name: Check out the Meltano Hub repository
+      uses: actions/checkout@v4.1.1
+      with:
+        repository: meltano/meltano-hub
+        ref: main
+        path: meltano-hub
+
+    - name: Build the database
       run: |
         poetry install
+        poetry run python -I build.py meltano-hub
+
+    - name: Run Pytest
+      run: |
         poetry run pytest

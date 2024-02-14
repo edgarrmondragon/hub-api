@@ -1,4 +1,5 @@
 """Hub API."""
+from __future__ import annotations
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.gzip import GZipMiddleware
@@ -16,7 +17,7 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 async def missing_variant_exception_handler(
     request: Request,
     exc: PluginVariantNotFoundError,
-):
+) -> JSONResponse:
     return JSONResponse(
         status_code=404,
         content={
