@@ -1,4 +1,5 @@
 """Response schemas for the API."""
+
 from __future__ import annotations
 
 import enum
@@ -35,7 +36,7 @@ class SettingKind(str, enum.Enum):
     BOOLEAN = "boolean"
     OBJECT = "object"
     ARRAY = "array"
-    PASSWORD = "password"
+    PASSWORD = "password"  # noqa: S105
     DATE_ISO8601 = "date_iso8601"
 
 

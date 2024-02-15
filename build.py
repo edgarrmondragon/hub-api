@@ -14,14 +14,14 @@ from app.models import Capability, EntityBase, Keyword, Plugin, PluginVariant, S
 
 def get_default_variants(path: Path) -> list[Path]:
     """Get default variants of a given plugin."""
-    with open(path) as f:
+    with path.open() as f:
         return yaml.safe_load(f)
 
 
 def get_plugin_variants(plugin_path: Path) -> t.Generator[tuple[str, dict], None, None]:
     """Get plugin variants of a given type."""
     for plugin_file in plugin_path.glob("*.yml"):
-        with open(plugin_file) as f:
+        with plugin_file.open() as f:
             yield plugin_file.stem, yaml.safe_load(f)
 
 

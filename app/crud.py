@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import typing as t
 
-from sqlalchemy import and_, select
+import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 
@@ -56,7 +56,7 @@ class MeltanoHub:
         """
         aliased_plugin = aliased(PluginVariant, name="default_variant")
         q = (
-            select(
+            sa.select(
                 Plugin.name,
                 PluginVariant.name.label("variant"),
                 aliased_plugin.name.label("default_variant"),
@@ -64,7 +64,7 @@ class MeltanoHub:
             .join(Plugin, Plugin.id == PluginVariant.plugin_id)
             .join(
                 aliased_plugin,
-                and_(
+                sa.and_(
                     Plugin.default_variant_id == aliased_plugin.id,
                     Plugin.id == aliased_plugin.plugin_id,
                 ),
@@ -83,8 +83,8 @@ class MeltanoHub:
                             plugin_type,
                             row.name,
                             row.variant,
-                        )
-                    }
+                        ),
+                    },
                 },
             }
             for row in result.all()
@@ -100,7 +100,7 @@ class MeltanoHub:
             Plugin variant.
         """
         q = (
-            select(
+            sa.select(
                 Plugin.name,
                 PluginVariant.name.label("variant"),
                 PluginVariant.repo,
@@ -131,7 +131,7 @@ class MeltanoHub:
         Returns:
             List of settings.
         """
-        q = select(
+        q = sa.select(
             Setting.name,
             Setting.value,
             Setting.description,
@@ -150,7 +150,7 @@ class MeltanoHub:
         Returns:
             List of capabilities.
         """
-        q = select(Capability.name).where(Capability.variant_id == variant_id)
+        q = sa.select(Capability.name).where(Capability.variant_id == variant_id)
         result = await self.db_session.execute(q)
         return result.scalars().all()
 
@@ -163,7 +163,7 @@ class MeltanoHub:
         Returns:
             List of keywords.
         """
-        q = select(Keyword.name).where(Keyword.variant_id == variant_id)
+        q = sa.select(Keyword.name).where(Keyword.variant_id == variant_id)
         result = await self.db_session.execute(q)
         return result.scalars().all()
 
@@ -174,7 +174,7 @@ class MeltanoHub:
             List of plugins.
         """
         q = (
-            select(
+            sa.select(
                 Plugin.id,
                 Plugin.name,
             )
@@ -184,7 +184,7 @@ class MeltanoHub:
             )
             .join(
                 Keyword,
-                and_(
+                sa.and_(
                     Keyword.variant_id == PluginVariant.id,
                     Keyword.name == "meltano_sdk",
                 ),
