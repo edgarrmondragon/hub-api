@@ -43,14 +43,14 @@ jobs:
     - name: Check out the Meltano Hub repository
       uses: actions/checkout@v4.1.1
       with:
-        repository: meltano/meltano-hub
+        repository: meltano/hub
         ref: main
         path: meltano-hub
 
     - name: Build the database
       run: |
         poetry install
-        poetry run python -I build.py meltano-hub
+        poetry run python -I build.py meltano-hub/_data
 
     - name: Run Pytest
       run: |
