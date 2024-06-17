@@ -19,7 +19,7 @@ jobs:
         python-version: ["3.10"]
 
     steps:
-    - uses: actions/checkout@v4.1.6
+    - uses: actions/checkout@v4.1.7
     - name: Setup Python
       uses: actions/setup-python@v5.1.0
       with:
@@ -41,7 +41,7 @@ jobs:
         poetry --version
 
     - name: Check out the Meltano Hub repository
-      uses: actions/checkout@v4.1.6
+      uses: actions/checkout@v4.1.7
       with:
         repository: meltano/hub
         ref: main
