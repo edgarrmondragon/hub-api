@@ -66,6 +66,7 @@ def load_db(path: Path, session: SessionBase) -> None:
                         description=setting.get("description"),
                         kind=setting.get("kind"),
                         value=setting.get("value"),
+                        options=setting.get("options"),
                     )
                     session.add(setting_object)
 

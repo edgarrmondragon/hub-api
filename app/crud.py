@@ -136,6 +136,7 @@ class MeltanoHub:
             Setting.value,
             Setting.description,
             Setting.kind,
+            Setting.options,
         ).where(Setting.variant_id == variant_id)
 
         result = await self.db_session.execute(q)

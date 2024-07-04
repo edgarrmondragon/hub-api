@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import enum
+import typing as t
 
 from pydantic import BaseModel, Field, RootModel
 
@@ -32,15 +33,19 @@ class SettingKind(str, enum.Enum):
 
     STRING = "string"
     INTEGER = "integer"
-    FLOAT = "float"
     BOOLEAN = "boolean"
-    OBJECT = "object"
-    ARRAY = "array"
-    PASSWORD = "password"  # noqa: S105
     DATE_ISO8601 = "date_iso8601"
+    EMAIL = "email"
+    PASSWORD = "password"  # noqa: S105
+    OAUTH = "oauth"
+    OPTIONS = "options"
+    FILE = "file"
+    ARRAY = "array"
+    OBJECT = "object"
+    HIDDEN = "hidden"
 
 
-class PluginSetting(BaseModel):
+class _BasePluginSetting(BaseModel):
     """Plugin setting model."""
 
     name: str = Field(
@@ -53,10 +58,113 @@ class PluginSetting(BaseModel):
         examples=["The API token."],
     )
     # label: str = Field(description="The setting label.", examples=["API Token"])
-    kind: SettingKind | None = Field(
-        default=SettingKind.STRING,
+    # kind: SettingKind | None = Field(
+    #     default=SettingKind.STRING,
+    #     description="The setting kind.",
+    #     examples=[SettingKind.PASSWORD],
+    # )
+
+
+class StringSetting(_BasePluginSetting):
+    """String setting model."""
+
+    kind: t.Literal["string"]
+
+
+class IntegerSetting(_BasePluginSetting):
+    """Integer setting model."""
+
+    kind: t.Literal["integer"]
+
+
+class BooleanSetting(_BasePluginSetting):
+    """Boolean setting model."""
+
+    kind: t.Literal["boolean"]
+
+
+class DateIso8601Setting(_BasePluginSetting):
+    """Date ISO8601 setting model."""
+
+    kind: t.Literal["date_iso8601"]
+
+
+class EmailSetting(_BasePluginSetting):
+    """Email setting model."""
+
+    kind: t.Literal["email"]
+
+
+class PasswordSetting(_BasePluginSetting):
+    """Password setting model."""
+
+    kind: t.Literal["password"]
+
+
+class OAuthSetting(_BasePluginSetting):
+    """OAuth setting model."""
+
+    kind: t.Literal["oauth"]
+
+
+class Option(BaseModel):
+    """Option model."""
+
+    value: str = Field(description="The option value")
+    label: str = Field(description="The option label")
+
+
+class OptionsSetting(_BasePluginSetting):
+    """Options setting model."""
+
+    kind: t.Literal["options"]
+    options: list[Option] = Field(
+        description="The setting options",
+        default_factory=list,
+    )
+
+
+class FileSetting(_BasePluginSetting):
+    """File setting model."""
+
+    kind: t.Literal["file"]
+
+
+class ArraySetting(_BasePluginSetting):
+    """Array setting model."""
+
+    kind: t.Literal["array"]
+
+
+class ObjectSetting(_BasePluginSetting):
+    """Object setting model."""
+
+    kind: t.Literal["object"]
+
+
+class HiddenSetting(_BasePluginSetting):
+    """Hidden setting model."""
+
+    kind: t.Literal["hidden"]
+
+
+class PluginSetting(RootModel):
+    root: (
+        StringSetting
+        | IntegerSetting
+        | BooleanSetting
+        | DateIso8601Setting
+        | EmailSetting
+        | PasswordSetting
+        | OAuthSetting
+        | OptionsSetting
+        | FileSetting
+        | ArraySetting
+        | ObjectSetting
+        | HiddenSetting
+    ) = Field(
         description="The setting kind.",
-        examples=[SettingKind.PASSWORD],
+        discriminator="kind",
     )
 
 

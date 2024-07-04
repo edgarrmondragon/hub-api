@@ -85,6 +85,7 @@ class Setting(EntityBase):
     description = sa.Column(sa.String)
     kind = sa.Column(sa.String)
     value = sa.Column(sa.JSON, nullable=False)
+    options = sa.Column(sa.JSON, nullable=True)
 
 
 class Capability(EntityBase):
