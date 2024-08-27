@@ -7,15 +7,15 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
-from app.api.api_v1.api import router as api_router
-from app.crud import PluginVariantNotFoundError
+from hub_api.api.api_v1.api import router as api_router
+from hub_api.crud import PluginVariantNotFoundError
 
 app = FastAPI()
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 
 @app.exception_handler(PluginVariantNotFoundError)
-async def missing_variant_exception_handler(
+def missing_variant_exception_handler(
     request: Request,
     exc: PluginVariantNotFoundError,
 ) -> JSONResponse:

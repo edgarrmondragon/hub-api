@@ -8,8 +8,7 @@ import yaml
 from sqlalchemy.orm import Session as SessionBase
 from sqlalchemy.orm import sessionmaker
 
-from app.api.api_v1.endpoints.plugins import PluginType
-from app.models import Capability, EntityBase, Keyword, Plugin, PluginVariant, Setting
+from hub_api import models
 
 
 def get_default_variants(path: Path) -> list[Path]:
@@ -27,7 +26,7 @@ def get_plugin_variants(plugin_path: Path) -> t.Generator[tuple[str, dict], None
 
 def get_plugins_of_type(
     base_path: Path,
-    plugin_type: PluginType,
+    plugin_type: models.PluginType,
 ) -> t.Generator[tuple[str, dict], None, None]:
     """Get plugins of a given type."""
     for plugin_path in base_path.joinpath(plugin_type.value).glob("*"):
@@ -39,7 +38,7 @@ def load_db(path: Path, session: SessionBase) -> None:
 
     default_variants = get_default_variants(path.joinpath("default_variants.yml"))
 
-    for plugin_type in PluginType:
+    for plugin_type in models.PluginType:
         for plugin_path in path.joinpath("meltano", plugin_type.value).glob("*"):
             default_variant = default_variants[plugin_type.value].get(plugin_path.name)
             plugin_id = f"{plugin_type.value}.{plugin_path.name}"
@@ -47,7 +46,7 @@ def load_db(path: Path, session: SessionBase) -> None:
 
             for variant, definition in get_plugin_variants(plugin_path):
                 variant_id = f"{plugin_id}.{variant}"
-                plugin_object = PluginVariant(
+                plugin_object = models.PluginVariant(
                     id=variant_id,
                     plugin_id=plugin_id,
                     name=variant,
@@ -58,7 +57,7 @@ def load_db(path: Path, session: SessionBase) -> None:
                 session.add(plugin_object)
 
                 for setting in definition.get("settings", []):
-                    setting_object = Setting(
+                    setting_object = models.Setting(
                         id=f"{variant_id}.{setting['name']}",
                         variant_id=variant_id,
                         name=setting["name"],
@@ -71,7 +70,7 @@ def load_db(path: Path, session: SessionBase) -> None:
                     session.add(setting_object)
 
                 for capability in definition.get("capabilities", []):
-                    capability_object = Capability(
+                    capability_object = models.Capability(
                         id=f"{variant_id}.{capability}",
                         variant_id=variant_id,
                         name=capability,
@@ -79,14 +78,14 @@ def load_db(path: Path, session: SessionBase) -> None:
                     session.add(capability_object)
 
                 for keyword in definition.get("keywords", []):
-                    keyword_object = Keyword(
+                    keyword_object = models.Keyword(
                         id=f"{variant_id}.{keyword}",
                         variant_id=variant_id,
                         name=keyword,
                     )
                     session.add(keyword_object)
 
-            default_variant_object = Plugin(
+            default_variant_object = models.Plugin(
                 id=plugin_id,
                 default_variant_id=f"{plugin_id}.{default_variant}",
                 plugin_type=plugin_type.value,
@@ -104,8 +103,8 @@ if __name__ == "__main__":
     SyncSession = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     session = SyncSession()
 
-    EntityBase.metadata.drop_all(engine)
-    EntityBase.metadata.create_all(engine)
+    models.EntityBase.metadata.drop_all(engine)
+    models.EntityBase.metadata.create_all(engine)
 
     hub_data = sys.argv[1] if len(sys.argv) > 1 else "../../meltano/hub/_data"
     load_db(Path(hub_data).resolve(), session)

@@ -6,7 +6,7 @@ import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 
-from app.models import Capability, Keyword, Plugin, PluginType, PluginVariant, Setting
+from hub_api import models
 
 BASE_URL = "http://localhost:8000"
 
@@ -19,7 +19,7 @@ class PluginVariantNotFoundError(Exception):
 
 def build_variant_url(
     base_url: str,
-    plugin_type: PluginType,
+    plugin_type: models.PluginType,
     plugin_name: str,
     plugin_variant: str,
 ) -> str:
@@ -44,7 +44,7 @@ class MeltanoHub:
 
     async def get_plugin_type_index(
         self: MeltanoHub,
-        plugin_type: PluginType,
+        plugin_type: models.PluginType,
     ) -> dict[str, dict[str, str]]:
         """Get all plugins of a given type.
 
@@ -54,22 +54,22 @@ class MeltanoHub:
         Returns:
             Mapping of plugin name to variants.
         """
-        aliased_plugin = aliased(PluginVariant, name="default_variant")
+        aliased_plugin = aliased(models.PluginVariant, name="default_variant")
         q = (
             sa.select(
-                Plugin.name,
-                PluginVariant.name.label("variant"),
+                models.Plugin.name,
+                models.PluginVariant.name.label("variant"),
                 aliased_plugin.name.label("default_variant"),
             )
-            .join(Plugin, Plugin.id == PluginVariant.plugin_id)
+            .join(models.Plugin, models.Plugin.id == models.PluginVariant.plugin_id)
             .join(
                 aliased_plugin,
                 sa.and_(
-                    Plugin.default_variant_id == aliased_plugin.id,
-                    Plugin.id == aliased_plugin.plugin_id,
+                    models.Plugin.default_variant_id == aliased_plugin.id,
+                    models.Plugin.id == aliased_plugin.plugin_id,
                 ),
             )
-            .where(Plugin.plugin_type == plugin_type)
+            .where(models.Plugin.plugin_type == plugin_type)
         )
 
         result = await self.db_session.execute(q)
@@ -101,14 +101,14 @@ class MeltanoHub:
         """
         q = (
             sa.select(
-                Plugin.name,
-                PluginVariant.name.label("variant"),
-                PluginVariant.repo,
-                PluginVariant.pip_url,
-                PluginVariant.namespace,
+                models.Plugin.name,
+                models.PluginVariant.name.label("variant"),
+                models.PluginVariant.repo,
+                models.PluginVariant.pip_url,
+                models.PluginVariant.namespace,
             )
-            .join(Plugin, Plugin.id == PluginVariant.plugin_id)
-            .where(PluginVariant.id == variant_id)
+            .join(models.Plugin, models.Plugin.id == models.PluginVariant.plugin_id)
+            .where(models.PluginVariant.id == variant_id)
         )
 
         result = await self.db_session.execute(q)
@@ -132,12 +132,12 @@ class MeltanoHub:
             List of settings.
         """
         q = sa.select(
-            Setting.name,
-            Setting.value,
-            Setting.description,
-            Setting.kind,
-            Setting.options,
-        ).where(Setting.variant_id == variant_id)
+            models.Setting.name,
+            models.Setting.value,
+            models.Setting.description,
+            models.Setting.kind,
+            models.Setting.options,
+        ).where(models.Setting.variant_id == variant_id)
 
         result = await self.db_session.execute(q)
         return [row._asdict() for row in result.all()]
@@ -151,7 +151,9 @@ class MeltanoHub:
         Returns:
             List of capabilities.
         """
-        q = sa.select(Capability.name).where(Capability.variant_id == variant_id)
+        q = sa.select(models.Capability.name).where(
+            models.Capability.variant_id == variant_id
+        )
         result = await self.db_session.execute(q)
         return result.scalars().all()
 
@@ -164,7 +166,9 @@ class MeltanoHub:
         Returns:
             List of keywords.
         """
-        q = sa.select(Keyword.name).where(Keyword.variant_id == variant_id)
+        q = sa.select(models.Keyword.name).where(
+            models.Keyword.variant_id == variant_id
+        )
         result = await self.db_session.execute(q)
         return result.scalars().all()
 
@@ -176,18 +180,18 @@ class MeltanoHub:
         """
         q = (
             sa.select(
-                Plugin.id,
-                Plugin.name,
+                models.Plugin.id,
+                models.Plugin.name,
             )
             .join(
-                PluginVariant,
-                PluginVariant.plugin_id == Plugin.id,
+                models.PluginVariant,
+                models.PluginVariant.plugin_id == models.Plugin.id,
             )
             .join(
-                Keyword,
+                models.Keyword,
                 sa.and_(
-                    Keyword.variant_id == PluginVariant.id,
-                    Keyword.name == "meltano_sdk",
+                    models.Keyword.variant_id == models.PluginVariant.id,
+                    models.Keyword.name == "meltano_sdk",
                 ),
             )
             .limit(100)
