@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 
-from app.helpers.files import get_files
+from hub_api.helpers.files import get_files
 
 
 def test_get_files_default() -> None:

@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from fastapi.testclient import TestClient
 
-from app.main import app
+from hub_api.main import app
 
 
 def test_plugin_index(monkeypatch: pytest.MonkeyPatch) -> None:

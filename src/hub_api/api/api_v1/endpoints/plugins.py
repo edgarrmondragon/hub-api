@@ -5,9 +5,9 @@ from __future__ import annotations
 from fastapi import APIRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.api_v1.schemas import BasePluginDetails, PluginIndex
-from app.crud import MeltanoHub
-from app.models import PluginType, SessionLocal
+from hub_api import models
+from hub_api.api.api_v1.schemas import BasePluginDetails, PluginIndex
+from hub_api.crud import MeltanoHub
 
 router = APIRouter()
 
@@ -18,11 +18,11 @@ router = APIRouter()
     response_model_exclude_none=True,
 )
 async def test_sqlite(
-    plugin_type: PluginType,
+    plugin_type: models.PluginType,
 ) -> dict:
     """Test sqlite plugin index."""
     db: AsyncSession
-    async with SessionLocal() as db:
+    async with models.SessionLocal() as db:
         hub = MeltanoHub(db)
         return await hub.get_plugin_type_index(plugin_type)
 
@@ -33,7 +33,7 @@ async def test_sqlite(
     response_model_exclude_none=True,
 )
 async def get_plugin_variant(
-    plugin_type: PluginType,
+    plugin_type: models.PluginType,
     plugin_name: str,
     plugin_variant: str,
 ) -> dict:
@@ -42,7 +42,7 @@ async def get_plugin_variant(
     variant_id = f"{plugin_id}.{plugin_variant}"
 
     db: AsyncSession
-    async with SessionLocal() as db:
+    async with models.SessionLocal() as db:
         hub = MeltanoHub(db)
         plugin = await hub.get_plugin_variant(variant_id)
         settings = await hub.get_plugin_settings(variant_id)
@@ -61,6 +61,6 @@ async def get_plugin_variant(
 async def sdk() -> list[dict[str, str]]:
     """Test sqlite plugin details."""
     db: AsyncSession
-    async with SessionLocal() as db:
+    async with models.SessionLocal() as db:
         hub = MeltanoHub(db)
         return await hub.get_sdk_plugins()
