@@ -68,7 +68,7 @@ class _BasePluginSetting(BaseModel):
 class StringSetting(_BasePluginSetting):
     """String setting model."""
 
-    kind: t.Literal["string"]
+    kind: t.Literal["string", None]
 
 
 class IntegerSetting(_BasePluginSetting):
