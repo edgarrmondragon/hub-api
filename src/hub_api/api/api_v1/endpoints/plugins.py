@@ -14,12 +14,11 @@ router = APIRouter()
 
 @router.get(
     "/{plugin_type}/index",
+    name="Get plugin index",
     response_model=PluginIndex,
     response_model_exclude_none=True,
 )
-async def test_sqlite(
-    plugin_type: models.PluginType,
-) -> dict:
+async def test_sqlite(plugin_type: models.PluginType) -> dict:
     """Test sqlite plugin index."""
     db: AsyncSession
     async with models.SessionLocal() as db:
@@ -57,10 +56,10 @@ async def get_plugin_variant(
         }
 
 
-@router.get("/test-sqlite/made-with-sdk")
-async def sdk() -> list[dict[str, str]]:
+@router.get("/made-with-sdk", name="Get SDK plugins")
+async def sdk(plugin_type: models.PluginType | None = None) -> list[dict[str, str]]:
     """Test sqlite plugin details."""
     db: AsyncSession
     async with models.SessionLocal() as db:
         hub = MeltanoHub(db)
-        return await hub.get_sdk_plugins()
+        return await hub.get_sdk_plugins(plugin_type=plugin_type)

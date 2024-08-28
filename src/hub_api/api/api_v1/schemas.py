@@ -57,12 +57,13 @@ class _BasePluginSetting(BaseModel):
         description="The setting description.",
         examples=["The API token."],
     )
-    # label: str = Field(description="The setting label.", examples=["API Token"])
-    # kind: SettingKind | None = Field(
-    #     default=SettingKind.STRING,
-    #     description="The setting kind.",
-    #     examples=[SettingKind.PASSWORD],
-    # )
+    label: str | None = Field(
+        description="The setting label.",
+        examples=["API Token"],
+    )
+    sensitive: bool = Field(
+        description="Whether the setting is sensitive.",
+    )
 
 
 class StringSetting(_BasePluginSetting):

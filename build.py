@@ -11,7 +11,7 @@ from sqlalchemy.orm import sessionmaker
 from hub_api import models
 
 
-def get_default_variants(path: Path) -> list[Path]:
+def get_default_variants(path: Path) -> dict[str, dict[str, str]]:
     """Get default variants of a given plugin."""
     with path.open() as f:
         return yaml.safe_load(f)
@@ -66,6 +66,7 @@ def load_db(path: Path, session: SessionBase) -> None:
                         kind=setting.get("kind"),
                         value=setting.get("value"),
                         options=setting.get("options"),
+                        sensitive=setting.get("sensitive", False),
                     )
                     session.add(setting_object)
 
