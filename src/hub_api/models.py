@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import enum
+import typing as t
 
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
@@ -38,10 +39,10 @@ class Plugin(EntityBase):
     id: Mapped[str] = mapped_column(primary_key=True)
 
     # TODO: Make this a foreign key
-    default_variant_id: Mapped[str] = mapped_column(nullable=False)
+    default_variant_id: Mapped[str]
 
-    plugin_type: Mapped[PluginType] = mapped_column(nullable=False)
-    name: Mapped[str] = mapped_column(nullable=False)
+    plugin_type: Mapped[PluginType]
+    name: Mapped[str]
 
     # default_variant: Mapped[PluginVariant] = relationship(
     #     "PluginVariant", uselist=False
@@ -60,13 +61,13 @@ class PluginVariant(EntityBase):
     )
 
     id: Mapped[str] = mapped_column(primary_key=True)
-    plugin_id: Mapped[str] = mapped_column(nullable=False)
+    plugin_id: Mapped[str]
 
-    name: Mapped[str] = mapped_column(nullable=False)
-    pip_url: Mapped[str] = mapped_column()
-    repo: Mapped[str] = mapped_column()
-    namespace: Mapped[str] = mapped_column(nullable=False)
-    hidden: Mapped[bool] = mapped_column()
+    name: Mapped[str]
+    pip_url: Mapped[str | None]
+    repo: Mapped[str | None]
+    namespace: Mapped[str]
+    hidden: Mapped[bool | None]
 
     # plugin = relationship("Plugin", backref="variants")
 
@@ -85,15 +86,15 @@ class Setting(EntityBase):
     )
 
     id: Mapped[str] = mapped_column(primary_key=True)
-    variant_id: Mapped[str] = mapped_column(nullable=False)
+    variant_id: Mapped[str]
 
-    name: Mapped[str] = mapped_column(nullable=False)
-    label: Mapped[str] = mapped_column()
-    description: Mapped[str] = mapped_column()
-    kind: Mapped[str] = mapped_column()
-    value: Mapped[str] = mapped_column()
-    options: Mapped[str] = mapped_column()
-    sensitive: Mapped[bool] = mapped_column()
+    name: Mapped[str]
+    label: Mapped[str | None]
+    description: Mapped[str | None]
+    kind: Mapped[str | None]
+    value: Mapped[t.Any | None] = mapped_column(sa.JSON)
+    options: Mapped[list[str] | None] = mapped_column(sa.JSON)
+    sensitive: Mapped[bool | None]
 
 
 class Capability(EntityBase):
@@ -106,9 +107,9 @@ class Capability(EntityBase):
     )
 
     id: Mapped[str] = mapped_column(primary_key=True)
-    variant_id: Mapped[str] = mapped_column(nullable=False)
+    variant_id: Mapped[str]
 
-    name: Mapped[str] = mapped_column(nullable=False)
+    name: Mapped[str]
 
 
 class Keyword(EntityBase):
@@ -121,6 +122,6 @@ class Keyword(EntityBase):
     )
 
     id: Mapped[str] = mapped_column(primary_key=True)
-    variant_id: Mapped[str] = mapped_column(nullable=False)
+    variant_id: Mapped[str]
 
-    name: Mapped[str] = mapped_column(nullable=False)
+    name: Mapped[str]
