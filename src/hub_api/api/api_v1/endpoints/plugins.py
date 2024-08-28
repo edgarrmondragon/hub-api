@@ -43,26 +43,20 @@ async def get_plugin_variant(
     db: AsyncSession
     async with models.SessionLocal() as db:
         hub = MeltanoHub(db)
-        plugin = await hub.get_plugin_variant(variant_id)
-        settings = await hub.get_plugin_settings(variant_id)
-        capabilities = await hub.get_plugin_capabilities(variant_id)
-        keywords = await hub.get_plugin_keywords(variant_id)
-
-        return {
-            **plugin,
-            "settings": settings,
-            "capabilities": capabilities,
-            "keywords": keywords,
-        }
+        return await hub.get_plugin_details(variant_id)
 
 
 @router.get("/made-with-sdk", name="Get SDK plugins")
-async def sdk(plugin_type: models.PluginType | None = None) -> list[dict[str, str]]:
+async def sdk(
+    *,
+    limit: int = 100,
+    plugin_type: models.PluginType | None = None,
+) -> list[dict[str, str]]:
     """Retrieve plugins made with the Singer SDK."""
     db: AsyncSession
     async with models.SessionLocal() as db:
         hub = MeltanoHub(db)
-        return await hub.get_sdk_plugins(plugin_type=plugin_type)
+        return await hub.get_sdk_plugins(limit=limit, plugin_type=plugin_type)
 
 
 @router.get("/stats", name="Hub statistics")

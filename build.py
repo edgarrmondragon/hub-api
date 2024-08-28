@@ -29,7 +29,7 @@ def get_plugins_of_type(
     plugin_type: models.PluginType,
 ) -> t.Generator[tuple[str, dict], None, None]:
     """Get plugins of a given type."""
-    for plugin_path in base_path.joinpath(plugin_type.value).glob("*"):
+    for plugin_path in base_path.joinpath(plugin_type).glob("*"):
         yield from get_plugin_variants(plugin_path)
 
 
@@ -39,28 +39,29 @@ def load_db(path: Path, session: SessionBase) -> None:
     default_variants = get_default_variants(path.joinpath("default_variants.yml"))
 
     for plugin_type in models.PluginType:
-        for plugin_path in path.joinpath("meltano", plugin_type.value).glob("*"):
-            default_variant = default_variants[plugin_type.value].get(plugin_path.name)
-            plugin_id = f"{plugin_type.value}.{plugin_path.name}"
+        for plugin_path in path.joinpath("meltano", plugin_type).glob("*"):
+            default_variant = default_variants[plugin_type].get(plugin_path.name)
+            plugin_id = f"{plugin_type}.{plugin_path.name}"
             default_variant_id = f"{plugin_id}.{default_variant}"  # noqa: F841
 
             for variant, definition in get_plugin_variants(plugin_path):
                 variant_id = f"{plugin_id}.{variant}"
-                plugin_object = models.PluginVariant(
-                    id=variant_id,
+                variant_object = models.PluginVariant(
                     plugin_id=plugin_id,
+                    id=variant_id,
+                    description=definition.get("description"),
                     name=variant,
                     pip_url=definition.get("pip_url"),
                     repo=definition.get("repo"),
                     namespace=definition.get("namespace"),
                     hidden=definition.get("hidden"),
                 )
-                session.add(plugin_object)
+                session.add(variant_object)
 
                 for setting in definition.get("settings", []):
                     setting_object = models.Setting(
                         id=f"{variant_id}.{setting['name']}",
-                        variant_id=variant_id,
+                        variant_id=variant_object.id,
                         name=setting["name"],
                         label=setting.get("label"),
                         description=setting.get("description"),
@@ -74,7 +75,7 @@ def load_db(path: Path, session: SessionBase) -> None:
                 for capability in definition.get("capabilities", []):
                     capability_object = models.Capability(
                         id=f"{variant_id}.{capability}",
-                        variant_id=variant_id,
+                        variant_id=variant_object.id,
                         name=capability,
                     )
                     session.add(capability_object)
@@ -82,7 +83,7 @@ def load_db(path: Path, session: SessionBase) -> None:
                 for keyword in definition.get("keywords", []):
                     keyword_object = models.Keyword(
                         id=f"{variant_id}.{keyword}",
-                        variant_id=variant_id,
+                        variant_id=variant_object.id,
                         name=keyword,
                     )
                     session.add(keyword_object)
