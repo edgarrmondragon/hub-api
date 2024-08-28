@@ -18,8 +18,8 @@ router = APIRouter()
     response_model=PluginIndex,
     response_model_exclude_none=True,
 )
-async def test_sqlite(plugin_type: models.PluginType) -> dict:
-    """Test sqlite plugin index."""
+async def get_index(plugin_type: models.PluginType) -> dict:
+    """Retrieve index of plugins of a given type."""
     db: AsyncSession
     async with models.SessionLocal() as db:
         hub = MeltanoHub(db)
@@ -36,7 +36,7 @@ async def get_plugin_variant(
     plugin_name: str,
     plugin_variant: str,
 ) -> dict:
-    """Test sqlite plugin details."""
+    """Retrieve details of a plugin variant."""
     plugin_id = f"{plugin_type.value}.{plugin_name}"
     variant_id = f"{plugin_id}.{plugin_variant}"
 
@@ -58,8 +58,17 @@ async def get_plugin_variant(
 
 @router.get("/made-with-sdk", name="Get SDK plugins")
 async def sdk(plugin_type: models.PluginType | None = None) -> list[dict[str, str]]:
-    """Test sqlite plugin details."""
+    """Retrieve plugins made with the Singer SDK."""
     db: AsyncSession
     async with models.SessionLocal() as db:
         hub = MeltanoHub(db)
         return await hub.get_sdk_plugins(plugin_type=plugin_type)
+
+
+@router.get("/stats", name="Hub statistics")
+async def stats() -> dict[models.PluginType, int]:
+    """Retrieve Hub plugin statistics."""
+    db: AsyncSession
+    async with models.SessionLocal() as db:
+        hub = MeltanoHub(db)
+        return await hub.get_plugin_stats()

@@ -53,6 +53,7 @@ def load_db(path: Path, session: SessionBase) -> None:
                     pip_url=definition.get("pip_url"),
                     repo=definition.get("repo"),
                     namespace=definition.get("namespace"),
+                    hidden=definition.get("hidden"),
                 )
                 session.add(plugin_object)
 

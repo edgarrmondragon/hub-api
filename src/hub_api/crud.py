@@ -207,3 +207,17 @@ class MeltanoHub:
 
         result = await self.db.execute(q)
         return result.mappings().all()
+
+    async def get_plugin_stats(self: MeltanoHub) -> dict[models.PluginType, int]:
+        """Get plugin statistics.
+
+        Returns:
+            Plugin statistics.
+        """
+        q = sa.select(
+            models.Plugin.plugin_type,
+            sa.func.count(models.Plugin.id),
+        ).group_by(models.Plugin.plugin_type)
+
+        result = await self.db.execute(q)
+        return dict(result.all())
