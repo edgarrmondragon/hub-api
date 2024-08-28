@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import enum
+import typing as t
 
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
-from sqlalchemy.orm import DeclarativeBase, relationship
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///./plugins.db"
 
@@ -35,13 +36,17 @@ class PluginType(enum.StrEnum):
 class Plugin(EntityBase):
     __tablename__ = "plugins"
 
-    id = sa.Column(sa.String, primary_key=True)
-    default_variant_id = sa.Column(sa.String, nullable=False)
+    id: Mapped[str] = mapped_column(primary_key=True)
 
-    plugin_type = sa.Column(sa.Enum(PluginType), nullable=False)
-    name = sa.Column(sa.String, nullable=False)
+    # TODO: Make this a foreign key
+    default_variant_id: Mapped[str]
 
-    default_variant = relationship("PluginVariant", uselist=False)
+    plugin_type: Mapped[PluginType]
+    name: Mapped[str]
+
+    # default_variant: Mapped[PluginVariant] = relationship(
+    #     "PluginVariant", uselist=False
+    # )
     # variants = relationship("PluginVariant", backref="plugin")
 
 
@@ -55,13 +60,14 @@ class PluginVariant(EntityBase):
         ),
     )
 
-    id = sa.Column(sa.String, primary_key=True)
-    plugin_id = sa.Column(sa.String, nullable=False)
+    id: Mapped[str] = mapped_column(primary_key=True)
+    plugin_id: Mapped[str]
 
-    name = sa.Column(sa.String, nullable=False)
-    pip_url = sa.Column(sa.String)
-    repo = sa.Column(sa.String)
-    namespace = sa.Column(sa.String, nullable=False)
+    name: Mapped[str]
+    pip_url: Mapped[str | None]
+    repo: Mapped[str | None]
+    namespace: Mapped[str]
+    hidden: Mapped[bool | None]
 
     # plugin = relationship("Plugin", backref="variants")
 
@@ -79,16 +85,16 @@ class Setting(EntityBase):
         ),
     )
 
-    id = sa.Column(sa.String, primary_key=True)
-    variant_id = sa.Column(sa.String, nullable=False)
+    id: Mapped[str] = mapped_column(primary_key=True)
+    variant_id: Mapped[str]
 
-    name = sa.Column(sa.String, nullable=False)
-    label = sa.Column(sa.String)
-    description = sa.Column(sa.String)
-    kind = sa.Column(sa.String)
-    value = sa.Column(sa.JSON, nullable=False)
-    options = sa.Column(sa.JSON, nullable=True)
-    sensitive = sa.Column(sa.Boolean, nullable=True)
+    name: Mapped[str]
+    label: Mapped[str | None]
+    description: Mapped[str | None]
+    kind: Mapped[str | None]
+    value: Mapped[t.Any | None] = mapped_column(sa.JSON)
+    options: Mapped[list[str] | None] = mapped_column(sa.JSON)
+    sensitive: Mapped[bool | None]
 
 
 class Capability(EntityBase):
@@ -100,10 +106,10 @@ class Capability(EntityBase):
         ),
     )
 
-    id = sa.Column(sa.String, primary_key=True)
-    variant_id = sa.Column(sa.String, nullable=False)
+    id: Mapped[str] = mapped_column(primary_key=True)
+    variant_id: Mapped[str]
 
-    name = sa.Column(sa.String, nullable=False)
+    name: Mapped[str]
 
 
 class Keyword(EntityBase):
@@ -115,7 +121,7 @@ class Keyword(EntityBase):
         ),
     )
 
-    id = sa.Column(sa.String, primary_key=True)
-    variant_id = sa.Column(sa.String, nullable=False)
+    id: Mapped[str] = mapped_column(primary_key=True)
+    variant_id: Mapped[str]
 
-    name = sa.Column(sa.String, nullable=False)
+    name: Mapped[str]

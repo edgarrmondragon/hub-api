@@ -42,7 +42,6 @@ select = [
     "YTT",   # flake8-2020
     "ANN",   # flake8-annotations
     "ASYNC", # flake8-async
-    "ASYNC", # flake8-trio
     "S",     # flake8-bandit
     "BLE",   # flake8-blind-except
     "B",     # flake8-bugbear
@@ -73,6 +72,9 @@ banned-from = ["sqlalchemy"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101"]
+
+[tool.pytest.ini_options]
+asyncio_default_fixture_loop_scope = "session"
 
 [build-system]
 requires = ["hatch-vcs"]
