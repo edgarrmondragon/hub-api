@@ -4,7 +4,7 @@ import enum
 
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
-from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.orm import DeclarativeBase, relationship
 
 SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///./plugins.db"
 
@@ -14,20 +14,22 @@ engine = create_async_engine(
 )
 SessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-EntityBase = declarative_base()
+
+class EntityBase(DeclarativeBase):
+    """Base entity class."""
 
 
-class PluginType(str, enum.Enum):
+class PluginType(enum.StrEnum):
     """Plugin types."""
 
-    EXTRACTORS = "extractors"
-    LOADERS = "loaders"
-    TRANSFORMERS = "transformers"
-    UTILITIES = "utilities"
-    TRANSFORMS = "transforms"
-    ORCHESTRATORS = "orchestrators"
-    MAPPERS = "mappers"
-    FILES = "files"
+    extractors = enum.auto()
+    loaders = enum.auto()
+    transformers = enum.auto()
+    utilities = enum.auto()
+    transforms = enum.auto()
+    orchestrators = enum.auto()
+    mappers = enum.auto()
+    files = enum.auto()
 
 
 class Plugin(EntityBase):
@@ -86,6 +88,7 @@ class Setting(EntityBase):
     kind = sa.Column(sa.String)
     value = sa.Column(sa.JSON, nullable=False)
     options = sa.Column(sa.JSON, nullable=True)
+    sensitive = sa.Column(sa.Boolean, nullable=True)
 
 
 class Capability(EntityBase):

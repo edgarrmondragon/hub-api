@@ -39,13 +39,13 @@ def build_variant_url(
 
 
 class MeltanoHub:
-    def __init__(self: MeltanoHub, session: AsyncSession) -> None:
-        self.db_session = session
+    def __init__(self: MeltanoHub, db: AsyncSession) -> None:
+        self.db = db
 
     async def get_plugin_type_index(
         self: MeltanoHub,
         plugin_type: models.PluginType,
-    ) -> dict[str, dict[str, str]]:
+    ) -> dict[str, dict[str, t.Any]]:
         """Get all plugins of a given type.
 
         Args:
@@ -72,7 +72,7 @@ class MeltanoHub:
             .where(models.Plugin.plugin_type == plugin_type)
         )
 
-        result = await self.db_session.execute(q)
+        result = await self.db.execute(q)
         return {
             row.name: {
                 "default_variant": row.default_variant,
@@ -111,7 +111,7 @@ class MeltanoHub:
             .where(models.PluginVariant.id == variant_id)
         )
 
-        result = await self.db_session.execute(q)
+        result = await self.db.execute(q)
         variant = result.one_or_none()
 
         if not variant:
@@ -133,13 +133,15 @@ class MeltanoHub:
         """
         q = sa.select(
             models.Setting.name,
+            models.Setting.label,
             models.Setting.value,
             models.Setting.description,
             models.Setting.kind,
             models.Setting.options,
+            models.Setting.sensitive,
         ).where(models.Setting.variant_id == variant_id)
 
-        result = await self.db_session.execute(q)
+        result = await self.db.execute(q)
         return [row._asdict() for row in result.all()]
 
     async def get_plugin_capabilities(self: MeltanoHub, variant_id: str) -> list[str]:
@@ -154,7 +156,7 @@ class MeltanoHub:
         q = sa.select(models.Capability.name).where(
             models.Capability.variant_id == variant_id
         )
-        result = await self.db_session.execute(q)
+        result = await self.db.execute(q)
         return result.scalars().all()
 
     async def get_plugin_keywords(self: MeltanoHub, variant_id: str) -> list[str]:
@@ -169,21 +171,27 @@ class MeltanoHub:
         q = sa.select(models.Keyword.name).where(
             models.Keyword.variant_id == variant_id
         )
-        result = await self.db_session.execute(q)
+        result = await self.db.execute(q)
         return result.scalars().all()
 
-    async def get_sdk_plugins(self: MeltanoHub) -> list[dict[str, t.Any]]:
+    async def get_sdk_plugins(
+        self: MeltanoHub,
+        *,
+        plugin_type: models.PluginType | None = None,
+        limit: int = 100,
+    ) -> list[dict[str, t.Any]]:
         """Get all plugins with the sdk keyword.
 
         Returns:
             List of plugins.
         """
+        q = sa.select(models.Plugin.id, models.Plugin.name)
+
+        if plugin_type:
+            q = q.where(models.Plugin.plugin_type == plugin_type)
+
         q = (
-            sa.select(
-                models.Plugin.id,
-                models.Plugin.name,
-            )
-            .join(
+            q.join(
                 models.PluginVariant,
                 models.PluginVariant.plugin_id == models.Plugin.id,
             )
@@ -194,8 +202,8 @@ class MeltanoHub:
                     models.Keyword.name == "meltano_sdk",
                 ),
             )
-            .limit(100)
+            .limit(limit)
         )
 
-        result = await self.db_session.execute(q)
+        result = await self.db.execute(q)
         return result.mappings().all()
