@@ -4,8 +4,13 @@ import enum
 import typing as t
 
 import sqlalchemy as sa
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
+from sqlalchemy.orm import (
+    DeclarativeBase,
+    Mapped,
+    mapped_column,
+    relationship,
+)
 
 SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///./plugins.db"
 
@@ -16,7 +21,7 @@ engine = create_async_engine(
 SessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-class EntityBase(DeclarativeBase):
+class EntityBase(AsyncAttrs, DeclarativeBase):
     """Base entity class."""
 
 
@@ -38,55 +43,42 @@ class Plugin(EntityBase):
 
     id: Mapped[str] = mapped_column(primary_key=True)
 
-    # TODO: Make this a foreign key
+    # TODO: Make this a foreign key?
     default_variant_id: Mapped[str]
 
     plugin_type: Mapped[PluginType]
     name: Mapped[str]
 
-    # default_variant: Mapped[PluginVariant] = relationship(
-    #     "PluginVariant", uselist=False
-    # )
-    # variants = relationship("PluginVariant", backref="plugin")
+    variants: Mapped[list[PluginVariant]] = relationship(back_populates="plugin")
 
 
 class PluginVariant(EntityBase):
     __tablename__ = "plugin_variants"
-    __table_args__ = (
-        sa.ForeignKeyConstraint(
-            ["plugin_id"],
-            ["plugins.id"],
-            ondelete="CASCADE",
-        ),
-    )
 
     id: Mapped[str] = mapped_column(primary_key=True)
-    plugin_id: Mapped[str]
+    plugin_id: Mapped[str] = mapped_column(sa.ForeignKey("plugins.id"), index=True)
 
     name: Mapped[str]
+    description: Mapped[str | None]
     pip_url: Mapped[str | None]
     repo: Mapped[str | None]
     namespace: Mapped[str]
     hidden: Mapped[bool | None]
 
-    # plugin = relationship("Plugin", backref="variants")
-
-    settings = relationship("Setting", backref="plugin")
-    capabilities = relationship("Capability", backref="plugin")
-    keywords = relationship("Keyword", backref="plugin")
+    plugin: Mapped[Plugin] = relationship(back_populates="variants")
+    settings: Mapped[list[Setting]] = relationship(back_populates="variant")
+    capabilities: Mapped[list[Capability]] = relationship(back_populates="variant")
+    keywords: Mapped[list[Keyword]] = relationship(back_populates="variant")
 
 
 class Setting(EntityBase):
     __tablename__ = "settings"
-    __table_args__ = (
-        sa.ForeignKeyConstraint(
-            ["variant_id"],
-            ["plugin_variants.id"],
-        ),
-    )
 
     id: Mapped[str] = mapped_column(primary_key=True)
-    variant_id: Mapped[str]
+    variant_id: Mapped[str] = mapped_column(
+        sa.ForeignKey("plugin_variants.id"),
+        index=True,
+    )
 
     name: Mapped[str]
     label: Mapped[str | None]
@@ -96,32 +88,32 @@ class Setting(EntityBase):
     options: Mapped[list[str] | None] = mapped_column(sa.JSON)
     sensitive: Mapped[bool | None]
 
+    variant: Mapped[PluginVariant] = relationship(back_populates="settings")
+
 
 class Capability(EntityBase):
     __tablename__ = "capabilities"
-    __table_args__ = (
-        sa.ForeignKeyConstraint(
-            ["variant_id"],
-            ["plugin_variants.id"],
-        ),
+
+    variant_id: Mapped[str] = mapped_column(
+        sa.ForeignKey("plugin_variants.id"),
+        index=True,
     )
 
     id: Mapped[str] = mapped_column(primary_key=True)
-    variant_id: Mapped[str]
-
     name: Mapped[str]
+
+    variant: Mapped[PluginVariant] = relationship(back_populates="capabilities")
 
 
 class Keyword(EntityBase):
     __tablename__ = "keywords"
-    __table_args__ = (
-        sa.ForeignKeyConstraint(
-            ["variant_id"],
-            ["plugin_variants.id"],
-        ),
-    )
 
     id: Mapped[str] = mapped_column(primary_key=True)
-    variant_id: Mapped[str]
+    variant_id: Mapped[str] = mapped_column(
+        sa.ForeignKey("plugin_variants.id"),
+        index=True,
+    )
 
     name: Mapped[str]
+
+    variant: Mapped[PluginVariant] = relationship(back_populates="keywords")

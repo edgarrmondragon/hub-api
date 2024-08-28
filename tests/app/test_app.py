@@ -15,21 +15,16 @@ def api() -> AsyncClient:
 
 
 @pytest.mark.asyncio
-async def test_plugin_index(api: AsyncClient, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Test app."""
-    monkeypatch.setenv("PLUGINS_FILES_PATH", "tests/fixtures/plugins")
+async def test_plugin_index(api: AsyncClient) -> None:
+    """Test /meltano/api/v1/plugins/extractors/index."""
     response = await api.get("/meltano/api/v1/plugins/extractors/index")
     assert response.status_code == 200
     assert response.json()
 
 
 @pytest.mark.asyncio
-async def test_plugin_details(
-    api: AsyncClient,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Test app."""
-    monkeypatch.setenv("PLUGINS_FILES_PATH", "tests/fixtures/plugins")
+async def test_plugin_details(api: AsyncClient) -> None:
+    """Test /meltano/api/v1/plugins/extractors/<plugin>--<variant>."""
     response = await api.get("/meltano/api/v1/plugins/extractors/tap-github--singer-io")
     assert response.status_code == 200
 
@@ -38,9 +33,8 @@ async def test_plugin_details(
 
 
 @pytest.mark.asyncio
-async def test_hub_stats(api: AsyncClient, monkeypatch: pytest.MonkeyPatch) -> None:
-    """Test app."""
-    monkeypatch.setenv("PLUGINS_FILES_PATH", "tests/fixtures/plugins")
+async def test_hub_stats(api: AsyncClient) -> None:
+    """Test /meltano/api/v1/plugins/stats."""
     response = await api.get("/meltano/api/v1/plugins/stats")
     assert response.status_code == 200
 
