@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import collections
 import typing as t
 import urllib.parse
 
@@ -13,7 +14,11 @@ BASE_API_URL = "http://localhost:8000"
 BASE_HUB_URL = "https://hub.meltano.com"
 
 
-class PluginVariantNotFoundError(Exception):
+class NotFoundError(Exception):
+    """Not found error."""
+
+
+class PluginVariantNotFoundError(NotFoundError):
     """Plugin variant not found error."""
 
     pass
@@ -76,10 +81,20 @@ class MeltanoHub:
 
     async def get_plugin_details(self, variant_id: str) -> dict[str, t.Any]:
         v = await self.db.get(models.PluginVariant, variant_id)
+
+        if not v:
+            raise PluginVariantNotFoundError(f"Plugin variant {variant_id} not found")
+
         plugin: models.Plugin = await self.db.get(models.Plugin, v.plugin_id)
         settings: list[models.Setting] = await v.awaitable_attrs.settings
         capabilities: list[models.Capability] = await v.awaitable_attrs.capabilities
         commands: list[models.Command] = await v.awaitable_attrs.commands
+
+        settings_groups = collections.defaultdict(list)
+        required_settings: list[models.RequiredSetting] = await v.awaitable_attrs.required_settings
+
+        for required in required_settings:
+            settings_groups[required.group_id].append(required.setting.name)
 
         result = {
             "capabilities": [c.name for c in capabilities],
@@ -98,24 +113,20 @@ class MeltanoHub:
             "pip_url": v.pip_url,
             "repo": v.repo,
             "ext_repo": v.ext_repo,
-            "settings": [
-                schemas.PluginSetting.model_validate(s, from_attributes=True)
-                for s in settings
-            ],
-            "settings_group_validation": [],  # TODO: Implement
+            "settings": [schemas.PluginSetting.model_validate(s, from_attributes=True) for s in settings],
+            "settings_group_validation": list(settings_groups.values()),
             "variant": v.name,
         }
 
         if commands:
-            result["commands"] = [
-                schemas.Command.model_validate(c, from_attributes=True)
-                for c in commands
-            ]
+            result["commands"] = [schemas.Command.model_validate(c, from_attributes=True) for c in commands]
 
         match plugin.plugin_type:
             case models.PluginType.extractors:
                 if select := await v.awaitable_attrs.select:
                     result["select"] = select
+                if metadata := await v.awaitable_attrs.extractor_metadata:
+                    result["metadata"] = {m.key: m.value for m in metadata}
             case _:
                 pass
 

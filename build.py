@@ -33,7 +33,7 @@ def get_plugins_of_type(
         yield from get_plugin_variants(plugin_path)
 
 
-def load_db(path: Path, session: SessionBase) -> None:
+def load_db(path: Path, session: SessionBase) -> None:  # noqa: C901
     """Load database."""
 
     default_variants = get_default_variants(path.joinpath("default_variants.yml"))
@@ -86,6 +86,18 @@ def load_db(path: Path, session: SessionBase) -> None:
                     )
                     session.add(setting_object)
 
+                for group_idx, setting_group in enumerate(
+                    definition.get("settings_group_validation", []),
+                ):
+                    for setting_name in setting_group:
+                        setting_id = f"{variant_id}.setting_{setting_name}"
+                        setting_group_object = models.RequiredSetting(
+                            variant_id=variant_object.id,
+                            setting_id=setting_id,
+                            group_id=group_idx,
+                        )
+                        session.add(setting_group_object)
+
                 for capability in definition.get("capabilities", []):
                     capability_object = models.Capability(
                         id=f"{variant_id}.capability_{capability}",
@@ -109,6 +121,15 @@ def load_db(path: Path, session: SessionBase) -> None:
                         expression=select,
                     )
                     session.add(select_object)
+
+                for i, (key, metadata) in enumerate(definition.get("metadata", {}).items()):
+                    metadata_object = models.Metadata(
+                        id=f"{variant_id}.metadata_{i}",
+                        variant_id=variant_object.id,
+                        key=key,
+                        value=metadata,
+                    )
+                    session.add(metadata_object)
 
                 for command_name, command in definition.get("commands", {}).items():
                     command_id = f"{variant_id}.command_{command_name}"

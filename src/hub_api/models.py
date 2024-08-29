@@ -102,8 +102,14 @@ class PluginVariant(EntityBase):
     settings: Mapped[list[Setting]] = relationship(back_populates="variant")
     capabilities: Mapped[list[Capability]] = relationship(back_populates="variant")
     keywords: Mapped[list[Keyword]] = relationship(back_populates="variant")
-    select: Mapped[list[Select]] = relationship(back_populates="variant")
     commands: Mapped[list[Command]] = relationship(back_populates="variant")
+    required_settings: Mapped[list[RequiredSetting]] = relationship(
+        back_populates="variant",
+    )
+
+    # Extractor-specific
+    select: Mapped[list[Select]] = relationship(back_populates="variant")
+    extractor_metadata: Mapped[list[Metadata]] = relationship(back_populates="variant")
 
 
 class Setting(EntityBase):
@@ -125,9 +131,7 @@ class Setting(EntityBase):
     sensitive: Mapped[bool | None]
 
     variant: Mapped[PluginVariant] = relationship(back_populates="settings")
-    aliases: Mapped[list[SettingAlias]] = relationship(
-        back_populates="setting", lazy="joined"
-    )
+    aliases: Mapped[list[SettingAlias]] = relationship(back_populates="setting", lazy="joined")
 
 
 class SettingAlias(EntityBase):
@@ -141,6 +145,31 @@ class SettingAlias(EntityBase):
 
     name: Mapped[str]
     setting: Mapped[Setting] = relationship(back_populates="aliases")
+
+
+class RequiredSetting(EntityBase):
+    __tablename__ = "setting_groups"
+    __table_args__ = (
+        sa.PrimaryKeyConstraint(
+            "variant_id",
+            "setting_id",
+            "group_id",
+        ),
+    )
+
+    variant_id: Mapped[str] = mapped_column(
+        sa.ForeignKey("plugin_variants.id"),
+        index=True,
+    )
+    setting_id: Mapped[str] = mapped_column(
+        sa.ForeignKey("settings.id"),
+        index=True,
+    )
+
+    group_id: Mapped[int]
+
+    variant: Mapped[PluginVariant] = relationship(back_populates="required_settings")
+    setting: Mapped[Setting] = relationship(lazy="joined")
 
 
 class Capability(EntityBase):
@@ -213,3 +242,18 @@ class Select(EntityBase):
     expression: Mapped[str]
 
     variant: Mapped[PluginVariant] = relationship(back_populates="select")
+
+
+class Metadata(EntityBase):
+    __tablename__ = "metadata"
+
+    id: Mapped[str] = mapped_column(primary_key=True)
+    variant_id: Mapped[str] = mapped_column(
+        sa.ForeignKey("plugin_variants.id"),
+        index=True,
+    )
+
+    key: Mapped[str]
+    value: Mapped[dict] = mapped_column(sa.JSON)
+
+    variant: Mapped[PluginVariant] = relationship(back_populates="extractor_metadata")
