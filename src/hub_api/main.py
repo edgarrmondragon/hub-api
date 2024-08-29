@@ -2,24 +2,22 @@
 
 from __future__ import annotations
 
-from fastapi import FastAPI, Request
-from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import JSONResponse
-from fastapi.staticfiles import StaticFiles
+import fastapi
+from fastapi import responses, staticfiles
+from fastapi.middleware import gzip
 
-from hub_api.api.api_v1.api import router as api_router
-from hub_api.crud import NotFoundError
+from . import api, crud
 
-app = FastAPI()
-app.add_middleware(GZipMiddleware, minimum_size=1000)
+app = fastapi.FastAPI()
+app.add_middleware(gzip.GZipMiddleware, minimum_size=1000)
 
 
-@app.exception_handler(NotFoundError)
+@app.exception_handler(crud.NotFoundError)
 def missing_variant_exception_handler(
-    request: Request,
-    exc: NotFoundError,
-) -> JSONResponse:
-    return JSONResponse(
+    request: fastapi.Request,  # noqa: ARG001
+    exc: crud.NotFoundError,
+) -> responses.JSONResponse:
+    return responses.JSONResponse(
         status_code=404,
         content={
             "detail": exc.args[0],
@@ -27,5 +25,5 @@ def missing_variant_exception_handler(
     )
 
 
-app.include_router(api_router, prefix="/meltano/api/v1")
-app.mount("/assets", StaticFiles(directory="static/assets"), name="assets")
+app.include_router(api.v1.api.router, prefix="/meltano/api/v1")
+app.mount("/assets", staticfiles.StaticFiles(directory="static/assets"), name="assets")

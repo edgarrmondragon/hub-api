@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter
+import fastapi
 
-from .endpoints import plugins
+from . import endpoints
 
-router = APIRouter()
-router.include_router(plugins.router, prefix="/plugins")
+router = fastapi.APIRouter()
+router.include_router(endpoints.plugins.router, prefix="/plugins")
+
+__all__ = ["router"]

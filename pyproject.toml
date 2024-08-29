@@ -54,7 +54,11 @@ select = [
     "RET",   # flake8-return
     "SLF",   # flake8-self
     "SIM",   # flake8-simplify
+    "TCH",   # flake8-type-checking
+    "ARG",   # flake8-unused-arguments
     "PTH",   # flake8-use-pathlib
+    "PGH",   # pygrep-hooks
+    "FAST",  # FastAPI
     "PERF",  # Perflint
     "FURB",  # refurb
     "LOG",   # flake8-logging
@@ -75,6 +79,11 @@ banned-from = ["sqlalchemy"]
 
 [tool.pytest.ini_options]
 asyncio_default_fixture_loop_scope = "session"
+
+[tool.mypy]
+warn_unused_configs = true
+warn_unused_ignores = true
+warn_redundant_casts = true
 
 [build-system]
 requires = ["hatch-vcs"]

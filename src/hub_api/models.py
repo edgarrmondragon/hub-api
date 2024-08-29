@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import enum
 import typing as t
 
 import sqlalchemy as sa
@@ -11,6 +10,8 @@ from sqlalchemy.orm import (
     mapped_column,
     relationship,
 )
+
+from . import enums  # noqa: TCH001
 
 SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///./plugins.db"
 
@@ -25,38 +26,6 @@ class EntityBase(AsyncAttrs, DeclarativeBase):
     """Base entity class."""
 
 
-class PluginType(enum.StrEnum):
-    """Plugin types."""
-
-    extractors = enum.auto()
-    loaders = enum.auto()
-    transformers = enum.auto()
-    utilities = enum.auto()
-    transforms = enum.auto()
-    orchestrators = enum.auto()
-    mappers = enum.auto()
-    files = enum.auto()
-
-
-class MaintenanceStatus(enum.StrEnum):
-    """Maintenance statuses."""
-
-    active = enum.auto()
-    beta = enum.auto()
-    development = enum.auto()
-    inactive = enum.auto()
-    unknown = enum.auto()
-
-
-class Quality(enum.StrEnum):
-    """Quality levels."""
-
-    gold = enum.auto()
-    silver = enum.auto()
-    bronze = enum.auto()
-    unknown = enum.auto()
-
-
 class Plugin(EntityBase):
     __tablename__ = "plugins"
 
@@ -65,7 +34,7 @@ class Plugin(EntityBase):
     # TODO: Make this a foreign key?
     default_variant_id: Mapped[str]
 
-    plugin_type: Mapped[PluginType]
+    plugin_type: Mapped[enums.PluginTypeEnum]
     name: Mapped[str]
 
     variants: Mapped[list[PluginVariant]] = relationship(back_populates="plugin")
@@ -89,8 +58,8 @@ class PluginVariant(EntityBase):
     label: Mapped[str | None]
     hidden: Mapped[bool | None]
 
-    maintenance_status: Mapped[MaintenanceStatus | None]
-    quality: Mapped[Quality | None]
+    maintenance_status: Mapped[enums.MaintenanceStatusEnum | None]
+    quality: Mapped[enums.QualityEnum | None]
     domain_url: Mapped[str | None]
     definition: Mapped[str | None]
     next_steps: Mapped[str | None]
@@ -98,7 +67,7 @@ class PluginVariant(EntityBase):
     usage: Mapped[str | None]
     prereq: Mapped[str | None]
 
-    plugin: Mapped[Plugin] = relationship(back_populates="variants")
+    plugin: Mapped[Plugin] = relationship(back_populates="variants", lazy="joined")
     settings: Mapped[list[Setting]] = relationship(back_populates="variant")
     capabilities: Mapped[list[Capability]] = relationship(back_populates="variant")
     keywords: Mapped[list[Keyword]] = relationship(back_populates="variant")

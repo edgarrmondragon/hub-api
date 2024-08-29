@@ -8,7 +8,7 @@ import yaml
 from sqlalchemy.orm import Session as SessionBase
 from sqlalchemy.orm import sessionmaker
 
-from hub_api import models
+from hub_api import enums, models
 
 
 def get_default_variants(path: Path) -> dict[str, dict[str, str]]:
@@ -26,7 +26,7 @@ def get_plugin_variants(plugin_path: Path) -> t.Generator[tuple[str, dict], None
 
 def get_plugins_of_type(
     base_path: Path,
-    plugin_type: models.PluginType,
+    plugin_type: models.PluginTypeEnum,
 ) -> t.Generator[tuple[str, dict], None, None]:
     """Get plugins of a given type."""
     for plugin_path in base_path.joinpath(plugin_type).glob("*"):
@@ -38,7 +38,7 @@ def load_db(path: Path, session: SessionBase) -> None:  # noqa: C901
 
     default_variants = get_default_variants(path.joinpath("default_variants.yml"))
 
-    for plugin_type in models.PluginType:
+    for plugin_type in enums.PluginTypeEnum:
         for plugin_path in path.joinpath("meltano", plugin_type).glob("*"):
             default_variant = default_variants[plugin_type].get(plugin_path.name)
             plugin_id = f"{plugin_type}.{plugin_path.name}"

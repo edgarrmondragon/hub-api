@@ -2,21 +2,20 @@
 
 from __future__ import annotations
 
+import httpx
 import pytest
-from httpx import ASGITransport, AsyncClient
 
-from hub_api.main import app
-from hub_api.models import PluginType
+from hub_api import enums, main
 
 
 @pytest.fixture(scope="session")
-def api() -> AsyncClient:
+def api() -> httpx.AsyncClient:
     """Create app."""
-    return AsyncClient(base_url="http://test", transport=ASGITransport(app=app))
+    return httpx.AsyncClient(base_url="http://test", transport=httpx.ASGITransport(app=main.app))
 
 
 @pytest.mark.asyncio
-async def test_plugin_index(api: AsyncClient) -> None:
+async def test_plugin_index(api: httpx.AsyncClient) -> None:
     """Test /meltano/api/v1/plugins/extractors/index."""
     response = await api.get("/meltano/api/v1/plugins/extractors/index")
     assert response.status_code == 200
@@ -27,16 +26,16 @@ async def test_plugin_index(api: AsyncClient) -> None:
 @pytest.mark.parametrize(
     ("plugin", "plugin_type", "variant"),
     [
-        ("tap-github", PluginType.extractors, "singer-io"),
-        ("tap-mssql", PluginType.extractors, "wintersrd"),
-        ("target-postgres", PluginType.loaders, "meltanolabs"),
-        ("dbt-postgres", PluginType.utilities, "dbt-labs"),
+        ("tap-github", enums.PluginTypeEnum.extractors, "singer-io"),
+        ("tap-mssql", enums.PluginTypeEnum.extractors, "wintersrd"),
+        ("target-postgres", enums.PluginTypeEnum.loaders, "meltanolabs"),
+        ("dbt-postgres", enums.PluginTypeEnum.utilities, "dbt-labs"),
     ],
 )
 async def test_plugin_details(
-    api: AsyncClient,
+    api: httpx.AsyncClient,
     plugin: str,
-    plugin_type: PluginType,
+    plugin_type: enums.PluginTypeEnum,
     variant: str,
 ) -> None:
     """Test /meltano/api/v1/plugins/extractors/<plugin>--<variant>."""
@@ -49,7 +48,7 @@ async def test_plugin_details(
 
 
 @pytest.mark.asyncio
-async def test_hub_stats(api: AsyncClient) -> None:
+async def test_hub_stats(api: httpx.AsyncClient) -> None:
     """Test /meltano/api/v1/plugins/stats."""
     response = await api.get("/meltano/api/v1/plugins/stats")
     assert response.status_code == 200

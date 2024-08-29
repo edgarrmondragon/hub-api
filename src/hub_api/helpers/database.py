@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import os
-from collections.abc import AsyncGenerator
+import typing as t
 
 import aiosqlite
+
+if t.TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
 
 
 def dict_factory(cursor: aiosqlite.Cursor, row: tuple) -> dict:
@@ -33,7 +36,7 @@ async def get_db() -> AsyncGenerator[aiosqlite.Connection, None]:
     """
     database_uri = os.getenv("DATABASE_URI", ":memory:")
     db = await aiosqlite.connect(database_uri)
-    db.row_factory = dict_factory  # type: ignore
+    db.row_factory = dict_factory  # type: ignore[assignment]
 
     await db.commit()
     try:
