@@ -38,6 +38,25 @@ class PluginType(enum.StrEnum):
     files = enum.auto()
 
 
+class MaintenanceStatus(enum.StrEnum):
+    """Maintenance statuses."""
+
+    active = enum.auto()
+    beta = enum.auto()
+    development = enum.auto()
+    inactive = enum.auto()
+    unknown = enum.auto()
+
+
+class Quality(enum.StrEnum):
+    """Quality levels."""
+
+    gold = enum.auto()
+    silver = enum.auto()
+    bronze = enum.auto()
+    unknown = enum.auto()
+
+
 class Plugin(EntityBase):
     __tablename__ = "plugins"
 
@@ -60,15 +79,28 @@ class PluginVariant(EntityBase):
 
     name: Mapped[str]
     description: Mapped[str | None]
+    docs: Mapped[str | None]
+    logo_url: Mapped[str | None]
     pip_url: Mapped[str | None]
     repo: Mapped[str | None]
     namespace: Mapped[str]
+    label: Mapped[str | None]
     hidden: Mapped[bool | None]
+
+    maintenance_status: Mapped[MaintenanceStatus | None]
+    quality: Mapped[Quality | None]
+    domain_url: Mapped[str | None]
+    definition: Mapped[str | None]
+    next_steps: Mapped[str | None]
+    settings_preamble: Mapped[str | None]
+    usage: Mapped[str | None]
+    prereq: Mapped[str | None]
 
     plugin: Mapped[Plugin] = relationship(back_populates="variants")
     settings: Mapped[list[Setting]] = relationship(back_populates="variant")
     capabilities: Mapped[list[Capability]] = relationship(back_populates="variant")
     keywords: Mapped[list[Keyword]] = relationship(back_populates="variant")
+    select: Mapped[list[Select]] = relationship(back_populates="variant")
 
 
 class Setting(EntityBase):
@@ -117,3 +149,44 @@ class Keyword(EntityBase):
     name: Mapped[str]
 
     variant: Mapped[PluginVariant] = relationship(back_populates="keywords")
+
+
+class Command(EntityBase):
+    __tablename__ = "commands"
+
+    id: Mapped[str] = mapped_column(primary_key=True)
+    variant_id: Mapped[str] = mapped_column(
+        sa.ForeignKey("plugin_variants.id"),
+        index=True,
+    )
+
+    args: Mapped[str]
+    description: Mapped[str | None]
+    executable: Mapped[str | None]
+
+
+class PluginRequires(EntityBase):
+    __tablename__ = "plugin_requires"
+
+    id: Mapped[str] = mapped_column(primary_key=True)
+    variant_id: Mapped[str] = mapped_column(
+        sa.ForeignKey("plugin_variants.id"),
+        index=True,
+    )
+
+    name: Mapped[str]
+    variant: Mapped[str]
+
+
+class Select(EntityBase):
+    __tablename__ = "selects"
+
+    id: Mapped[str] = mapped_column(primary_key=True)
+    variant_id: Mapped[str] = mapped_column(
+        sa.ForeignKey("plugin_variants.id"),
+        index=True,
+    )
+
+    expression: Mapped[str]
+
+    variant: Mapped[PluginVariant] = relationship(back_populates="select")

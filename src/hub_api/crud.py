@@ -1,14 +1,17 @@
 from __future__ import annotations
 
 import typing as t
+import urllib.parse
 
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 
 from hub_api import models
+from hub_api.api.api_v1.schemas import PluginSetting
 
-BASE_URL = "http://localhost:8000"
+BASE_API_URL = "http://localhost:8000"
+BASE_HUB_URL = "https://hub.meltano.com"
 
 
 class PluginVariantNotFoundError(Exception):
@@ -18,6 +21,7 @@ class PluginVariantNotFoundError(Exception):
 
 
 def build_variant_url(
+    *,
     base_url: str,
     plugin_type: models.PluginType,
     plugin_name: str,
@@ -38,38 +42,73 @@ def build_variant_url(
     return f"{base_url}{prefix}/{plugin_type.value}/{plugin_name}--{plugin_variant}"
 
 
+def build_hub_url(
+    *,
+    base_url: str,
+    plugin_type: models.PluginType,
+    plugin_name: str,
+    plugin_variant: str,
+) -> str:
+    """Build hub URL.
+
+    Args:
+        base_url: Base API URL.
+        plugin_type: Plugin type.
+        plugin_name: Plugin name.
+        plugin_variant: Plugin variant
+
+    Returns:
+        Hub URL for the plugin.
+    """
+    return f"{base_url}/{plugin_type.value}/{plugin_name}--{plugin_variant}"
+
+
 class MeltanoHub:
-    def __init__(self: MeltanoHub, db: AsyncSession) -> None:
+    def __init__(
+        self: MeltanoHub,
+        *,
+        db: AsyncSession,
+        base_api_url: str = BASE_API_URL,
+        base_hub_url: str = BASE_HUB_URL,
+    ) -> None:
         self.db = db
+        self.base_api_url = base_api_url
+        self.base_hub_url = base_hub_url
 
     async def get_plugin_details(self, variant_id: str) -> dict[str, t.Any]:
         v = await self.db.get(models.PluginVariant, variant_id)
         plugin: models.Plugin = await self.db.get(models.Plugin, v.plugin_id)
         settings: list[models.Setting] = await v.awaitable_attrs.settings
         capabilities: list[models.Capability] = await v.awaitable_attrs.capabilities
-        keywords: list[models.Keyword] = await v.awaitable_attrs.keywords
 
-        return {
-            "name": plugin.name,
-            "variant": v.name,
-            "namespace": v.namespace,
-            "repo": v.repo,
-            "pip_url": v.pip_url,
-            "settings": [
-                {
-                    "name": s.name,
-                    "label": s.label,
-                    "value": s.value,
-                    "description": s.description,
-                    "kind": s.kind,
-                    "options": s.options,
-                    "sensitive": s.sensitive,
-                }
-                for s in settings
-            ],
+        result = {
             "capabilities": [c.name for c in capabilities],
-            "keywords": [k.name for k in keywords],
+            "description": v.description,
+            "docs": build_hub_url(
+                base_url=self.base_hub_url,
+                plugin_type=plugin.plugin_type,
+                plugin_name=plugin.name,
+                plugin_variant=v.name,
+            ),
+            "label": v.label,
+            "logo_url": urllib.parse.urljoin(self.base_hub_url, v.logo_url),
+            "name": plugin.name,
+            "namespace": v.namespace,
+            "pip_url": v.pip_url,
+            "repo": v.repo,
+            "settings": [PluginSetting.model_validate(s, from_attributes=True) for s in settings],
+            "settings_group_validation": [],  # TODO: Implement
+            "variant": v.name,
         }
+
+        match plugin.plugin_type:
+            case models.PluginType.extractors:
+                if select := await v.awaitable_attrs.select:
+                    result["select"] = select
+            case _:
+                pass
+
+        return result
 
     async def get_plugin_type_index(
         self: MeltanoHub,
@@ -103,20 +142,20 @@ class MeltanoHub:
 
         result = await self.db.execute(q)
         return {
-            row.name: {
-                "default_variant": row.default_variant,
+            plugin_name: {
+                "default_variant": default_variant,
                 "variants": {
-                    row.variant: {
+                    variant_name: {
                         "ref": build_variant_url(
-                            BASE_URL,
-                            plugin_type,
-                            row.name,
-                            row.variant,
+                            base_url=self.base_api_url,
+                            plugin_type=plugin_type,
+                            plugin_name=plugin_name,
+                            plugin_variant=variant_name,
                         ),
                     },
                 },
             }
-            for row in result.all()
+            for plugin_name, variant_name, default_variant in result.all()
         }
 
     async def get_sdk_plugins(

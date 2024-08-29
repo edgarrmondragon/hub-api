@@ -5,7 +5,14 @@ from __future__ import annotations
 import enum
 import typing as t
 
-from pydantic import BaseModel, Field, RootModel
+from pydantic import BaseModel as PydanticBaseModel
+from pydantic import Field, HttpUrl, RootModel
+
+from hub_api import models
+
+
+class BaseModel(PydanticBaseModel):
+    pass
 
 
 class VariantReference(BaseModel):
@@ -48,10 +55,6 @@ class SettingKind(str, enum.Enum):
 class _BasePluginSetting(BaseModel):
     """Plugin setting model."""
 
-    name: str = Field(
-        description="The setting name.",
-        json_schema_extra={"example": "token"},
-    )
     description: str = Field(
         default="",
         description="The setting description.",
@@ -61,9 +64,14 @@ class _BasePluginSetting(BaseModel):
         description="The setting label.",
         examples=["API Token"],
     )
+    name: str = Field(
+        description="The setting name.",
+        json_schema_extra={"example": "token"},
+    )
     sensitive: bool = Field(
         description="Whether the setting is sensitive.",
     )
+    value: t.Any | None = Field(None, description="The setting value.")
 
 
 class StringSetting(_BasePluginSetting):
@@ -169,16 +177,47 @@ class PluginSetting(RootModel):
     )
 
 
+class Command(BaseModel):
+    """Command model."""
+
+    args: list[str] = Field(description="Command arguments")
+    description: str = Field(description="Documentation displayed when listing commands")
+    executable: str = Field(
+        description="Override the plugin's executable for this command",
+    )
+
+    # TODO: Fill the container_spec field
+    container_spec: dict[str, t.Any] = Field(
+        description="Container specification for this command",
+    )
+
+
+class PluginRequires(BaseModel):
+    """Plugin requires model."""
+
+    name: str = Field(description="The required plugin name")
+    variant: str = Field(description="The required plugin variant")
+
+
 class BasePluginDetails(BaseModel):
     """Base plugin details model."""
 
     name: str = Field(description="The plugin name", examples=["tap-csv"])
+    namespace: str
+    label: str | None = Field(description="The plugin label", examples=["CSV Tap"])
     description: str = Field(
         default="",
         description="The plugin description",
         examples=["A Singer tap for CSV files."],
     )
-    # label: str = Field(description="The plugin label", examples=["CSV Tap"])
+    docs: HttpUrl | None = Field(
+        None,
+        description="A URL to the documentation for this plugin",
+    )
+    variant: str = Field(
+        description="The plugin variant",
+        examples=["meltanolabs"],
+    )
     pip_url: str = Field(
         title="Pip URL",
         description=(
@@ -192,22 +231,100 @@ class BasePluginDetails(BaseModel):
             "-e path/to/local/tap",
         ],
     )
-    namespace: str
-    variant: str = Field(
-        description="The plugin variant",
-        examples=["meltanolabs"],
+    logo_url: HttpUrl | None = Field(
+        description="URL to the plugin's logo",
+        examples=["https://meltano.com/images/logo.png"],
     )
-    # logo_url: str | None = Field(
-    #     description="URL to the plugin's logo",
-    #     examples=["https://meltano.com/images/logo.png"],
-    # )
-    repo: str = Field(description="The plugin repository")
+    repo: HttpUrl = Field(description="The plugin repository")
+    ext_repo: HttpUrl | None = Field(
+        None,
+        description="The URL to the repository where the plugin extension code lives.",
+    )
+    python: str | None = Field(
+        None,
+        description=(
+            "The python version to use for this plugin, specified as a path, or as "
+            "the name of an executable to find within a directory in $PATH. If not "
+            "specified, the top-level `python` setting will be used, or if it is not "
+            "set, the python executable that was used to run Meltano will be used "
+            "(within a separate virtual environment)."
+        ),
+        examples=[
+            "/usr/bin/python3.10",
+            "python",
+            "python3.11",
+        ],
+    )
+
     settings_group_validation: list[list[str]] = Field(
         default_factory=list,
         description="A list of lists of setting names that must be set together.",
     )
+
     settings: list[PluginSetting]
     capabilities: list[str]
     keywords: list[str]
+    commands: dict[str, str | Command] = Field(
+        default_factory=dict,
+        description=(
+            "An object containing commands to be run by the plugin, the keys are the "
+            "name of the command and the values are the arguments to be passed to the "
+            "plugin executable.",
+        ),
+    )
+    requires: list[PluginRequires] = Field(default_factory=list)
 
-    # maintenance_status: str = "active"
+    hidden: bool | None = Field(
+        None,
+        description="Whether the plugin should be shown when listing or not.",
+    )
+
+    maintenance_status: models.MaintenanceStatus
+    quality: models.Quality
+    domain_url: HttpUrl | None = Field(
+        None,
+        description="Links to the website represnting the database, api, etc.",
+    )
+    definition: str | None = Field(
+        None,
+        description="A brief description of the plugin.",
+    )
+    next_steps: str | None = Field(
+        None,
+        description=(
+            "A markdown string that gets added after the auto generated installation "
+            "section. Commonly used for next steps following "
+            "installation/configuration i.e. how to turn on a service or init a system "
+            "database."
+        ),
+    )
+    settings_preamble: str | None = Field(
+        None,
+        description=(
+            "A markdown string that gets added to the beginning of the setting section "
+            "on the plugin pages. Commonly used for adding notes on advanced settings."
+        ),
+    )
+    usage: str | None = Field(
+        None,
+        description=(
+            "A markdown string that gets appended to the bottom of the plugin pages. "
+            "Commonly used for troubleshooting notes or additional setup instructions."
+        ),
+    )
+    prereq: str | None = Field(
+        None,
+        description=(
+            "A markdown string that included at the end of the auto generated "
+            "`Prerequisites` section on the plugin page. Can be used to include custom "
+            "prerequisites other than the default set."
+        ),
+    )
+
+
+class ExtractorDetails(BasePluginDetails):
+    """Extractor details model."""
+
+    metadata: dict[str, t.Any] = Field(default_factory=dict)
+    extractor_schema: dict[str, t.Any] = Field(default_factory=dict, alias="schema")
+    select: list[str] = Field(default_factory=list)

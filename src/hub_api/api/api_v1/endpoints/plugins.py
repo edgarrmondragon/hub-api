@@ -6,7 +6,7 @@ from fastapi import APIRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from hub_api import models
-from hub_api.api.api_v1.schemas import BasePluginDetails, PluginIndex
+from hub_api.api.api_v1.schemas import BasePluginDetails, PluginIndex  # noqa: F401
 from hub_api.crud import MeltanoHub
 
 router = APIRouter()
@@ -22,13 +22,13 @@ async def get_index(plugin_type: models.PluginType) -> dict:
     """Retrieve index of plugins of a given type."""
     db: AsyncSession
     async with models.SessionLocal() as db:
-        hub = MeltanoHub(db)
+        hub = MeltanoHub(db=db)
         return await hub.get_plugin_type_index(plugin_type)
 
 
 @router.get(
     "/{plugin_type}/{plugin_name}--{plugin_variant}",
-    response_model=BasePluginDetails,
+    # response_model=BasePluginDetails,
     response_model_exclude_none=True,
 )
 async def get_plugin_variant(
@@ -42,7 +42,7 @@ async def get_plugin_variant(
 
     db: AsyncSession
     async with models.SessionLocal() as db:
-        hub = MeltanoHub(db)
+        hub = MeltanoHub(db=db)
         return await hub.get_plugin_details(variant_id)
 
 
@@ -55,7 +55,7 @@ async def sdk(
     """Retrieve plugins made with the Singer SDK."""
     db: AsyncSession
     async with models.SessionLocal() as db:
-        hub = MeltanoHub(db)
+        hub = MeltanoHub(db=db)
         return await hub.get_sdk_plugins(limit=limit, plugin_type=plugin_type)
 
 
@@ -64,5 +64,5 @@ async def stats() -> dict[models.PluginType, int]:
     """Retrieve Hub plugin statistics."""
     db: AsyncSession
     async with models.SessionLocal() as db:
-        hub = MeltanoHub(db)
+        hub = MeltanoHub(db=db)
         return await hub.get_plugin_stats()

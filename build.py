@@ -50,11 +50,22 @@ def load_db(path: Path, session: SessionBase) -> None:
                     plugin_id=plugin_id,
                     id=variant_id,
                     description=definition.get("description"),
+                    docs=definition.get("docs"),
                     name=variant,
+                    label=definition.get("label"),
+                    logo_url=definition.get("logo_url"),
                     pip_url=definition.get("pip_url"),
                     repo=definition.get("repo"),
                     namespace=definition.get("namespace"),
                     hidden=definition.get("hidden"),
+                    maintenance_status=definition.get("maintenance_status"),
+                    quality=definition.get("quality"),
+                    domain_url=definition.get("domain_url"),
+                    definition=definition.get("definition"),
+                    next_steps=definition.get("next_steps"),
+                    settings_preamble=definition.get("settings_preamble"),
+                    usage=definition.get("usage"),
+                    prereq=definition.get("prereq"),
                 )
                 session.add(variant_object)
 
@@ -87,6 +98,14 @@ def load_db(path: Path, session: SessionBase) -> None:
                         name=keyword,
                     )
                     session.add(keyword_object)
+
+                for i, select in enumerate(definition.get("select", [])):
+                    select_object = models.Select(
+                        id=f"{variant_id}.select_{i}",
+                        variant_id=variant_object.id,
+                        expression=select,
+                    )
+                    session.add(select_object)
 
             default_variant_object = models.Plugin(
                 id=plugin_id,
