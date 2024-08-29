@@ -50,12 +50,14 @@ def load_db(path: Path, session: SessionBase) -> None:
                     plugin_id=plugin_id,
                     id=variant_id,
                     description=definition.get("description"),
+                    executable=definition.get("executable"),
                     docs=definition.get("docs"),
                     name=variant,
                     label=definition.get("label"),
                     logo_url=definition.get("logo_url"),
                     pip_url=definition.get("pip_url"),
                     repo=definition.get("repo"),
+                    ext_repo=definition.get("ext_repo"),
                     namespace=definition.get("namespace"),
                     hidden=definition.get("hidden"),
                     maintenance_status=definition.get("maintenance_status"),
@@ -71,21 +73,22 @@ def load_db(path: Path, session: SessionBase) -> None:
 
                 for setting in definition.get("settings", []):
                     setting_object = models.Setting(
-                        id=f"{variant_id}.{setting['name']}",
+                        id=f"{variant_id}.setting_{setting['name']}",
                         variant_id=variant_object.id,
                         name=setting["name"],
                         label=setting.get("label"),
                         description=setting.get("description"),
+                        env=setting.get("env"),
                         kind=setting.get("kind"),
                         value=setting.get("value"),
                         options=setting.get("options"),
-                        sensitive=setting.get("sensitive", False),
+                        sensitive=setting.get("sensitive"),
                     )
                     session.add(setting_object)
 
                 for capability in definition.get("capabilities", []):
                     capability_object = models.Capability(
-                        id=f"{variant_id}.{capability}",
+                        id=f"{variant_id}.capability_{capability}",
                         variant_id=variant_object.id,
                         name=capability,
                     )
@@ -93,7 +96,7 @@ def load_db(path: Path, session: SessionBase) -> None:
 
                 for keyword in definition.get("keywords", []):
                     keyword_object = models.Keyword(
-                        id=f"{variant_id}.{keyword}",
+                        id=f"{variant_id}.keyword_{keyword}",
                         variant_id=variant_object.id,
                         name=keyword,
                     )
@@ -106,6 +109,26 @@ def load_db(path: Path, session: SessionBase) -> None:
                         expression=select,
                     )
                     session.add(select_object)
+
+                for command_name, command in definition.get("commands", {}).items():
+                    command_id = f"{variant_id}.command_{command_name}"
+                    if isinstance(command, str):
+                        command_object = models.Command(
+                            id=command_id,
+                            variant_id=variant_object.id,
+                            name=command_name,
+                            args=command,
+                        )
+                    else:
+                        command_object = models.Command(
+                            id=command_id,
+                            variant_id=variant_object.id,
+                            name=command_name,
+                            args=command.get("args"),
+                            description=command.get("description"),
+                            executable=command.get("executable"),
+                        )
+                    session.add(command_object)
 
             default_variant_object = models.Plugin(
                 id=plugin_id,

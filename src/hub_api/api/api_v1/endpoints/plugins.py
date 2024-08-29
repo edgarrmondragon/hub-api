@@ -6,8 +6,8 @@ from fastapi import APIRouter
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from hub_api import models
-from hub_api.api.api_v1.schemas import BasePluginDetails, PluginIndex  # noqa: F401
 from hub_api.crud import MeltanoHub
+from hub_api.schemas import BasePluginDetails, PluginIndex  # noqa: F401
 
 router = APIRouter()
 
