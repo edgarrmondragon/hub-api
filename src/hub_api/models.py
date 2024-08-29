@@ -121,8 +121,8 @@ class RequiredSetting(EntityBase):
     __table_args__ = (
         sa.PrimaryKeyConstraint(
             "variant_id",
-            "setting_id",
             "group_id",
+            "setting_name",
         ),
     )
 
@@ -136,6 +136,7 @@ class RequiredSetting(EntityBase):
     )
 
     group_id: Mapped[int]
+    setting_name: Mapped[str]
 
     variant: Mapped[PluginVariant] = relationship(back_populates="required_settings")
     setting: Mapped[Setting | None] = relationship(lazy="joined")

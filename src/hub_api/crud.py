@@ -95,8 +95,7 @@ class MeltanoHub:
         required_settings: list[models.RequiredSetting] = await v.awaitable_attrs.required_settings
 
         for required in required_settings:
-            if required.setting:
-                settings_groups[required.group_id].append(required.setting.name)
+            settings_groups[required.group_id].append(required.setting_name)
 
         result: dict[str, t.Any] = {
             "capabilities": [c.name for c in capabilities],
