@@ -6,6 +6,9 @@ on:
     branches: [main]
   workflow_dispatch:
     inputs: {}
+  schedule:
+    # Weekly on Monday at 12:00 PM UTC
+  - cron: "0 12 * * 1"
 
 jobs:
   tests:
