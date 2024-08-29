@@ -6,6 +6,7 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 
 from hub_api.main import app
+from hub_api.models import PluginType
 
 
 @pytest.fixture(scope="session")
@@ -23,13 +24,27 @@ async def test_plugin_index(api: AsyncClient) -> None:
 
 
 @pytest.mark.asyncio
-async def test_plugin_details(api: AsyncClient) -> None:
+@pytest.mark.parametrize(
+    ("plugin", "plugin_type", "variant"),
+    [
+        ("tap-github", PluginType.extractors, "singer-io"),
+        ("target-postgres", PluginType.loaders, "meltanolabs"),
+        ("dbt-postgres", PluginType.utilities, "dbt-labs"),
+    ],
+)
+async def test_plugin_details(
+    api: AsyncClient,
+    plugin: str,
+    plugin_type: PluginType,
+    variant: str,
+) -> None:
     """Test /meltano/api/v1/plugins/extractors/<plugin>--<variant>."""
-    response = await api.get("/meltano/api/v1/plugins/extractors/tap-github--singer-io")
+    path = f"/meltano/api/v1/plugins/{plugin_type}/{plugin}--{variant}"
+    response = await api.get(path)
     assert response.status_code == 200
 
-    plugin = response.json()
-    assert plugin["name"] == "tap-github"
+    details = response.json()
+    assert details["name"] == plugin
 
 
 @pytest.mark.asyncio
