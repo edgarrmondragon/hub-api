@@ -138,7 +138,7 @@ class RequiredSetting(EntityBase):
     group_id: Mapped[int]
 
     variant: Mapped[PluginVariant] = relationship(back_populates="required_settings")
-    setting: Mapped[Setting] = relationship(lazy="joined")
+    setting: Mapped[Setting | None] = relationship(lazy="joined")
 
 
 class Capability(EntityBase):
