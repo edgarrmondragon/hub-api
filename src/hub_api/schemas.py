@@ -8,7 +8,7 @@ import typing as t
 from pydantic import BaseModel as PydanticBaseModel
 from pydantic import ConfigDict, Field, HttpUrl, RootModel
 
-from . import enums  # noqa: TCH001
+from . import enums
 
 
 class BaseModel(PydanticBaseModel):
@@ -18,21 +18,22 @@ class BaseModel(PydanticBaseModel):
 class VariantReference(BaseModel):
     """Variant reference model."""
 
-    ref: str = Field(description="API URL for the variant")
+    ref: str = Field(
+        description="API URL for the variant",
+        examples=["https://hub.meltano.com/meltano/api/v1/plugins/extractors/tap-github--singer-io"],
+    )
 
 
 class Plugin(BaseModel):
     """Plugin entry."""
 
     # logo_url: str = Field(description="URL to the plugin's logo")
-    default_variant: str = Field(description="The default variant of the plugin")
-    variants: dict[str, VariantReference] = Field(
-        description="The variants of the plugin",
-    )
+    default_variant: str = Field(description="The default variant of the plugin", examples=["singer-io"])
+    variants: dict[str, VariantReference] = Field(description="The variants of the plugin", default_factory=dict)
 
 
-class PluginIndex(RootModel):
-    """Plugin index model."""
+PluginTypeIndex: t.TypeAlias = dict[str, Plugin]
+PluginIndex: t.TypeAlias = dict[enums.PluginTypeEnum, PluginTypeIndex]
 
 
 class SettingKind(str, enum.Enum):
@@ -354,4 +355,43 @@ class UtilityDetails(BasePluginDetails):
     pass
 
 
-PluginDetails: t.TypeAlias = ExtractorDetails | LoaderDetails | UtilityDetails
+class OrchestrationDetails(BasePluginDetails):
+    """Orchestration details model."""
+
+    pass
+
+
+class TransformDetails(BasePluginDetails):
+    """Transform details model."""
+
+    pass
+
+
+class TransformerDetails(BasePluginDetails):
+    """Transformer details model."""
+
+    pass
+
+
+class MapperDetails(BasePluginDetails):
+    """Mapper details model."""
+
+    pass
+
+
+class FileDetails(BasePluginDetails):
+    """File details model."""
+
+    pass
+
+
+PluginDetails: t.TypeAlias = (
+    ExtractorDetails
+    | LoaderDetails
+    | UtilityDetails
+    | OrchestrationDetails
+    | TransformDetails
+    | TransformerDetails
+    | MapperDetails
+    | FileDetails
+)

@@ -15,22 +15,33 @@ router = fastapi.APIRouter()
 
 
 @router.get(
-    "/{plugin_type}/index",
+    "/index",
     name="Get plugin index",
-    response_model=schemas.PluginIndex,
     response_model_exclude_none=True,
 )
-async def get_index(plugin_type: enums.PluginTypeEnum) -> dict:
+async def get_index() -> schemas.PluginIndex:
+    """Retrieve global index of plugins."""
+    db: AsyncSession
+    async with models.SessionLocal() as db:
+        hub = crud.MeltanoHub(db=db)
+        return await hub.get_plugin_index()
+
+
+@router.get(
+    "/{plugin_type}/index",
+    name="Get plugin type index",
+    response_model_exclude_none=True,
+)
+async def get_type_index(plugin_type: enums.PluginTypeEnum) -> schemas.PluginTypeIndex:
     """Retrieve index of plugins of a given type."""
     db: AsyncSession
     async with models.SessionLocal() as db:
         hub = crud.MeltanoHub(db=db)
-        return await hub.get_plugin_type_index(plugin_type)
+        return await hub.get_plugin_type_index(plugin_type=plugin_type)
 
 
 @router.get(
     "/{plugin_type}/{plugin_name}--{plugin_variant}",
-    # response_model=BasePluginDetails,
     response_model_exclude_none=True,
 )
 async def get_plugin_variant(

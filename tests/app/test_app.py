@@ -17,6 +17,14 @@ def api() -> httpx.AsyncClient:
 @pytest.mark.asyncio
 async def test_plugin_index(api: httpx.AsyncClient) -> None:
     """Test /meltano/api/v1/plugins/extractors/index."""
+    response = await api.get("/meltano/api/v1/plugins/index")
+    assert response.status_code == 200
+    assert response.json()
+
+
+@pytest.mark.asyncio
+async def test_plugin_type_index(api: httpx.AsyncClient) -> None:
+    """Test /meltano/api/v1/plugins/extractors/index."""
     response = await api.get("/meltano/api/v1/plugins/extractors/index")
     assert response.status_code == 200
     assert response.json()

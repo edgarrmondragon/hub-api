@@ -81,7 +81,7 @@ class MeltanoHub:
         self.base_api_url = base_api_url
         self.base_hub_url = base_hub_url
 
-    async def get_plugin_details(self, variant_id: str) -> schemas.PluginDetails:
+    async def get_plugin_details(self, variant_id: str) -> schemas.PluginDetails:  # noqa: C901
         v = await self.db.get(models.PluginVariant, variant_id)
 
         if not v:
@@ -133,25 +133,29 @@ class MeltanoHub:
                 return schemas.LoaderDetails.model_validate(result)
             case enums.PluginTypeEnum.utilities:
                 return schemas.UtilityDetails.model_validate(result)
+            case enums.PluginTypeEnum.orchestrators:
+                return schemas.OrchestrationDetails.model_validate(result)
+            case enums.PluginTypeEnum.transforms:
+                return schemas.TransformDetails.model_validate(result)
+            case enums.PluginTypeEnum.transformers:
+                return schemas.TransformerDetails.model_validate(result)
+            case enums.PluginTypeEnum.mappers:
+                return schemas.MapperDetails.model_validate(result)
+            case enums.PluginTypeEnum.files:
+                return schemas.FileDetails.model_validate(result)
             case _:
                 raise ValueError(f"Unknown plugin type: {v.plugin.plugin_type}")
 
-    async def get_plugin_type_index(
+    async def _get_all_plugins(
         self: MeltanoHub,
-        plugin_type: enums.PluginTypeEnum,
-    ) -> dict[str, dict[str, t.Any]]:
-        """Get all plugins of a given type.
-
-        Args:
-            plugin_type: Plugin type.
-
-        Returns:
-            Mapping of plugin name to variants.
-        """
+        *,
+        plugin_type: enums.PluginTypeEnum | None,
+    ) -> t.Sequence[sa.Row[tuple[str, enums.PluginTypeEnum, str, str]]]:
         aliased_plugin = aliased(models.PluginVariant, name="default_variant")
         q = (
             sa.select(
                 models.Plugin.name,
+                models.Plugin.plugin_type,
                 models.PluginVariant.name.label("variant"),
                 aliased_plugin.name.label("default_variant"),
             )
@@ -163,33 +167,75 @@ class MeltanoHub:
                     models.Plugin.id == aliased_plugin.plugin_id,
                 ),
             )
-            .where(models.Plugin.plugin_type == plugin_type)
         )
 
-        result = await self.db.execute(q)
-        return {
-            plugin_name: {
-                "default_variant": default_variant,
-                "variants": {
-                    variant_name: {
-                        "ref": build_variant_url(
-                            base_url=self.base_api_url,
-                            plugin_type=plugin_type,
-                            plugin_name=plugin_name,
-                            plugin_variant=variant_name,
-                        ),
-                    },
-                },
-            }
-            for plugin_name, variant_name, default_variant in result.all()
-        }
+        if plugin_type:
+            q = q.where(models.Plugin.plugin_type == plugin_type)
+
+        return (await self.db.execute(q)).all()
+
+    async def get_plugin_index(self: MeltanoHub) -> schemas.PluginIndex:
+        """Get all plugins.
+
+        Returns:
+            Mapping of plugin name to variants.
+        """
+        # plugins: dict[enums.PluginTypeEnum, dict[str, dict[str, t.Any]]] = collections.defaultdict(dict)
+        plugins = schemas.PluginIndex(dict.fromkeys(enums.PluginTypeEnum, schemas.PluginTypeIndex({})))
+
+        for row in await self._get_all_plugins(plugin_type=None):
+            plugin_name, plugin_type, variant_name, default_variant = row._tuple()  # noqa: SLF001
+            if plugin_name not in plugins[plugin_type]:
+                plugins[plugin_type][plugin_name] = schemas.Plugin(default_variant=default_variant)
+
+            plugins[plugin_type][plugin_name].variants[variant_name] = schemas.VariantReference(
+                ref=build_variant_url(
+                    base_url=self.base_api_url,
+                    plugin_type=plugin_type,
+                    plugin_name=plugin_name,
+                    plugin_variant=variant_name,
+                ),
+            )
+
+        return plugins
+
+    async def get_plugin_type_index(
+        self: MeltanoHub,
+        *,
+        plugin_type: enums.PluginTypeEnum,
+    ) -> schemas.PluginTypeIndex:
+        """Get all plugins of a given type.
+
+        Args:
+            plugin_type: Plugin type.
+
+        Returns:
+            Mapping of plugin name to variants.
+        """
+        plugins = schemas.PluginTypeIndex({})
+
+        for row in await self._get_all_plugins(plugin_type=plugin_type):
+            plugin_name, _, variant_name, default_variant = row._tuple()  # noqa: SLF001
+            if plugin_name not in plugins:
+                plugins[plugin_name] = schemas.Plugin(default_variant=default_variant)
+
+            plugins[plugin_name].variants[variant_name] = schemas.VariantReference(
+                ref=build_variant_url(
+                    base_url=self.base_api_url,
+                    plugin_type=plugin_type,
+                    plugin_name=plugin_name,
+                    plugin_variant=variant_name,
+                ),
+            )
+
+        return plugins
 
     async def get_sdk_plugins(
         self: MeltanoHub,
         *,
         limit: int,
         plugin_type: enums.PluginTypeEnum | None,
-    ) -> t.Sequence[dict[str, t.Any]]:
+    ) -> list[dict[str, str]]:
         """Get all plugins with the sdk keyword.
 
         Returns:
@@ -220,7 +266,7 @@ class MeltanoHub:
         )
 
         result = await self.db.execute(q)
-        return result.mappings().all()
+        return [dict(row) for row in result.mappings().all()]
 
     async def get_plugin_stats(self: MeltanoHub) -> dict[enums.PluginTypeEnum, int]:
         """Get plugin statistics.
@@ -234,4 +280,4 @@ class MeltanoHub:
         ).group_by(models.Plugin.plugin_type)
 
         result = await self.db.execute(q)
-        return dict(result.all())
+        return dict(row._tuple() for row in result.all())  # noqa: SLF001

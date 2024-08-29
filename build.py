@@ -26,7 +26,7 @@ def get_plugin_variants(plugin_path: Path) -> t.Generator[tuple[str, dict], None
 
 def get_plugins_of_type(
     base_path: Path,
-    plugin_type: models.PluginTypeEnum,
+    plugin_type: enums.PluginTypeEnum,
 ) -> t.Generator[tuple[str, dict], None, None]:
     """Get plugins of a given type."""
     for plugin_path in base_path.joinpath(plugin_type).glob("*"):

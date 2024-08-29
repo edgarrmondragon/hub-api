@@ -78,6 +78,7 @@ banned-from = ["sqlalchemy"]
 "tests/*" = ["S101"]
 
 [tool.pytest.ini_options]
+addopts = ["--durations=5"]
 asyncio_default_fixture_loop_scope = "session"
 
 [tool.mypy]
