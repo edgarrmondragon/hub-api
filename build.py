@@ -94,6 +94,7 @@ def load_db(path: Path, session: SessionBase) -> None:  # noqa: C901
                         setting_group_object = models.RequiredSetting(
                             variant_id=variant_object.id,
                             setting_id=setting_id,
+                            setting_name=setting_name,
                             group_id=group_idx,
                         )
                         session.add(setting_group_object)
