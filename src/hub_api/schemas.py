@@ -244,10 +244,7 @@ class BasePluginDetails(BaseModel):
     )
     executable: str | None = Field(
         None,
-        description=(
-            "The plugin's executable name, as defined in setup.py (if a Python based "
-            "plugin)"
-        ),
+        description="The plugin's executable name, as defined in setup.py (if a Python based " "plugin)",
         examples=[
             "tap-stripe",
             "tap-covid-19",

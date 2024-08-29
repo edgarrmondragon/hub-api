@@ -8,16 +8,16 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from hub_api.api.api_v1.api import router as api_router
-from hub_api.crud import PluginVariantNotFoundError
+from hub_api.crud import NotFoundError
 
 app = FastAPI()
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 
-@app.exception_handler(PluginVariantNotFoundError)
+@app.exception_handler(NotFoundError)
 def missing_variant_exception_handler(
     request: Request,
-    exc: PluginVariantNotFoundError,
+    exc: NotFoundError,
 ) -> JSONResponse:
     return JSONResponse(
         status_code=404,

@@ -28,6 +28,7 @@ async def test_plugin_index(api: AsyncClient) -> None:
     ("plugin", "plugin_type", "variant"),
     [
         ("tap-github", PluginType.extractors, "singer-io"),
+        ("tap-mssql", PluginType.extractors, "wintersrd"),
         ("target-postgres", PluginType.loaders, "meltanolabs"),
         ("dbt-postgres", PluginType.utilities, "dbt-labs"),
     ],
