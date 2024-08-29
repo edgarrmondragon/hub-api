@@ -8,7 +8,7 @@ import typing as t
 from pydantic import BaseModel as PydanticBaseModel
 from pydantic import Field, HttpUrl, RootModel
 
-from hub_api import models
+from . import enums  # noqa: TCH001
 
 
 class BaseModel(PydanticBaseModel):
@@ -277,14 +277,12 @@ class BasePluginDetails(BaseModel):
     )
 
     settings: list[PluginSetting]
-    capabilities: list[str]
-    keywords: list[str]
     commands: dict[str, str | Command] = Field(
         default_factory=dict,
         description=(
             "An object containing commands to be run by the plugin, the keys are the "
             "name of the command and the values are the arguments to be passed to the "
-            "plugin executable.",
+            "plugin executable."
         ),
     )
     requires: list[PluginRequires] = Field(default_factory=list)
@@ -294,8 +292,6 @@ class BasePluginDetails(BaseModel):
         description="Whether the plugin should be shown when listing or not.",
     )
 
-    maintenance_status: models.MaintenanceStatus
-    quality: models.Quality
     domain_url: HttpUrl | None = Field(
         None,
         description="Links to the website represnting the database, api, etc.",
@@ -340,6 +336,22 @@ class BasePluginDetails(BaseModel):
 class ExtractorDetails(BasePluginDetails):
     """Extractor details model."""
 
+    capabilities: list[enums.ExtractorCapabilityEnum]
     metadata: dict[str, t.Any] = Field(default_factory=dict)
-    extractor_schema: dict[str, t.Any] = Field(default_factory=dict, alias="schema")
+    extractor_schema: dict[str, t.Any] | None = Field(None, alias="schema")
     select: list[str] = Field(default_factory=list)
+
+
+class LoaderDetails(BasePluginDetails):
+    """Loader details model."""
+
+    capabilities: list[enums.LoaderCapabilityEnum]
+
+
+class UtilityDetails(BasePluginDetails):
+    """Utility details model."""
+
+    pass
+
+
+PluginDetails: t.TypeAlias = ExtractorDetails | LoaderDetails | UtilityDetails

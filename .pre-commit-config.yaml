@@ -26,6 +26,8 @@ repos:
     -   id: mypy
         additional_dependencies:
         -   aiosqlite
+        -   pydantic
+        -   sqlalchemy
         -   types-aiofiles
         -   types-PyYAML
 
