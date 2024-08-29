@@ -82,7 +82,9 @@ class PluginVariant(EntityBase):
     docs: Mapped[str | None]
     logo_url: Mapped[str | None]
     pip_url: Mapped[str | None]
+    executable: Mapped[str | None]
     repo: Mapped[str | None]
+    ext_repo: Mapped[str | None]
     namespace: Mapped[str]
     label: Mapped[str | None]
     hidden: Mapped[bool | None]
@@ -101,6 +103,7 @@ class PluginVariant(EntityBase):
     capabilities: Mapped[list[Capability]] = relationship(back_populates="variant")
     keywords: Mapped[list[Keyword]] = relationship(back_populates="variant")
     select: Mapped[list[Select]] = relationship(back_populates="variant")
+    commands: Mapped[list[Command]] = relationship(back_populates="variant")
 
 
 class Setting(EntityBase):
@@ -115,12 +118,29 @@ class Setting(EntityBase):
     name: Mapped[str]
     label: Mapped[str | None]
     description: Mapped[str | None]
+    env: Mapped[str | None]
     kind: Mapped[str | None]
     value: Mapped[t.Any | None] = mapped_column(sa.JSON)
     options: Mapped[list[str] | None] = mapped_column(sa.JSON)
     sensitive: Mapped[bool | None]
 
     variant: Mapped[PluginVariant] = relationship(back_populates="settings")
+    aliases: Mapped[list[SettingAlias]] = relationship(
+        back_populates="setting", lazy="joined"
+    )
+
+
+class SettingAlias(EntityBase):
+    __tablename__ = "setting_aliases"
+
+    id: Mapped[str] = mapped_column(primary_key=True)
+    setting_id: Mapped[str] = mapped_column(
+        sa.ForeignKey("settings.id"),
+        index=True,
+    )
+
+    name: Mapped[str]
+    setting: Mapped[Setting] = relationship(back_populates="aliases")
 
 
 class Capability(EntityBase):
@@ -160,9 +180,12 @@ class Command(EntityBase):
         index=True,
     )
 
+    name: Mapped[str]
     args: Mapped[str]
     description: Mapped[str | None]
     executable: Mapped[str | None]
+
+    variant: Mapped[PluginVariant] = relationship(back_populates="commands")
 
 
 class PluginRequires(EntityBase):

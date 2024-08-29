@@ -55,11 +55,13 @@ class SettingKind(str, enum.Enum):
 class _BasePluginSetting(BaseModel):
     """Plugin setting model."""
 
-    description: str = Field(
-        default="",
+    aliases: list[str] | None = None
+    description: str | None = Field(
+        None,
         description="The setting description.",
         examples=["The API token."],
     )
+    env: str | None = Field(None, description="The environment variable name.")
     label: str | None = Field(
         description="The setting label.",
         examples=["API Token"],
@@ -68,7 +70,7 @@ class _BasePluginSetting(BaseModel):
         description="The setting name.",
         json_schema_extra={"example": "token"},
     )
-    sensitive: bool = Field(
+    sensitive: bool | None = Field(
         description="Whether the setting is sensitive.",
     )
     value: t.Any | None = Field(None, description="The setting value.")
@@ -180,14 +182,19 @@ class PluginSetting(RootModel):
 class Command(BaseModel):
     """Command model."""
 
-    args: list[str] = Field(description="Command arguments")
-    description: str = Field(description="Documentation displayed when listing commands")
-    executable: str = Field(
+    args: str = Field(description="Command arguments")
+    description: str | None = Field(
+        None,
+        description="Documentation displayed when listing commands",
+    )
+    executable: str | None = Field(
+        None,
         description="Override the plugin's executable for this command",
     )
 
     # TODO: Fill the container_spec field
-    container_spec: dict[str, t.Any] = Field(
+    container_spec: dict[str, t.Any] | None = Field(
+        None,
         description="Container specification for this command",
     )
 
@@ -205,8 +212,8 @@ class BasePluginDetails(BaseModel):
     name: str = Field(description="The plugin name", examples=["tap-csv"])
     namespace: str
     label: str | None = Field(description="The plugin label", examples=["CSV Tap"])
-    description: str = Field(
-        default="",
+    description: str | None = Field(
+        None,
         description="The plugin description",
         examples=["A Singer tap for CSV files."],
     )
@@ -234,6 +241,17 @@ class BasePluginDetails(BaseModel):
     logo_url: HttpUrl | None = Field(
         description="URL to the plugin's logo",
         examples=["https://meltano.com/images/logo.png"],
+    )
+    executable: str | None = Field(
+        None,
+        description=(
+            "The plugin's executable name, as defined in setup.py (if a Python based "
+            "plugin)"
+        ),
+        examples=[
+            "tap-stripe",
+            "tap-covid-19",
+        ],
     )
     repo: HttpUrl = Field(description="The plugin repository")
     ext_repo: HttpUrl | None = Field(

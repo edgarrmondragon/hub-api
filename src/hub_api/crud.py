@@ -7,8 +7,7 @@ import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 
-from hub_api import models
-from hub_api.api.api_v1.schemas import PluginSetting
+from hub_api import models, schemas
 
 BASE_API_URL = "http://localhost:8000"
 BASE_HUB_URL = "https://hub.meltano.com"
@@ -80,10 +79,12 @@ class MeltanoHub:
         plugin: models.Plugin = await self.db.get(models.Plugin, v.plugin_id)
         settings: list[models.Setting] = await v.awaitable_attrs.settings
         capabilities: list[models.Capability] = await v.awaitable_attrs.capabilities
+        commands: list[models.Command] = await v.awaitable_attrs.commands
 
         result = {
             "capabilities": [c.name for c in capabilities],
             "description": v.description,
+            "executable": v.executable,
             "docs": build_hub_url(
                 base_url=self.base_hub_url,
                 plugin_type=plugin.plugin_type,
@@ -96,10 +97,20 @@ class MeltanoHub:
             "namespace": v.namespace,
             "pip_url": v.pip_url,
             "repo": v.repo,
-            "settings": [PluginSetting.model_validate(s, from_attributes=True) for s in settings],
+            "ext_repo": v.ext_repo,
+            "settings": [
+                schemas.PluginSetting.model_validate(s, from_attributes=True)
+                for s in settings
+            ],
             "settings_group_validation": [],  # TODO: Implement
             "variant": v.name,
         }
+
+        if commands:
+            result["commands"] = [
+                schemas.Command.model_validate(c, from_attributes=True)
+                for c in commands
+            ]
 
         match plugin.plugin_type:
             case models.PluginType.extractors:
