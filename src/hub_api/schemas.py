@@ -27,9 +27,9 @@ class VariantReference(BaseModel):
 class Plugin(BaseModel):
     """Plugin entry."""
 
-    # logo_url: str = Field(description="URL to the plugin's logo")
     default_variant: str = Field(description="The default variant of the plugin", examples=["singer-io"])
     variants: dict[str, VariantReference] = Field(description="The variants of the plugin", default_factory=dict)
+    logo_url: str | None = Field(None, description="URL to the plugin's logo")
 
 
 PluginTypeIndex: t.TypeAlias = dict[str, Plugin]

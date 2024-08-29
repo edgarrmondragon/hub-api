@@ -150,13 +150,14 @@ class MeltanoHub:
         self: MeltanoHub,
         *,
         plugin_type: enums.PluginTypeEnum | None,
-    ) -> t.Sequence[sa.Row[tuple[str, enums.PluginTypeEnum, str, str]]]:
+    ) -> t.Sequence[sa.Row[tuple[str, enums.PluginTypeEnum, str, str | None, str]]]:
         aliased_plugin = aliased(models.PluginVariant, name="default_variant")
         q = (
             sa.select(
                 models.Plugin.name,
                 models.Plugin.plugin_type,
                 models.PluginVariant.name.label("variant"),
+                models.PluginVariant.logo_url,
                 aliased_plugin.name.label("default_variant"),
             )
             .join(models.Plugin, models.Plugin.id == models.PluginVariant.plugin_id)
@@ -184,9 +185,9 @@ class MeltanoHub:
         plugins = schemas.PluginIndex(dict.fromkeys(enums.PluginTypeEnum, schemas.PluginTypeIndex({})))
 
         for row in await self._get_all_plugins(plugin_type=None):
-            plugin_name, plugin_type, variant_name, default_variant = row._tuple()  # noqa: SLF001
+            plugin_name, plugin_type, variant_name, logo_url, default_variant = row._tuple()  # noqa: SLF001
             if plugin_name not in plugins[plugin_type]:
-                plugins[plugin_type][plugin_name] = schemas.Plugin(default_variant=default_variant)
+                plugins[plugin_type][plugin_name] = schemas.Plugin(default_variant=default_variant, logo_url=logo_url)
 
             plugins[plugin_type][plugin_name].variants[variant_name] = schemas.VariantReference(
                 ref=build_variant_url(
@@ -215,9 +216,9 @@ class MeltanoHub:
         plugins = schemas.PluginTypeIndex({})
 
         for row in await self._get_all_plugins(plugin_type=plugin_type):
-            plugin_name, _, variant_name, default_variant = row._tuple()  # noqa: SLF001
+            plugin_name, _, variant_name, logo_url, default_variant = row._tuple()  # noqa: SLF001
             if plugin_name not in plugins:
-                plugins[plugin_name] = schemas.Plugin(default_variant=default_variant)
+                plugins[plugin_name] = schemas.Plugin(default_variant=default_variant, logo_url=logo_url)
 
             plugins[plugin_name].variants[variant_name] = schemas.VariantReference(
                 ref=build_variant_url(
