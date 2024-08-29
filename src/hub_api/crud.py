@@ -114,13 +114,13 @@ class MeltanoHub:
             "pip_url": v.pip_url,
             "repo": v.repo,
             "ext_repo": v.ext_repo,
-            "settings": [schemas.PluginSetting.model_validate(s, from_attributes=True) for s in settings],
+            "settings": [schemas.PluginSetting.model_validate(s) for s in settings],
             "settings_group_validation": list(settings_groups.values()),
             "variant": v.name,
         }
 
         if commands:
-            result["commands"] = {c.name: schemas.Command.model_validate(c, from_attributes=True) for c in commands}
+            result["commands"] = {cmd.name: schemas.Command.model_validate(cmd) for cmd in commands}
 
         match v.plugin.plugin_type:
             case enums.PluginTypeEnum.extractors:
