@@ -23,7 +23,7 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f # v5.1.1
       with:
-        python-version: 3.12
+        python-version: 3.13-dev
         architecture: x64
     - uses: hynek/setup-cached-uv@4b4bfa932036976749a9653b0fa4fa10b1a7092b # v2.1.0
     - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
