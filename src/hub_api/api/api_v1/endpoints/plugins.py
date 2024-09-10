@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import contextlib
+import logging
 import typing as t
 
+import cachetools
 import fastapi
 
 from hub_api import crud, enums, models, schemas
@@ -11,6 +14,7 @@ from hub_api import crud, enums, models, schemas
 if t.TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
 
+logger = logging.getLogger("uvicorn.error")
 router = fastapi.APIRouter()
 
 
@@ -40,11 +44,18 @@ async def get_type_index(plugin_type: enums.PluginTypeEnum) -> schemas.PluginTyp
         return await hub.get_plugin_type_index(plugin_type=plugin_type)
 
 
+plugin_details_response: cachetools.TTLCache[str, schemas.PluginDetails] = cachetools.TTLCache(
+    maxsize=10,
+    ttl=30,
+)
+
+
 @router.get(
     "/{plugin_type}/{plugin_name}--{plugin_variant}",
     response_model_exclude_none=True,
 )
 async def get_plugin_variant(
+    response: fastapi.Response,
     plugin_type: enums.PluginTypeEnum,
     plugin_name: str,
     plugin_variant: str,
@@ -56,7 +67,15 @@ async def get_plugin_variant(
     db: AsyncSession
     async with models.SessionLocal() as db:
         hub = crud.MeltanoHub(db=db)
-        return await hub.get_plugin_details(variant_id)
+        plugin_details_response.expire()
+        with contextlib.suppress(KeyError):
+            return plugin_details_response[variant_id]
+
+        plugin_details = await hub.get_plugin_details(variant_id)
+        plugin_details_response[variant_id] = plugin_details
+        response.headers["Cache-Control"] = "max-age=30"
+
+        return plugin_details
 
 
 @router.get("/made-with-sdk", name="Get SDK plugins")
