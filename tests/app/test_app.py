@@ -7,7 +7,8 @@ import http
 import httpx
 import pytest
 
-from hub_api import enums, helpers, main
+from hub_api import enums, main
+from hub_api.helpers import etag
 
 
 @pytest.fixture(scope="session")
@@ -62,7 +63,7 @@ async def test_plugin_details(
 @pytest.mark.asyncio
 async def test_plugin_details_etag_match(api: httpx.AsyncClient) -> None:
     """Test /meltano/api/v1/plugins/stats."""
-    etag_value = helpers.etag.get_etag()
+    etag_value = etag.get_etag()
     response = await api.get(
         "/meltano/api/v1/plugins/extractors/index",
         headers={"If-None-Match": etag_value},

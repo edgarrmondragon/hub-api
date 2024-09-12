@@ -9,14 +9,15 @@ import fastapi
 from fastapi import responses, staticfiles
 from fastapi.middleware import gzip
 
-from hub_api import api, exceptions, helpers
+from hub_api import api, exceptions
+from hub_api.helpers import etag
 
 app = fastapi.FastAPI(
     version=metadata.version("hub-api"),
-    dependencies=[fastapi.Depends(helpers.etag.check_etag)],
+    dependencies=[fastapi.Depends(etag.check_etag)],
 )
 app.add_middleware(gzip.GZipMiddleware, minimum_size=1000)
-app.add_middleware(helpers.etag.ETagMiddleware)
+app.add_middleware(etag.ETagMiddleware)
 
 
 @app.exception_handler(exceptions.NotFoundError)

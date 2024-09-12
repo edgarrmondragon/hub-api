@@ -88,8 +88,8 @@ jobs:
         # Report and write to summary.
         uv run coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
 
-        # Report again and fail if under 95%.
-        uv run coverage report --fail-under=95 --show-missing
+        # Report again and fail if under 100%.
+        uv run coverage report --fail-under=100 --show-missing
     - uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
       if: failure()
       with:
