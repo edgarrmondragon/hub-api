@@ -82,7 +82,7 @@ class MeltanoHub:
         self.base_api_url = base_api_url
         self.base_hub_url = base_hub_url
 
-    async def _variant_details(self: MeltanoHub, variant: models.PluginVariant) -> schemas.PluginDetails:  # noqa: C901
+    async def _variant_details(self: MeltanoHub, variant: models.PluginVariant) -> schemas.PluginDetails:  # noqa: C901, PLR0911, PLR0912
         settings: list[models.Setting] = await variant.awaitable_attrs.settings
         capabilities: list[models.Capability] = await variant.awaitable_attrs.capabilities
         commands: list[models.Command] = await variant.awaitable_attrs.commands
@@ -139,7 +139,7 @@ class MeltanoHub:
                 return schemas.MapperDetails.model_validate(result)
             case enums.PluginTypeEnum.files:
                 return schemas.FileDetails.model_validate(result)
-            case _:
+            case _:  # pragma: no cover
                 raise ValueError(f"Unknown plugin type: {variant.plugin.plugin_type}")
 
     async def get_plugin_details(self, variant_id: str) -> schemas.PluginDetails:
@@ -205,7 +205,6 @@ class MeltanoHub:
         Returns:
             Mapping of plugin name to variants.
         """
-        # plugins: dict[enums.PluginTypeEnum, dict[str, dict[str, t.Any]]] = collections.defaultdict(dict)
         plugins: schemas.PluginIndex = {key: {} for key in enums.PluginTypeEnum}
 
         for row in await self._get_all_plugins(plugin_type=None):

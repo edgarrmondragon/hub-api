@@ -33,7 +33,22 @@ def get_plugins_of_type(
         yield from get_plugin_variants(plugin_path)
 
 
-def load_db(path: Path, session: SessionBase) -> None:  # noqa: C901
+def _build_setting(variant_id: str, setting: dict) -> models.Setting:
+    return models.Setting(
+        id=f"{variant_id}.setting_{setting["name"]}",
+        variant_id=variant_id,
+        name=setting["name"],
+        label=setting.get("label"),
+        description=setting.get("description"),
+        env=setting.get("env"),
+        kind=setting.get("kind"),
+        value=setting.get("value"),
+        options=setting.get("options"),
+        sensitive=setting.get("sensitive"),
+    )
+
+
+def load_db(path: Path, session: SessionBase) -> None:  # noqa: C901, PLR0912, PLR0914
     """Load database."""
 
     default_variants = get_default_variants(path.joinpath("default_variants.yml"))
@@ -52,7 +67,7 @@ def load_db(path: Path, session: SessionBase) -> None:  # noqa: C901
         for plugin_path in path.joinpath("meltano", plugin_type).glob("*"):
             default_variant = default_variants[plugin_type].get(plugin_path.name)
             plugin_id = f"{plugin_type}.{plugin_path.name}"
-            default_variant_id = f"{plugin_id}.{default_variant}"  # noqa: F841
+            default_variant_id = f"{plugin_id}.{default_variant}"
 
             for variant, definition in get_plugin_variants(plugin_path):
                 variant_id = f"{plugin_id}.{variant}"
@@ -82,19 +97,7 @@ def load_db(path: Path, session: SessionBase) -> None:  # noqa: C901
                 session.add(variant_object)
 
                 for setting in definition.get("settings", []):
-                    setting_object = models.Setting(
-                        id=f"{variant_id}.setting_{setting["name"]}",
-                        variant_id=variant_object.id,
-                        name=setting["name"],
-                        label=setting.get("label"),
-                        description=setting.get("description"),
-                        env=setting.get("env"),
-                        kind=setting.get("kind"),
-                        value=setting.get("value"),
-                        options=setting.get("options"),
-                        sensitive=setting.get("sensitive"),
-                    )
-                    session.add(setting_object)
+                    session.add(_build_setting(variant_id, setting))
 
                 for group_idx, setting_group in enumerate(
                     definition.get("settings_group_validation", []),
@@ -164,7 +167,7 @@ def load_db(path: Path, session: SessionBase) -> None:  # noqa: C901
 
             default_variant_object = models.Plugin(
                 id=plugin_id,
-                default_variant_id=f"{plugin_id}.{default_variant}",
+                default_variant_id=default_variant_id,
                 plugin_type=plugin_type.value,
                 name=plugin_path.name,
             )

@@ -25,7 +25,7 @@ def get_etag() -> str:
 class ETagMiddleware(BaseHTTPMiddleware):
     """ETag middleware."""
 
-    async def dispatch(
+    async def dispatch(  # noqa: PLR6301
         self,
         request: Request,
         call_next: t.Callable[[Request], t.Awaitable[Response]],

@@ -70,6 +70,23 @@ async def test_plugin_details_etag_match(api: httpx.AsyncClient) -> None:
 
 
 @pytest.mark.asyncio
+async def test_plugin_variant_not_found(api: httpx.AsyncClient) -> None:
+    """Test /meltano/api/v1/plugins/extractors/<plugin>--<variant>."""
+    response = await api.get("/meltano/api/v1/plugins/extractors/tap-github--unknown")
+    assert response.status_code == http.HTTPStatus.NOT_FOUND
+
+
+@pytest.mark.asyncio
+async def test_sdk_filter(api: httpx.AsyncClient) -> None:
+    """Test /meltano/api/v1/plugins/made-with-sdk."""
+    response = await api.get("/meltano/api/v1/plugins/made-with-sdk")
+    assert response.status_code == http.HTTPStatus.OK
+
+    plugins = response.json()
+    assert len(plugins) > 0
+
+
+@pytest.mark.asyncio
 async def test_hub_stats(api: httpx.AsyncClient) -> None:
     """Test /meltano/api/v1/plugins/stats."""
     response = await api.get("/meltano/api/v1/plugins/stats")
@@ -107,8 +124,9 @@ async def test_maintainer_details(api: httpx.AsyncClient) -> None:
 @pytest.mark.asyncio
 async def test_top_maintainers(api: httpx.AsyncClient) -> None:
     """Test /meltano/api/v1/maintainers."""
-    response = await api.get("/meltano/api/v1/maintainers/top/3")
+    n = 3
+    response = await api.get(f"/meltano/api/v1/maintainers/top/{n}")
     assert response.status_code == http.HTTPStatus.OK
 
     maintainers = response.json()
-    assert len(maintainers) == 3
+    assert len(maintainers) == n
