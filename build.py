@@ -37,6 +37,16 @@ def load_db(path: Path, session: SessionBase) -> None:  # noqa: C901
     """Load database."""
 
     default_variants = get_default_variants(path.joinpath("default_variants.yml"))
+    maintainers = get_default_variants(path.joinpath("maintainers.yml"))
+
+    for maintainer_id, maintainer_data in maintainers.items():
+        maintainer_object = models.Maintainer(
+            id=maintainer_id,
+            name=maintainer_data.get("name"),
+            label=maintainer_data.get("label"),
+            url=maintainer_data.get("url"),
+        )
+        session.add(maintainer_object)
 
     for plugin_type in enums.PluginTypeEnum:
         for plugin_path in path.joinpath("meltano", plugin_type).glob("*"):

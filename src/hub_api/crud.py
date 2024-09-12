@@ -4,6 +4,7 @@ import collections
 import typing as t
 import urllib.parse
 
+import pydantic
 import sqlalchemy as sa
 from sqlalchemy.orm import aliased
 
@@ -32,7 +33,7 @@ def build_variant_url(
     plugin_type: enums.PluginTypeEnum,
     plugin_name: str,
     plugin_variant: str,
-) -> str:
+) -> pydantic.HttpUrl:
     """Build variant URL.
 
     Args:
@@ -45,7 +46,7 @@ def build_variant_url(
         Variant URL.
     """
     prefix = "/meltano/api/v1/plugins"
-    return f"{base_url}{prefix}/{plugin_type.value}/{plugin_name}--{plugin_variant}"
+    return pydantic.HttpUrl(f"{base_url}{prefix}/{plugin_type.value}/{plugin_name}--{plugin_variant}")
 
 
 def build_hub_url(
@@ -54,7 +55,7 @@ def build_hub_url(
     plugin_type: enums.PluginTypeEnum,
     plugin_name: str,
     plugin_variant: str,
-) -> str:
+) -> pydantic.HttpUrl:
     """Build hub URL.
 
     Args:
@@ -66,7 +67,7 @@ def build_hub_url(
     Returns:
         Hub URL for the plugin.
     """
-    return f"{base_url}/{plugin_type.value}/{plugin_name}--{plugin_variant}"
+    return pydantic.HttpUrl(f"{base_url}/{plugin_type.value}/{plugin_name}--{plugin_variant}")
 
 
 class MeltanoHub:
@@ -81,52 +82,47 @@ class MeltanoHub:
         self.base_api_url = base_api_url
         self.base_hub_url = base_hub_url
 
-    async def get_plugin_details(self, variant_id: str) -> schemas.PluginDetails:  # noqa: C901
-        v = await self.db.get(models.PluginVariant, variant_id)
-
-        if not v:
-            raise PluginVariantNotFoundError(f"Plugin variant {variant_id} not found")
-
-        settings: list[models.Setting] = await v.awaitable_attrs.settings
-        capabilities: list[models.Capability] = await v.awaitable_attrs.capabilities
-        commands: list[models.Command] = await v.awaitable_attrs.commands
+    async def _variant_details(self: MeltanoHub, variant: models.PluginVariant) -> t.Any:
+        settings: list[models.Setting] = await variant.awaitable_attrs.settings
+        capabilities: list[models.Capability] = await variant.awaitable_attrs.capabilities
+        commands: list[models.Command] = await variant.awaitable_attrs.commands
 
         settings_groups = collections.defaultdict(list)
-        required_settings: list[models.RequiredSetting] = await v.awaitable_attrs.required_settings
+        required_settings: list[models.RequiredSetting] = await variant.awaitable_attrs.required_settings
 
         for required in required_settings:
             settings_groups[required.group_id].append(required.setting_name)
 
         result: dict[str, t.Any] = {
             "capabilities": [c.name for c in capabilities],
-            "description": v.description,
-            "executable": v.executable,
+            "description": variant.description,
+            "executable": variant.executable,
             "docs": build_hub_url(
                 base_url=self.base_hub_url,
-                plugin_type=v.plugin.plugin_type,
-                plugin_name=v.plugin.name,
-                plugin_variant=v.name,
+                plugin_type=variant.plugin.plugin_type,
+                plugin_name=variant.plugin.name,
+                plugin_variant=variant.name,
             ),
-            "label": v.label,
-            "logo_url": urllib.parse.urljoin(self.base_hub_url, v.logo_url),
-            "name": v.plugin.name,
-            "namespace": v.namespace,
-            "pip_url": v.pip_url,
-            "repo": v.repo,
-            "ext_repo": v.ext_repo,
+            "label": variant.label,
+            "logo_url": urllib.parse.urljoin(self.base_hub_url, variant.logo_url),
+            "name": variant.plugin.name,
+            "namespace": variant.namespace,
+            "pip_url": variant.pip_url,
+            "repo": variant.repo,
+            "ext_repo": variant.ext_repo,
             "settings": [schemas.PluginSetting.model_validate(s) for s in settings],
             "settings_group_validation": list(settings_groups.values()),
-            "variant": v.name,
+            "variant": variant.name,
         }
 
         if commands:
             result["commands"] = {cmd.name: schemas.Command.model_validate(cmd) for cmd in commands}
 
-        match v.plugin.plugin_type:
+        match variant.plugin.plugin_type:
             case enums.PluginTypeEnum.extractors:
-                if select := await v.awaitable_attrs.select:
+                if select := await variant.awaitable_attrs.select:
                     result["select"] = select
-                if metadata := await v.awaitable_attrs.extractor_metadata:
+                if metadata := await variant.awaitable_attrs.extractor_metadata:
                     result["metadata"] = {m.key: m.value for m in metadata}
                 return schemas.ExtractorDetails.model_validate(result)
             case enums.PluginTypeEnum.loaders:
@@ -144,7 +140,32 @@ class MeltanoHub:
             case enums.PluginTypeEnum.files:
                 return schemas.FileDetails.model_validate(result)
             case _:
-                raise ValueError(f"Unknown plugin type: {v.plugin.plugin_type}")
+                raise ValueError(f"Unknown plugin type: {variant.plugin.plugin_type}")
+
+    async def get_plugin_details(self, variant_id: str) -> schemas.PluginDetails:  # noqa: C901
+        variant = await self.db.get(models.PluginVariant, variant_id)
+
+        if not variant:
+            raise PluginVariantNotFoundError(f"Plugin variant {variant_id} not found")
+
+        return await self._variant_details(variant)
+
+    async def get_default_variant_url(self, plugin_id: str) -> pydantic.HttpUrl:
+        q = (
+            sa.select(
+                models.Plugin,
+                models.PluginVariant.name.label("variant"),
+            )
+            .join(models.PluginVariant, models.PluginVariant.plugin_id == models.Plugin.id)
+            .where(models.PluginVariant.plugin_id == plugin_id)
+        )
+        plugin, variant = (await self.db.execute(q)).first()._tuple()
+        return build_variant_url(
+            base_url=self.base_api_url,
+            plugin_type=plugin.plugin_type,
+            plugin_name=plugin.name,
+            plugin_variant=variant,
+        )
 
     async def _get_all_plugins(
         self: MeltanoHub,
@@ -282,3 +303,64 @@ class MeltanoHub:
 
         result = await self.db.execute(q)
         return dict(row._tuple() for row in result.all())  # noqa: SLF001
+
+    async def get_maintainers(self: MeltanoHub) -> list[schemas.Maintainer]:
+        """Get maintainers.
+
+        Returns:
+            List of maintainers.
+        """
+        result = await self.db.execute(sa.select(models.Maintainer))
+        return [schemas.Maintainer.model_validate(row) for row in result.scalars().all()]
+
+    async def get_maintainer(self: MeltanoHub, maintainer_id: str) -> schemas.MaintainerDetails:
+        """Get maintainer, with links to plugins.
+
+        Args:
+            maintainer: Maintainer ID.
+
+        Returns:
+            Maintainer.
+        """
+        maintainer = await self.db.get(models.Maintainer, maintainer_id)
+        if not maintainer:
+            raise NotFoundError(f"Maintainer {maintainer} not found")
+
+        variants: list[models.PluginVariant] = await maintainer.awaitable_attrs.plugins
+
+        return schemas.MaintainerDetails(
+            id=maintainer.id,
+            label=maintainer.label,
+            url=pydantic.HttpUrl(maintainer.url) if maintainer.url else None,
+            links={
+                v.plugin.name: build_variant_url(
+                    base_url=self.base_api_url,
+                    plugin_type=v.plugin.plugin_type,
+                    plugin_name=v.plugin.name,
+                    plugin_variant=v.name,
+                )
+                for v in variants
+            },
+        )
+
+    async def get_top_maintainers(self: MeltanoHub, n: int) -> list[schemas.MaintainerPluginCount]:
+        """Get top maintainers.
+
+        Returns:
+            List of top maintainers.
+        """
+        q = (
+            sa.select(
+                models.Maintainer.id,
+                models.Maintainer.label,
+                models.Maintainer.url,
+                sa.func.count(models.PluginVariant.id).label("plugin_count"),
+            )
+            .join(models.PluginVariant, models.PluginVariant.name == models.Maintainer.id)
+            .group_by(models.Maintainer.id)
+            .order_by(sa.desc("plugin_count"))
+            .limit(n)
+        )
+
+        result = await self.db.execute(q)
+        return [schemas.MaintainerPluginCount.model_validate(row) for row in result.all()]

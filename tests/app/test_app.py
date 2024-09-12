@@ -64,3 +64,38 @@ async def test_hub_stats(api: httpx.AsyncClient) -> None:
 
     stats = response.json()
     assert isinstance(stats["extractors"], int)
+
+
+@pytest.mark.asyncio
+async def test_maintainers(api: httpx.AsyncClient) -> None:
+    """Test /meltano/api/v1/maintainers."""
+    response = await api.get("/meltano/api/v1/maintainers", follow_redirects=True)
+    assert response.status_code == 200
+
+    maintainers = response.json()
+    maintainer = next(filter(lambda m: m["id"] == "edgarrmondragon", maintainers))
+    assert maintainer["id"] == "edgarrmondragon"
+    assert maintainer["url"] == "https://github.com/edgarrmondragon"
+
+
+@pytest.mark.asyncio
+async def test_maintainer_details(api: httpx.AsyncClient) -> None:
+    """Test /meltano/api/v1/maintainers."""
+    response = await api.get("/meltano/api/v1/maintainers/edgarrmondragon")
+    assert response.status_code == 200
+
+    maintainer = response.json()
+    assert maintainer["id"] == "edgarrmondragon"
+    assert maintainer["url"] == "https://github.com/edgarrmondragon"
+    assert isinstance(maintainer["links"], dict)
+    assert len(maintainer["links"]) > 0
+
+
+@pytest.mark.asyncio
+async def test_top_maintainers(api: httpx.AsyncClient) -> None:
+    """Test /meltano/api/v1/maintainers."""
+    response = await api.get("/meltano/api/v1/maintainers/top/3")
+    assert response.status_code == 200
+
+    maintainers = response.json()
+    assert len(maintainers) == 3

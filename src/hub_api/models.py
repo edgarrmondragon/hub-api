@@ -46,7 +46,7 @@ class PluginVariant(EntityBase):
     id: Mapped[str] = mapped_column(primary_key=True)
     plugin_id: Mapped[str] = mapped_column(sa.ForeignKey("plugins.id"), index=True)
 
-    name: Mapped[str]
+    name: Mapped[str] = mapped_column(sa.ForeignKey("maintainers.id"), index=True)
     description: Mapped[str | None]
     docs: Mapped[str | None]
     logo_url: Mapped[str | None]
@@ -79,6 +79,8 @@ class PluginVariant(EntityBase):
     # Extractor-specific
     select: Mapped[list[Select]] = relationship(back_populates="variant")
     extractor_metadata: Mapped[list[Metadata]] = relationship(back_populates="variant")
+
+    maintainer: Mapped[Maintainer] = relationship(back_populates="plugins")
 
 
 class Setting(EntityBase):
@@ -227,3 +229,14 @@ class Metadata(EntityBase):
     value: Mapped[dict] = mapped_column(sa.JSON)
 
     variant: Mapped[PluginVariant] = relationship(back_populates="extractor_metadata")
+
+
+class Maintainer(EntityBase):
+    __tablename__ = "maintainers"
+
+    id: Mapped[str] = mapped_column(primary_key=True)
+    name: Mapped[str | None]
+    label: Mapped[str | None]
+    url: Mapped[str | None]
+
+    plugins: Mapped[list[PluginVariant]] = relationship(back_populates="maintainer")
