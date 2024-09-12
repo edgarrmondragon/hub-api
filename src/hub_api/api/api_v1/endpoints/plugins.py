@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import fastapi
+import fastapi.responses
 
 from hub_api import dependencies, enums, schemas  # noqa: TCH001
 
@@ -27,6 +28,21 @@ async def get_index(hub: dependencies.Hub) -> schemas.PluginIndex:
 async def get_type_index(hub: dependencies.Hub, plugin_type: enums.PluginTypeEnum) -> schemas.PluginTypeIndex:
     """Retrieve index of plugins of a given type."""
     return await hub.get_plugin_type_index(plugin_type=plugin_type)
+
+
+@router.get(
+    "/{plugin_type}/{plugin_name}/default",
+    status_code=fastapi.status.HTTP_307_TEMPORARY_REDIRECT,
+    summary="Get default plugin variant",
+)
+async def get_default_plugin(
+    hub: dependencies.Hub,
+    plugin_type: enums.PluginTypeEnum,
+    plugin_name: str,
+) -> fastapi.responses.RedirectResponse:
+    """Retrieve details of a plugin variant."""
+    plugin_id = f"{plugin_type.value}.{plugin_name}"
+    return fastapi.responses.RedirectResponse(url=str(await hub.get_default_variant_url(plugin_id)))
 
 
 @router.get(
