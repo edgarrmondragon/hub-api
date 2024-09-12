@@ -7,7 +7,7 @@ import typing as t
 import pytest
 import pytest_asyncio
 
-from hub_api import crud, enums, models
+from hub_api import crud, enums, exceptions, models
 
 
 @pytest_asyncio.fixture
@@ -63,7 +63,7 @@ async def test_get_plugin_details(
 @pytest.mark.asyncio
 async def test_get_plugin_variant_not_found(hub: crud.MeltanoHub) -> None:
     """Test get_plugin_details."""
-    with pytest.raises(crud.NotFoundError):
+    with pytest.raises(exceptions.NotFoundError):
         await hub.get_plugin_details(variant_id="unknown")
 
 
@@ -106,7 +106,7 @@ async def test_get_maintainer(hub: crud.MeltanoHub) -> None:
 @pytest.mark.asyncio
 async def test_get_maintainer_not_found(hub: crud.MeltanoHub) -> None:
     """Test get_maintainer."""
-    with pytest.raises(crud.NotFoundError):
+    with pytest.raises(exceptions.NotFoundError):
         await hub.get_maintainer("unknown")
 
 
