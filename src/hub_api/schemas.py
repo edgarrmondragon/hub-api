@@ -15,10 +15,36 @@ class BaseModel(PydanticBaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class Maintainer(BaseModel):
+    """Maintainer model."""
+
+    id: str = Field(description="The maintainer identifier", examples=["meltano"])
+    label: str | None = Field(description="The maintainer label", examples=["Meltano"])
+    url: HttpUrl | None = Field(description="The maintainer URL", examples=["https://meltano.com"])
+
+
+class MaintainerPluginCount(BaseModel):
+    """Maintainer model."""
+
+    id: str = Field(description="The maintainer identifier", examples=["meltano"])
+    label: str | None = Field(description="The maintainer label", examples=["Meltano"])
+    url: HttpUrl | None = Field(description="The maintainer URL", examples=["https://meltano.com"])
+    plugin_count: int = Field(description="The number of plugins the maintainer maintains", examples=[10])
+
+
+class MaintainerDetails(BaseModel):
+    """Maintainer details model."""
+
+    id: str = Field(description="The maintainer identifier", examples=["meltano"])
+    label: str | None = Field(description="The maintainer label", examples=["Meltano"])
+    url: HttpUrl | None = Field(description="The maintainer URL", examples=["https://meltano.com"])
+    links: dict[str, HttpUrl] = Field(description="Links to the maintainer's plugins", default_factory=dict)
+
+
 class VariantReference(BaseModel):
     """Variant reference model."""
 
-    ref: str = Field(
+    ref: HttpUrl = Field(
         description="API URL for the variant",
         examples=["https://hub.meltano.com/meltano/api/v1/plugins/extractors/tap-github--singer-io"],
     )

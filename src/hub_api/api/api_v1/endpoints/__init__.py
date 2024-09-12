@@ -1,5 +1,5 @@
 from __future__ import annotations
 
-from . import plugins
+from . import maintainers, plugins
 
-__all__ = ["plugins"]
+__all__ = ["maintainers", "plugins"]
