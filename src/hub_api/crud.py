@@ -8,7 +8,7 @@ import pydantic
 import sqlalchemy as sa
 from sqlalchemy.orm import aliased
 
-from hub_api import enums, models, schemas
+from hub_api import enums, exceptions, models, schemas
 
 if t.TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,11 +17,7 @@ BASE_API_URL = "http://localhost:8000"
 BASE_HUB_URL = "https://hub.meltano.com"
 
 
-class NotFoundError(Exception):
-    """Not found error."""
-
-
-class PluginVariantNotFoundError(NotFoundError):
+class PluginVariantNotFoundError(exceptions.NotFoundError):
     """Plugin variant not found error."""
 
     pass
@@ -82,7 +78,7 @@ class MeltanoHub:
         self.base_api_url = base_api_url
         self.base_hub_url = base_hub_url
 
-    async def _variant_details(self: MeltanoHub, variant: models.PluginVariant) -> schemas.PluginDetails:  # noqa: C901
+    async def _variant_details(self: MeltanoHub, variant: models.PluginVariant) -> schemas.PluginDetails:  # noqa: C901, PLR0911, PLR0912
         settings: list[models.Setting] = await variant.awaitable_attrs.settings
         capabilities: list[models.Capability] = await variant.awaitable_attrs.capabilities
         commands: list[models.Command] = await variant.awaitable_attrs.commands
@@ -121,7 +117,7 @@ class MeltanoHub:
         match variant.plugin.plugin_type:
             case enums.PluginTypeEnum.extractors:
                 if select := await variant.awaitable_attrs.select:
-                    result["select"] = select
+                    result["select"] = [s.expression for s in select]
                 if metadata := await variant.awaitable_attrs.extractor_metadata:
                     result["metadata"] = {m.key: m.value for m in metadata}
                 return schemas.ExtractorDetails.model_validate(result)
@@ -139,7 +135,7 @@ class MeltanoHub:
                 return schemas.MapperDetails.model_validate(result)
             case enums.PluginTypeEnum.files:
                 return schemas.FileDetails.model_validate(result)
-            case _:
+            case _:  # pragma: no cover
                 raise ValueError(f"Unknown plugin type: {variant.plugin.plugin_type}")
 
     async def get_plugin_details(self, variant_id: str) -> schemas.PluginDetails:
@@ -156,7 +152,7 @@ class MeltanoHub:
                 models.Plugin,
                 models.PluginVariant.name.label("variant"),
             )
-            .join(models.PluginVariant, models.PluginVariant.plugin_id == models.Plugin.id)
+            .join(models.PluginVariant, models.PluginVariant.id == models.Plugin.default_variant_id)
             .where(models.PluginVariant.plugin_id == plugin_id)
         )
         if result := (await self.db.execute(q)).first():
@@ -168,7 +164,7 @@ class MeltanoHub:
                 plugin_variant=variant,
             )
 
-        raise NotFoundError(f"Plugin {plugin_id} not found")
+        raise exceptions.NotFoundError(f"Plugin {plugin_id} not found")
 
     async def _get_all_plugins(
         self: MeltanoHub,
@@ -205,7 +201,6 @@ class MeltanoHub:
         Returns:
             Mapping of plugin name to variants.
         """
-        # plugins: dict[enums.PluginTypeEnum, dict[str, dict[str, t.Any]]] = collections.defaultdict(dict)
         plugins: schemas.PluginIndex = {key: {} for key in enums.PluginTypeEnum}
 
         for row in await self._get_all_plugins(plugin_type=None):
@@ -327,7 +322,7 @@ class MeltanoHub:
         """
         maintainer = await self.db.get(models.Maintainer, maintainer_id)
         if not maintainer:
-            raise NotFoundError(f"Maintainer {maintainer} not found")
+            raise exceptions.NotFoundError(f"Maintainer {maintainer} not found")
 
         variants: list[models.PluginVariant] = await maintainer.awaitable_attrs.plugins
 
