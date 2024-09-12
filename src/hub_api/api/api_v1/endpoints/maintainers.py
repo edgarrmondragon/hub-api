@@ -2,52 +2,38 @@
 
 from __future__ import annotations
 
-import typing as t
-
 import fastapi
 
-from hub_api import crud, models, schemas
-
-if t.TYPE_CHECKING:
-    from sqlalchemy.ext.asyncio import AsyncSession
+from hub_api import dependencies, schemas  # noqa: TCH001
 
 router = fastapi.APIRouter()
 
 
 @router.get(
     "/",
-    name="Get maintainers list",
+    summary="Get maintainers list",
     response_model_exclude_none=True,
 )
-async def get_maintainers() -> list[schemas.Maintainer]:
+async def get_maintainers(hub: dependencies.Hub) -> list[schemas.Maintainer]:
     """Retrieve global index of plugins."""
-    db: AsyncSession
-    async with models.SessionLocal() as db:
-        hub = crud.MeltanoHub(db=db)
-        return await hub.get_maintainers()
+    return await hub.get_maintainers()
 
 
 @router.get(
     "/top/{count}",
-    name="Get top plugin maintainers",
+    summary="Get top plugin maintainers",
     response_model_exclude_none=True,
 )
-async def get_top_maintainers(count: int) -> list[schemas.MaintainerPluginCount]:
+async def get_top_maintainers(hub: dependencies.Hub, count: int) -> list[schemas.MaintainerPluginCount]:
     """Retrieve top maintainers."""
-    db: AsyncSession
-    async with models.SessionLocal() as db:
-        hub = crud.MeltanoHub(db=db)
-        return await hub.get_top_maintainers(count)
+    return await hub.get_top_maintainers(count)
 
 
 @router.get(
     "/{maintainer}",
-    name="Get maintainer details",
+    summary="Get maintainer details",
     response_model_exclude_none=True,
 )
-async def get_maintainer(maintainer: str) -> schemas.MaintainerDetails:
+async def get_maintainer(hub: dependencies.Hub, maintainer: str) -> schemas.MaintainerDetails:
     """Retrieve maintainer details."""
-    db: AsyncSession
-    async with models.SessionLocal() as db:
-        hub = crud.MeltanoHub(db=db)
-        return await hub.get_maintainer(maintainer)
+    return await hub.get_maintainer(maintainer)

@@ -2,49 +2,40 @@
 
 from __future__ import annotations
 
-import typing as t
-
 import fastapi
 
-from hub_api import crud, enums, models, schemas
-
-if t.TYPE_CHECKING:
-    from sqlalchemy.ext.asyncio import AsyncSession
+from hub_api import dependencies, enums, schemas  # noqa: TCH001
 
 router = fastapi.APIRouter()
 
 
 @router.get(
     "/index",
-    name="Get plugin index",
+    summary="Get plugin index",
     response_model_exclude_none=True,
 )
-async def get_index() -> schemas.PluginIndex:
+async def get_index(hub: dependencies.Hub) -> schemas.PluginIndex:
     """Retrieve global index of plugins."""
-    db: AsyncSession
-    async with models.SessionLocal() as db:
-        hub = crud.MeltanoHub(db=db)
-        return await hub.get_plugin_index()
+    return await hub.get_plugin_index()
 
 
 @router.get(
     "/{plugin_type}/index",
-    name="Get plugin type index",
+    summary="Get plugin type index",
     response_model_exclude_none=True,
 )
-async def get_type_index(plugin_type: enums.PluginTypeEnum) -> schemas.PluginTypeIndex:
+async def get_type_index(hub: dependencies.Hub, plugin_type: enums.PluginTypeEnum) -> schemas.PluginTypeIndex:
     """Retrieve index of plugins of a given type."""
-    db: AsyncSession
-    async with models.SessionLocal() as db:
-        hub = crud.MeltanoHub(db=db)
-        return await hub.get_plugin_type_index(plugin_type=plugin_type)
+    return await hub.get_plugin_type_index(plugin_type=plugin_type)
 
 
 @router.get(
     "/{plugin_type}/{plugin_name}--{plugin_variant}",
     response_model_exclude_none=True,
+    summary="Get plugin variant",
 )
 async def get_plugin_variant(
+    hub: dependencies.Hub,
     plugin_type: enums.PluginTypeEnum,
     plugin_name: str,
     plugin_variant: str,
@@ -52,33 +43,24 @@ async def get_plugin_variant(
     """Retrieve details of a plugin variant."""
     plugin_id = f"{plugin_type.value}.{plugin_name}"
     variant_id = f"{plugin_id}.{plugin_variant}"
-
-    db: AsyncSession
-    async with models.SessionLocal() as db:
-        hub = crud.MeltanoHub(db=db)
-        return await hub.get_plugin_details(variant_id)
+    return await hub.get_plugin_details(variant_id)
 
 
-@router.get("/made-with-sdk", name="Get SDK plugins")
+@router.get("/made-with-sdk", summary="Get SDK plugins")
 async def sdk(
+    hub: dependencies.Hub,
     *,
     limit: int = 100,
     plugin_type: enums.PluginTypeEnum | None = None,
 ) -> list[dict[str, str]]:
     """Retrieve plugins made with the Singer SDK."""
-    db: AsyncSession
-    async with models.SessionLocal() as db:
-        hub = crud.MeltanoHub(db=db)
-        return await hub.get_sdk_plugins(limit=limit, plugin_type=plugin_type)
+    return await hub.get_sdk_plugins(limit=limit, plugin_type=plugin_type)
 
 
-@router.get("/stats", name="Hub statistics")
-async def stats() -> dict[enums.PluginTypeEnum, int]:
+@router.get("/stats", summary="Hub statistics")
+async def stats(hub: dependencies.Hub) -> dict[enums.PluginTypeEnum, int]:
     """Retrieve Hub plugin statistics."""
-    db: AsyncSession
-    async with models.SessionLocal() as db:
-        hub = crud.MeltanoHub(db=db)
-        return await hub.get_plugin_stats()
+    return await hub.get_plugin_stats()
 
 
 __all__ = ["router"]
