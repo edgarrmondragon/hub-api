@@ -37,6 +37,7 @@ async def test_plugin_type_index(api: httpx.AsyncClient) -> None:
     ("plugin", "plugin_type", "variant"),
     [
         ("tap-github", enums.PluginTypeEnum.extractors, "singer-io"),
+        ("tap-adwords", enums.PluginTypeEnum.extractors, "meltano"),
         ("tap-mssql", enums.PluginTypeEnum.extractors, "wintersrd"),
         ("tap-mssql", enums.PluginTypeEnum.extractors, "airbyte"),
         ("target-postgres", enums.PluginTypeEnum.loaders, "meltanolabs"),
