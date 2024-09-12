@@ -1,0 +1,64 @@
+exclude = []
+source_roots = [
+    "src",
+]
+exact = true
+forbid_circular_dependencies = true
+
+[[modules]]
+path = "hub_api.api"
+depends_on = [
+    { path = "hub_api.dependencies" },
+    { path = "hub_api.enums" },
+    { path = "hub_api.schemas" },
+]
+
+[[modules]]
+path = "hub_api.crud"
+depends_on = [
+    { path = "hub_api.enums" },
+    { path = "hub_api.exceptions" },
+    { path = "hub_api.models" },
+    { path = "hub_api.schemas" },
+]
+
+[[modules]]
+path = "hub_api.dependencies"
+depends_on = [
+    { path = "hub_api.crud" },
+    { path = "hub_api.models" },
+]
+
+[[modules]]
+path = "hub_api.enums"
+depends_on = []
+
+[[modules]]
+path = "hub_api.exceptions"
+depends_on = []
+
+[[modules]]
+path = "hub_api.helpers.etag"
+depends_on = []
+
+[[modules]]
+path = "hub_api.main"
+depends_on = [
+    { path = "hub_api.api" },
+    { path = "hub_api.exceptions" },
+    { path = "hub_api.helpers.etag" },
+]
+strict = true
+
+[[modules]]
+path = "hub_api.models"
+depends_on = [
+    { path = "hub_api.enums" },
+]
+strict = true
+
+[[modules]]
+path = "hub_api.schemas"
+depends_on = [
+    { path = "hub_api.enums" },
+]
