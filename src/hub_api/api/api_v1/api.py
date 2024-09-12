@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import fastapi
 
-from . import endpoints
+from hub_api.api.api_v1 import endpoints
 
 router = fastapi.APIRouter()
 router.include_router(endpoints.plugins.router, prefix="/plugins", tags=["plugins"])

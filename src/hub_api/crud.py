@@ -8,7 +8,7 @@ import pydantic
 import sqlalchemy as sa
 from sqlalchemy.orm import aliased
 
-from . import enums, models, schemas
+from hub_api import enums, models, schemas
 
 if t.TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession

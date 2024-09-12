@@ -6,7 +6,7 @@ import fastapi
 from fastapi import responses, staticfiles
 from fastapi.middleware import gzip
 
-from . import api, crud
+from hub_api import api, crud
 
 app = fastapi.FastAPI()
 app.add_middleware(gzip.GZipMiddleware, minimum_size=1000)

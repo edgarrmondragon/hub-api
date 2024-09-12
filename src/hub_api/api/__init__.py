@@ -2,6 +2,6 @@
 
 from __future__ import annotations
 
-from . import api_v1 as v1
+from hub_api.api import api_v1 as v1
 
 __all__ = ["v1"]
