@@ -152,7 +152,7 @@ class MeltanoHub:
                 models.Plugin,
                 models.PluginVariant.name.label("variant"),
             )
-            .join(models.PluginVariant, models.PluginVariant.plugin_id == models.Plugin.id)
+            .join(models.PluginVariant, models.PluginVariant.id == models.Plugin.default_variant_id)
             .where(models.PluginVariant.plugin_id == plugin_id)
         )
         if result := (await self.db.execute(q)).first():
