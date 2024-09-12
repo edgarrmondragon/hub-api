@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import http
+
 import fastapi
 from fastapi import responses, staticfiles
 from fastapi.middleware import gzip
@@ -19,7 +21,7 @@ def missing_variant_exception_handler(
     exc: crud.NotFoundError,
 ) -> responses.JSONResponse:
     return responses.JSONResponse(
-        status_code=404,
+        status_code=http.HTTPStatus.NOT_FOUND,
         content={
             "detail": exc.args[0],
         },

@@ -17,3 +17,7 @@ lock:
 
 test: build-db
     uv run pytest
+
+coverage: build-db
+    uv run coverage run -m pytest
+    uv run coverage report --fail-under=85 --show-missing
