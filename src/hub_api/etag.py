@@ -19,7 +19,7 @@ from fastapi import Header, Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
 
-@functools.lru_cache()
+@functools.lru_cache
 def get_etag() -> str:
     """Get ETag value."""
     return f"etag-{metadata.version("hub-api")}"
