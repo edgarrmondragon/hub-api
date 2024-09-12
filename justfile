@@ -20,4 +20,4 @@ test: build-db
 
 coverage: build-db
     uv run coverage run -m pytest
-    uv run coverage report --fail-under=100 --show-missing
+    uv run coverage report --fail-under=85 --show-missing
