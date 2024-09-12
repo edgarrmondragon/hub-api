@@ -81,12 +81,25 @@ banned-from = ["sqlalchemy"]
 "tests/*" = ["S101"]
 
 [tool.pytest.ini_options]
-addopts = ["--durations=5"]
+addopts = [
+    "--durations=5",
+    "-ra",
+    "--strict-config",
+    "--strict-markers",
+]
 asyncio_default_fixture_loop_scope = "session"
+filterwarnings = ["error"]
+log_cli_level = "INFO"
+minversion = "8"
+testpaths = ["tests"]
+xfail_strict = true
 
 [tool.mypy]
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+strict = true
 warn_unused_configs = true
 warn_unused_ignores = true
+warn_unreachable = false
 warn_redundant_casts = true
 
 [tool.coverage.run]

@@ -14,10 +14,10 @@ from hub_api import enums, models
 def get_default_variants(path: Path) -> dict[str, dict[str, str]]:
     """Get default variants of a given plugin."""
     with path.open() as f:
-        return yaml.safe_load(f)
+        return yaml.safe_load(f)  # type: ignore[no-any-return]
 
 
-def get_plugin_variants(plugin_path: Path) -> t.Generator[tuple[str, dict], None, None]:
+def get_plugin_variants(plugin_path: Path) -> t.Generator[tuple[str, dict[str, t.Any]], None, None]:
     """Get plugin variants of a given type."""
     for plugin_file in plugin_path.glob("*.yml"):
         with plugin_file.open() as f:
@@ -27,13 +27,13 @@ def get_plugin_variants(plugin_path: Path) -> t.Generator[tuple[str, dict], None
 def get_plugins_of_type(
     base_path: Path,
     plugin_type: enums.PluginTypeEnum,
-) -> t.Generator[tuple[str, dict], None, None]:
+) -> t.Generator[tuple[str, dict[str, t.Any]], None, None]:
     """Get plugins of a given type."""
     for plugin_path in base_path.joinpath(plugin_type).glob("*"):
         yield from get_plugin_variants(plugin_path)
 
 
-def _build_setting(variant_id: str, setting: dict) -> models.Setting:
+def _build_setting(variant_id: str, setting: dict[str, t.Any]) -> models.Setting:
     return models.Setting(
         id=f"{variant_id}.setting_{setting["name"]}",
         variant_id=variant_id,

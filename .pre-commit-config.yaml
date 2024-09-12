@@ -46,3 +46,8 @@ repos:
     rev: v0.10.7
     hooks:
     -   id: tach
+
+-   repo: https://github.com/crate-ci/typos
+    rev: v1.24.5
+    hooks:
+    -   id: typos

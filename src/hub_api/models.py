@@ -227,7 +227,7 @@ class Metadata(EntityBase):
     )
 
     key: Mapped[str]
-    value: Mapped[dict] = mapped_column(sa.JSON)
+    value: Mapped[dict[str, t.Any]] = mapped_column(sa.JSON)
 
     variant: Mapped[PluginVariant] = relationship(back_populates="extractor_metadata")
 

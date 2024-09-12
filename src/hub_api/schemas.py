@@ -186,7 +186,7 @@ class HiddenSetting(_BasePluginSetting):
     kind: t.Literal["hidden"]
 
 
-class PluginSetting(RootModel):
+class PluginSetting(RootModel[_BasePluginSetting]):
     root: (
         StringSetting
         | IntegerSetting
@@ -321,7 +321,7 @@ class BasePluginDetails(BaseModel):
 
     domain_url: HttpUrl | None = Field(
         None,
-        description="Links to the website represnting the database, api, etc.",
+        description="Links to the website representing the database, api, etc.",
     )
     definition: str | None = Field(
         None,
