@@ -34,8 +34,9 @@ jobs:
       with:
         repository: meltano/hub
         ref: main
+        path: meltano-hub
     - run: uv run python -I build.py meltano-hub/_data
-    - uses: actions/upload-artifact@v3
+    - uses: actions/upload-artifact@50769540e7f4bd5e21e526ee35c689e35e0d6874 # v4.4.0
       with:
         name: hub-data
         path: plugins.db
@@ -57,7 +58,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
         architecture: x64
     - uses: hynek/setup-cached-uv@3e2b834ff80f67c4f272449b9f1aa388c294ae48 # v2.2.1
-    - uses: actions/download-artifact@v3
+    - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
       with:
         name: hub-data
     - run: uv run pytest
