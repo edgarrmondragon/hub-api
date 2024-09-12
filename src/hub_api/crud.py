@@ -82,7 +82,7 @@ class MeltanoHub:
         self.base_api_url = base_api_url
         self.base_hub_url = base_hub_url
 
-    async def _variant_details(self: MeltanoHub, variant: models.PluginVariant) -> t.Any:
+    async def _variant_details(self: MeltanoHub, variant: models.PluginVariant) -> schemas.PluginDetails:  # noqa: C901
         settings: list[models.Setting] = await variant.awaitable_attrs.settings
         capabilities: list[models.Capability] = await variant.awaitable_attrs.capabilities
         commands: list[models.Command] = await variant.awaitable_attrs.commands
@@ -142,7 +142,7 @@ class MeltanoHub:
             case _:
                 raise ValueError(f"Unknown plugin type: {variant.plugin.plugin_type}")
 
-    async def get_plugin_details(self, variant_id: str) -> schemas.PluginDetails:  # noqa: C901
+    async def get_plugin_details(self, variant_id: str) -> schemas.PluginDetails:
         variant = await self.db.get(models.PluginVariant, variant_id)
 
         if not variant:
@@ -159,13 +159,16 @@ class MeltanoHub:
             .join(models.PluginVariant, models.PluginVariant.plugin_id == models.Plugin.id)
             .where(models.PluginVariant.plugin_id == plugin_id)
         )
-        plugin, variant = (await self.db.execute(q)).first()._tuple()
-        return build_variant_url(
-            base_url=self.base_api_url,
-            plugin_type=plugin.plugin_type,
-            plugin_name=plugin.name,
-            plugin_variant=variant,
-        )
+        if result := (await self.db.execute(q)).first():
+            plugin, variant = result
+            return build_variant_url(
+                base_url=self.base_api_url,
+                plugin_type=plugin.plugin_type,
+                plugin_name=plugin.name,
+                plugin_variant=variant,
+            )
+
+        raise NotFoundError(f"Plugin {plugin_id} not found")
 
     async def _get_all_plugins(
         self: MeltanoHub,
