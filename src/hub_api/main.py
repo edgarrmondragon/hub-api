@@ -6,10 +6,11 @@ import fastapi
 from fastapi import responses, staticfiles
 from fastapi.middleware import gzip
 
-from hub_api import api, crud
+from hub_api import api, crud, etag
 
-app = fastapi.FastAPI()
+app = fastapi.FastAPI(dependencies=[fastapi.Depends(etag.check_etag)])
 app.add_middleware(gzip.GZipMiddleware, minimum_size=1000)
+app.add_middleware(etag.ETagMiddleware)
 
 
 @app.exception_handler(crud.NotFoundError)
