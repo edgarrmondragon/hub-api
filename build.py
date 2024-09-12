@@ -73,7 +73,7 @@ def load_db(path: Path, session: SessionBase) -> None:  # noqa: C901
 
                 for setting in definition.get("settings", []):
                     setting_object = models.Setting(
-                        id=f"{variant_id}.setting_{setting['name']}",
+                        id=f"{variant_id}.setting_{setting["name"]}",
                         variant_id=variant_object.id,
                         name=setting["name"],
                         label=setting.get("label"),

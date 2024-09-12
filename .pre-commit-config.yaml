@@ -26,10 +26,15 @@ repos:
     -   id: mypy
         additional_dependencies:
         -   aiosqlite
+        -   fastapi
+        -   httpx
         -   pydantic
+        -   pytest
         -   sqlalchemy
         -   types-aiofiles
         -   types-PyYAML
+        args:
+        -   --enable-incomplete-feature=NewGenericSyntax
 
 -   repo: https://github.com/pre-commit/pre-commit
     rev: v3.8.0

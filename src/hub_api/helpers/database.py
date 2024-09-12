@@ -26,7 +26,7 @@ def dict_factory(cursor: aiosqlite.Cursor, row: tuple) -> dict:
     return {col[0]: row[idx] for idx, col in enumerate(cursor.description)}
 
 
-async def get_db() -> AsyncGenerator[aiosqlite.Connection, None]:
+async def get_db() -> AsyncGenerator[aiosqlite.Connection]:
     """Get a connection to the database.
 
     This is used as a dependency for FastAPI.
