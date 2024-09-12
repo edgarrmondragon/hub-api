@@ -20,9 +20,9 @@ app.add_middleware(helpers.etag.ETagMiddleware)
 
 
 @app.exception_handler(exceptions.NotFoundError)
-def missing_variant_exception_handler(
+def not_found_exception_handler(
     request: fastapi.Request,  # noqa: ARG001
-    exc: crud.NotFoundError,
+    exc: exceptions.NotFoundError,
 ) -> responses.JSONResponse:
     return responses.JSONResponse(
         status_code=http.HTTPStatus.NOT_FOUND,

@@ -45,6 +45,11 @@ async def test_get_plugin_type_index(hub: crud.MeltanoHub, plugin_type: enums.Pl
         ("tap-mssql", enums.PluginTypeEnum.extractors, "airbyte"),
         ("target-postgres", enums.PluginTypeEnum.loaders, "meltanolabs"),
         ("dbt-postgres", enums.PluginTypeEnum.utilities, "dbt-labs"),
+        ("dbt-postgres", enums.PluginTypeEnum.transformers, "dbt-labs"),
+        ("tap-gitlab", enums.PluginTypeEnum.transforms, "meltano"),
+        ("files-docker", enums.PluginTypeEnum.files, "meltano"),
+        ("airflow", enums.PluginTypeEnum.orchestrators, "apache"),
+        ("meltano-map-transformer", enums.PluginTypeEnum.mappers, "meltano"),
     ],
 )
 async def test_get_plugin_details(
@@ -116,3 +121,13 @@ async def test_get_top_maintainers(hub: crud.MeltanoHub) -> None:
     n = 10
     maintainers = await hub.get_top_maintainers(n)
     assert len(maintainers) == n
+
+
+@pytest.mark.asyncio
+async def test_get_default_variant_url(hub: crud.MeltanoHub) -> None:
+    """Test get_variant_url."""
+    url = await hub.get_default_variant_url("extractors.tap-github")
+    assert str(url).endswith("extractors/tap-github--meltanolabs")
+
+    with pytest.raises(exceptions.NotFoundError):
+        await hub.get_default_variant_url("unknown")
