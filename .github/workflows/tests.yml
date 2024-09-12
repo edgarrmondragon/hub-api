@@ -18,10 +18,33 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  get-hub-data:
+    name: Get Hub Data
+    runs-on: ubuntu-24.04
+    continue-on-error: false
+    steps:
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+    - name: Setup Python
+      uses: actions/setup-python@f677139bbe7f9c59b41e40162b753c062f5d49a3 # v5.2.0
+      with:
+        python-version: 3.x
+        architecture: x64
+    - uses: hynek/setup-cached-uv@3e2b834ff80f67c4f272449b9f1aa388c294ae48 # v2.2.1
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      with:
+        repository: meltano/hub
+        ref: main
+    - run: uv run python -I build.py meltano-hub/_data
+    - uses: actions/upload-artifact@v3
+      with:
+        name: hub-data
+        path: plugins.db
+
   tests:
     name: Test
     runs-on: ubuntu-24.04
     continue-on-error: false
+    needs: [get-hub-data]
     strategy:
       fail-fast: false
       matrix:
@@ -34,12 +57,9 @@ jobs:
         python-version: ${{ matrix.python-version }}
         architecture: x64
     - uses: hynek/setup-cached-uv@3e2b834ff80f67c4f272449b9f1aa388c294ae48 # v2.2.1
-    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+    - uses: actions/download-artifact@v3
       with:
-        repository: meltano/hub
-        ref: main
-        path: meltano-hub
-    - run: uv run python -I build.py meltano-hub/_data
+        name: hub-data
     - run: uv run pytest
 
   pre-commit:
