@@ -8,7 +8,9 @@ Otherwise, the response is returned as normal.
 https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
 """  # noqa: I002
 
+import functools
 import http
+import textwrap
 import typing as t
 from importlib import metadata
 
@@ -17,6 +19,7 @@ from fastapi import Header, Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
 
+@functools.lru_cache()
 def get_etag() -> str:
     """Get ETag value."""
     return f"etag-{metadata.version("hub-api")}"
@@ -36,7 +39,22 @@ class ETagMiddleware(BaseHTTPMiddleware):
         return response
 
 
-def check_etag(if_none_match: t.Annotated[str | None, Header()] = None) -> None:
+def check_etag(
+    if_none_match: t.Annotated[
+        str | None,
+        Header(
+            description=textwrap.dedent("""\
+                The `If-None-Match` HTTP request header makes the request conditional. \
+                For `GET` and `HEAD` methods, the server will return the requested resource, \
+                with a `200` status, only if it doesn't have an `ETag` matching the given ones. \
+                For other methods, the request will be processed only if the eventually existing \
+                resource's `ETag` doesn't match any of the values listed.
+
+                https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match
+            """),
+        ),
+    ] = None,
+) -> None:
     """Get ETag value."""
     if if_none_match == get_etag():
         raise fastapi.HTTPException(status_code=http.HTTPStatus.NOT_MODIFIED)
