@@ -121,7 +121,7 @@ class MeltanoHub:
         match variant.plugin.plugin_type:
             case enums.PluginTypeEnum.extractors:
                 if select := await variant.awaitable_attrs.select:
-                    result["select"] = select
+                    result["select"] = [s.expression for s in select]
                 if metadata := await variant.awaitable_attrs.extractor_metadata:
                     result["metadata"] = {m.key: m.value for m in metadata}
                 return schemas.ExtractorDetails.model_validate(result)
