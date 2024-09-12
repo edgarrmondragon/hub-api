@@ -1,6 +1,6 @@
 [project]
 name = "hub-api"
-dynamic = ["version"]
+version = "0.1.0"
 description = "API for hub.meltano.com"
 authors = [
     { name = "Edgar Ramírez Mondragón", email = "edgarrm358@gmail.com" },
@@ -18,7 +18,6 @@ dependencies = [
 ]
 
 [tool.uv]
-# cache-keys = [{ git = true }]
 dev-dependencies = [
     "coverage>=7.6.1",
     "httpx>=0.27.2",
@@ -27,9 +26,6 @@ dev-dependencies = [
     "requests>=2.32.3",
     "types-PyYAML>=6.0.12.20240808",
 ]
-
-[tool.hatch.version]
-source = "vcs"
 
 [tool.ruff]
 line-length = 120
@@ -103,5 +99,5 @@ exclude_also = [
 ]
 
 [build-system]
-requires = ["hatchling", "hatch-vcs"]
+requires = ["hatchling"]
 build-backend = "hatchling.build"

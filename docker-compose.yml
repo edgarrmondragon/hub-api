@@ -1,0 +1,9 @@
+services:
+  web:
+    build:
+      context: .
+    ports:
+    - "8000:8000"
+    volumes:
+    - ./src/:/app/src
+    command: ["uvicorn", "--reload", "--host", "0.0.0.0", "hub_api.main:app"]

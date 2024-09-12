@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import typing as t
 
 import sqlalchemy as sa
@@ -13,7 +14,7 @@ from sqlalchemy.orm import (
 
 from hub_api import enums  # noqa: TCH001
 
-SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///./plugins.db"
+SQLALCHEMY_DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL", "sqlite+aiosqlite:///./plugins.db")
 
 engine = create_async_engine(
     SQLALCHEMY_DATABASE_URL,

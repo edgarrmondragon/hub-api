@@ -10,9 +10,10 @@ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
 
 import functools
 import http
+import os
 import textwrap
 import typing as t
-from importlib import metadata
+import uuid
 
 import fastapi.middleware
 from fastapi import Header, Request, Response
@@ -22,7 +23,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 @functools.lru_cache
 def get_etag() -> str:
     """Get ETag value."""
-    return f"etag-{metadata.version("hub-api")}"
+    return os.environ.get("ETAG", f"etag-{uuid.uuid4()}")
 
 
 class ETagMiddleware(BaseHTTPMiddleware):

@@ -47,6 +47,7 @@ depends_on = [
     { path = "hub_api.api" },
     { path = "hub_api.exceptions" },
     { path = "hub_api.helpers.etag" },
+    { path = "hub_api.static" },
 ]
 strict = true
 
@@ -62,3 +63,7 @@ path = "hub_api.schemas"
 depends_on = [
     { path = "hub_api.enums" },
 ]
+
+[[modules]]
+path = "hub_api.static"
+depends_on = []
