@@ -6,8 +6,9 @@ header is compared to the ETag value. If they match, a 304 Not Modified response
 Otherwise, the response is returned as normal.
 
 https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
-"""
+"""  # noqa: I002
 
+import http
 import typing as t
 from importlib import metadata
 
@@ -35,10 +36,7 @@ class ETagMiddleware(BaseHTTPMiddleware):
         return response
 
 
-class CheckETag:
-    """ETag dependency."""
-
-    def __call__(self, if_none_match: t.Annotated[str | None, Header()] = None) -> None:
-        """Get ETag value."""
-        if if_none_match == get_etag():
-            raise fastapi.HTTPException(status_code=304)
+def check_etag(if_none_match: t.Annotated[str | None, Header()] = None) -> None:
+    """Get ETag value."""
+    if if_none_match == get_etag():
+        raise fastapi.HTTPException(status_code=http.HTTPStatus.NOT_MODIFIED)
