@@ -8,7 +8,7 @@ import pydantic
 import sqlalchemy as sa
 from sqlalchemy.orm import aliased
 
-from hub_api import enums, models, schemas
+from hub_api import enums, exceptions, models, schemas
 
 if t.TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,11 +17,7 @@ BASE_API_URL = "http://localhost:8000"
 BASE_HUB_URL = "https://hub.meltano.com"
 
 
-class NotFoundError(Exception):
-    """Not found error."""
-
-
-class PluginVariantNotFoundError(NotFoundError):
+class PluginVariantNotFoundError(exceptions.NotFoundError):
     """Plugin variant not found error."""
 
     pass
@@ -156,7 +152,7 @@ class MeltanoHub:
                 models.Plugin,
                 models.PluginVariant.name.label("variant"),
             )
-            .join(models.PluginVariant, models.PluginVariant.plugin_id == models.Plugin.id)
+            .join(models.PluginVariant, models.PluginVariant.id == models.Plugin.default_variant_id)
             .where(models.PluginVariant.plugin_id == plugin_id)
         )
         if result := (await self.db.execute(q)).first():
@@ -168,7 +164,7 @@ class MeltanoHub:
                 plugin_variant=variant,
             )
 
-        raise NotFoundError(f"Plugin {plugin_id} not found")
+        raise exceptions.NotFoundError(f"Plugin {plugin_id} not found")
 
     async def _get_all_plugins(
         self: MeltanoHub,
@@ -326,7 +322,7 @@ class MeltanoHub:
         """
         maintainer = await self.db.get(models.Maintainer, maintainer_id)
         if not maintainer:
-            raise NotFoundError(f"Maintainer {maintainer} not found")
+            raise exceptions.NotFoundError(f"Maintainer {maintainer} not found")
 
         variants: list[models.PluginVariant] = await maintainer.awaitable_attrs.plugins
 
