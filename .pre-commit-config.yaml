@@ -30,6 +30,7 @@ repos:
         -   httpx
         -   pydantic
         -   pytest
+        -   pytest-asyncio
         -   sqlalchemy
         -   types-aiofiles
         -   types-PyYAML
