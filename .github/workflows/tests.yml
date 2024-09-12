@@ -66,7 +66,7 @@ jobs:
       with:
         include-hidden-files: true
         name: coverage-${{ matrix.python-version }}
-        path: .coverage
+        path: .coverage-*
 
   coverage:
     name: Coverage
