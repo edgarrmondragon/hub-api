@@ -5,6 +5,7 @@ from __future__ import annotations
 import typing as t
 
 import fastapi
+import fastapi.responses
 
 from hub_api import crud, enums, models, schemas
 
@@ -41,7 +42,24 @@ async def get_type_index(plugin_type: enums.PluginTypeEnum) -> schemas.PluginTyp
 
 
 @router.get(
-    "/{plugin_type}/{plugin_name}--{plugin_variant}",
+    "/{plugin_type}/{plugin_name}",
+    status_code=fastapi.status.HTTP_307_TEMPORARY_REDIRECT,
+)
+async def get_default_plugin(
+    plugin_type: enums.PluginTypeEnum,
+    plugin_name: str,
+) -> fastapi.responses.RedirectResponse:
+    """Retrieve details of a plugin variant."""
+    plugin_id = f"{plugin_type.value}.{plugin_name}"
+
+    db: AsyncSession
+    async with models.SessionLocal() as db:
+        hub = crud.MeltanoHub(db=db)
+        return fastapi.responses.RedirectResponse(url=await hub.get_default_variant_url(plugin_id))
+
+
+@router.get(
+    "/{plugin_type}/{plugin_name}/{plugin_variant}",
     response_model_exclude_none=True,
 )
 async def get_plugin_variant(
@@ -50,6 +68,28 @@ async def get_plugin_variant(
     plugin_variant: str,
 ) -> schemas.PluginDetails:
     """Retrieve details of a plugin variant."""
+    plugin_id = f"{plugin_type.value}.{plugin_name}"
+    variant_id = f"{plugin_id}.{plugin_variant}"
+
+    db: AsyncSession
+    async with models.SessionLocal() as db:
+        hub = crud.MeltanoHub(db=db)
+        return await hub.get_plugin_details(variant_id)
+
+
+@router.get(
+    "/{plugin_type}/{plugin_name}--{plugin_variant}",
+    response_model_exclude_none=True,
+    deprecated=True,
+    name="Get plugin variant",
+    description="Use `/plugins/{plugin_type}/{plugin_name}/{plugin_variant}` instead.",
+)
+async def get_plugin_variant_deprecated(
+    plugin_type: enums.PluginTypeEnum,
+    plugin_name: str,
+    plugin_variant: str,
+) -> schemas.PluginDetails:
+    """Retrieve details of a plugin variant (deprecated)."""
     plugin_id = f"{plugin_type.value}.{plugin_name}"
     variant_id = f"{plugin_id}.{plugin_variant}"
 
