@@ -33,7 +33,7 @@ async def get_type_index(hub: dependencies.Hub, plugin_type: enums.PluginTypeEnu
 @router.get(
     "/{plugin_type}/{plugin_name}/default",
     status_code=fastapi.status.HTTP_307_TEMPORARY_REDIRECT,
-    summary="Get default plugin variant",
+    summary="Get the default plugin variant",
 )
 async def get_default_plugin(
     hub: dependencies.Hub,

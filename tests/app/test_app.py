@@ -131,3 +131,12 @@ async def test_top_maintainers(api: httpx.AsyncClient) -> None:
 
     maintainers = response.json()
     assert len(maintainers) == n
+
+
+@pytest.mark.asyncio
+async def test_default_plugin(api: httpx.AsyncClient) -> None:
+    """Test /meltano/api/v1/plugins/extractors/tap-github/default."""
+    response = await api.get("/meltano/api/v1/plugins/extractors/tap-github/default")
+    assert response.status_code == http.HTTPStatus.TEMPORARY_REDIRECT
+    assert response.is_redirect
+    assert response.headers["Location"].endswith("extractors/tap-github--meltanolabs")
