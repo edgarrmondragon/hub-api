@@ -32,11 +32,11 @@ class Plugin(BaseModel):
     logo_url: str | None = Field(None, description="URL to the plugin's logo")
 
 
-PluginTypeIndex: t.TypeAlias = dict[str, Plugin]
-PluginIndex: t.TypeAlias = dict[enums.PluginTypeEnum, PluginTypeIndex]
+type PluginTypeIndex = dict[str, Plugin]
+type PluginIndex = dict[enums.PluginTypeEnum, PluginTypeIndex]
 
 
-class SettingKind(str, enum.Enum):
+class SettingKind(enum.StrEnum):
     """A valid plugin setting kind."""
 
     STRING = "string"
@@ -385,7 +385,7 @@ class FileDetails(BasePluginDetails):
     pass
 
 
-PluginDetails: t.TypeAlias = (
+type PluginDetails = (
     ExtractorDetails
     | LoaderDetails
     | UtilityDetails

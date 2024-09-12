@@ -182,7 +182,7 @@ class MeltanoHub:
             Mapping of plugin name to variants.
         """
         # plugins: dict[enums.PluginTypeEnum, dict[str, dict[str, t.Any]]] = collections.defaultdict(dict)
-        plugins = schemas.PluginIndex(dict.fromkeys(enums.PluginTypeEnum, schemas.PluginTypeIndex({})))
+        plugins: schemas.PluginIndex = {key: {} for key in enums.PluginTypeEnum}
 
         for row in await self._get_all_plugins(plugin_type=None):
             plugin_name, plugin_type, variant_name, logo_url, default_variant = row._tuple()  # noqa: SLF001
@@ -213,7 +213,7 @@ class MeltanoHub:
         Returns:
             Mapping of plugin name to variants.
         """
-        plugins = schemas.PluginTypeIndex({})
+        plugins: schemas.PluginTypeIndex = {}
 
         for row in await self._get_all_plugins(plugin_type=plugin_type):
             plugin_name, _, variant_name, logo_url, default_variant = row._tuple()  # noqa: SLF001

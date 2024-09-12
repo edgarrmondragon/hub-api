@@ -10,9 +10,40 @@ on:
     # Weekly on Monday at 12:00 PM UTC
   - cron: "0 12 * * 1"
 
+env:
+  FORCE_COLOR: "1"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   tests:
     name: Test
+    runs-on: ubuntu-24.04
+    continue-on-error: false
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", 3.13-dev]
+    steps:
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+    - name: Setup Python
+      uses: actions/setup-python@f677139bbe7f9c59b41e40162b753c062f5d49a3 # v5.2.0
+      with:
+        python-version: ${{ matrix.python-version }}
+        architecture: x64
+    - uses: hynek/setup-cached-uv@3e2b834ff80f67c4f272449b9f1aa388c294ae48 # v2.2.1
+    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      with:
+        repository: meltano/hub
+        ref: main
+        path: meltano-hub
+    - run: uv run python -I build.py meltano-hub/_data
+    - run: uv run pytest
+
+  pre-commit:
+    name: pre-commit
     runs-on: ubuntu-24.04
     continue-on-error: false
     env:
@@ -26,10 +57,5 @@ jobs:
         python-version: 3.13-dev
         architecture: x64
     - uses: hynek/setup-cached-uv@3e2b834ff80f67c4f272449b9f1aa388c294ae48 # v2.2.1
-    - uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
-      with:
-        repository: meltano/hub
-        ref: main
-        path: meltano-hub
-    - run: uv run python -I build.py meltano-hub/_data
-    - run: uv run pytest
+    - run: uv tool install pre-commit --with pre-commit-uv
+    - run: pre-commit run --all-files
