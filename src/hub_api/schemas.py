@@ -8,7 +8,7 @@ import typing as t
 from pydantic import BaseModel as PydanticBaseModel
 from pydantic import ConfigDict, Field, HttpUrl, RootModel
 
-from . import enums
+from hub_api import enums
 
 
 class BaseModel(PydanticBaseModel):

@@ -11,7 +11,7 @@ from sqlalchemy.orm import (
     relationship,
 )
 
-from . import enums  # noqa: TCH001
+from hub_api import enums  # noqa: TCH001
 
 SQLALCHEMY_DATABASE_URL = "sqlite+aiosqlite:///./plugins.db"
 
