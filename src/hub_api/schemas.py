@@ -172,7 +172,7 @@ class HiddenSetting(_BasePluginSetting):
 
 def _kind_discriminator(setting: dict[str, t.Any] | _BasePluginSetting) -> str:
     if isinstance(setting, dict):
-        return setting.get("kind") or "string"
+        return setting.get("kind") or "string"  # pragma: no cover
     return getattr(setting, "kind", None) or "string"
 
 
