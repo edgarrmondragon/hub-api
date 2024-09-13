@@ -35,7 +35,15 @@ class QualityEnum(enum.StrEnum):
     unknown = enum.auto()
 
 
-class ExtractorCapabilityEnum(enum.StrEnum):
+class _HyphenatedEnum(enum.StrEnum):
+    """Base class for hyphenated enums."""
+
+    @staticmethod
+    def _generate_next_value_(name: str, start: int, count: int, last_values: list[str]) -> str:  # noqa: ARG004
+        return name.lower().replace("_", "-")
+
+
+class ExtractorCapabilityEnum(_HyphenatedEnum):
     """Extractor capabilities."""
 
     properties = enum.auto()
@@ -43,18 +51,18 @@ class ExtractorCapabilityEnum(enum.StrEnum):
     discover = enum.auto()
     state = enum.auto()
     about = enum.auto()
-    stream_maps = "stream-maps"
-    schema_flattening = "schema-flattening"
-    activate_version = "activate-version"
+    stream_maps = enum.auto()
+    schema_flattening = enum.auto()
+    activate_version = enum.auto()
     batch = enum.auto()
     test = enum.auto()
-    log_based = "log-based"
+    log_based = enum.auto()
 
 
-class LoaderCapabilityEnum(enum.StrEnum):
+class LoaderCapabilityEnum(_HyphenatedEnum):
     """Loader capabilities."""
 
     about = enum.auto()
-    stream_maps = "stream-maps"
-    schema_flattening = "schema-flattening"
-    hard_delete = "hard-delete"
+    stream_maps = enum.auto()
+    schema_flattening = enum.auto()
+    hard_delete = enum.auto()
