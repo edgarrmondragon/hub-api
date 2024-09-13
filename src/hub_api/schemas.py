@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-import enum
 import typing as t
 
 from pydantic import BaseModel as PydanticBaseModel
-from pydantic import ConfigDict, Field, HttpUrl, RootModel
+from pydantic import ConfigDict, Discriminator, Field, HttpUrl, RootModel, Tag
 
 from hub_api import enums
 
@@ -62,24 +61,10 @@ type PluginTypeIndex = dict[str, Plugin]
 type PluginIndex = dict[enums.PluginTypeEnum, PluginTypeIndex]
 
 
-class SettingKind(enum.StrEnum):
-    """A valid plugin setting kind."""
-
-    STRING = "string"
-    INTEGER = "integer"
-    BOOLEAN = "boolean"
-    DATE_ISO8601 = "date_iso8601"
-    EMAIL = "email"
-    PASSWORD = "password"  # noqa: S105
-    OAUTH = "oauth"
-    OPTIONS = "options"
-    FILE = "file"
-    ARRAY = "array"
-    OBJECT = "object"
-    HIDDEN = "hidden"
+_T = t.TypeVar("_T")
 
 
-class _BasePluginSetting(BaseModel):
+class _BasePluginSetting(BaseModel, t.Generic[_T]):
     """Plugin setting model."""
 
     aliases: list[str] | None = None
@@ -90,6 +75,7 @@ class _BasePluginSetting(BaseModel):
     )
     env: str | None = Field(None, description="The environment variable name.")
     label: str | None = Field(
+        None,
         description="The setting label.",
         examples=["API Token"],
     )
@@ -98,48 +84,49 @@ class _BasePluginSetting(BaseModel):
         json_schema_extra={"example": "token"},
     )
     sensitive: bool | None = Field(
+        None,
         description="Whether the setting is sensitive.",
     )
-    value: t.Any | None = Field(None, description="The setting value.")
+    value: _T | None = Field(None, description="The setting value.")
 
 
-class StringSetting(_BasePluginSetting):
+class StringSetting(_BasePluginSetting[str]):
     """String setting model."""
 
-    kind: t.Literal["string", None]
+    kind: t.Literal["string"] | None = None
 
 
-class IntegerSetting(_BasePluginSetting):
+class IntegerSetting(_BasePluginSetting[int]):
     """Integer setting model."""
 
     kind: t.Literal["integer"]
 
 
-class BooleanSetting(_BasePluginSetting):
+class BooleanSetting(_BasePluginSetting[bool]):
     """Boolean setting model."""
 
     kind: t.Literal["boolean"]
 
 
-class DateIso8601Setting(_BasePluginSetting):
+class DateIso8601Setting(_BasePluginSetting[str]):
     """Date ISO8601 setting model."""
 
     kind: t.Literal["date_iso8601"]
 
 
-class EmailSetting(_BasePluginSetting):
+class EmailSetting(_BasePluginSetting[str]):
     """Email setting model."""
 
     kind: t.Literal["email"]
 
 
-class PasswordSetting(_BasePluginSetting):
+class PasswordSetting(_BasePluginSetting[str]):
     """Password setting model."""
 
     kind: t.Literal["password"]
 
 
-class OAuthSetting(_BasePluginSetting):
+class OAuthSetting(_BasePluginSetting[str]):
     """OAuth setting model."""
 
     kind: t.Literal["oauth"]
@@ -149,10 +136,10 @@ class Option(BaseModel):
     """Option model."""
 
     value: str = Field(description="The option value")
-    label: str = Field(description="The option label")
+    label: str | None = Field(None, description="The option label")
 
 
-class OptionsSetting(_BasePluginSetting):
+class OptionsSetting(_BasePluginSetting[str]):
     """Options setting model."""
 
     kind: t.Literal["options"]
@@ -162,48 +149,52 @@ class OptionsSetting(_BasePluginSetting):
     )
 
 
-class FileSetting(_BasePluginSetting):
+class FileSetting(_BasePluginSetting[str]):
     """File setting model."""
 
     kind: t.Literal["file"]
 
 
-class ArraySetting(_BasePluginSetting):
+class ArraySetting(_BasePluginSetting[list[t.Any]]):
     """Array setting model."""
 
     kind: t.Literal["array"]
 
 
-class ObjectSetting(_BasePluginSetting):
+class ObjectSetting(_BasePluginSetting[dict[str, t.Any]]):
     """Object setting model."""
 
     kind: t.Literal["object"]
 
 
-class HiddenSetting(_BasePluginSetting):
+class HiddenSetting(_BasePluginSetting[str]):
     """Hidden setting model."""
 
     kind: t.Literal["hidden"]
 
 
-class PluginSetting(RootModel[_BasePluginSetting]):
-    root: (
-        StringSetting
-        | IntegerSetting
-        | BooleanSetting
-        | DateIso8601Setting
-        | EmailSetting
-        | PasswordSetting
-        | OAuthSetting
-        | OptionsSetting
-        | FileSetting
-        | ArraySetting
-        | ObjectSetting
-        | HiddenSetting
-    ) = Field(
-        description="The setting kind.",
-        discriminator="kind",
-    )
+def _kind_discriminator(setting: dict[str, t.Any] | _BasePluginSetting[t.Any]) -> str:
+    if isinstance(setting, dict):
+        return setting.get("kind") or "string"
+    return getattr(setting, "kind", None) or "string"
+
+
+class PluginSetting(RootModel[_BasePluginSetting[t.Any]]):
+    root: t.Annotated[
+        t.Annotated[StringSetting, Tag("string")]
+        | t.Annotated[IntegerSetting, Tag("integer")]
+        | t.Annotated[BooleanSetting, Tag("boolean")]
+        | t.Annotated[DateIso8601Setting, Tag("date_iso8601")]
+        | t.Annotated[EmailSetting, Tag("email")]
+        | t.Annotated[PasswordSetting, Tag("password")]
+        | t.Annotated[OAuthSetting, Tag("oauth")]
+        | t.Annotated[OptionsSetting, Tag("options")]
+        | t.Annotated[FileSetting, Tag("file")]
+        | t.Annotated[ArraySetting, Tag("array")]
+        | t.Annotated[ObjectSetting, Tag("object")]
+        | t.Annotated[HiddenSetting, Tag("hidden")],
+        Discriminator(_kind_discriminator),
+    ]
 
 
 class Command(BaseModel):
@@ -238,7 +229,7 @@ class BasePluginDetails(BaseModel):
 
     name: str = Field(description="The plugin name", examples=["tap-csv"])
     namespace: str
-    label: str | None = Field(description="The plugin label", examples=["CSV Tap"])
+    label: str | None = Field(None, description="The plugin label", examples=["CSV Tap"])
     description: str | None = Field(
         None,
         description="The plugin description",
@@ -252,7 +243,8 @@ class BasePluginDetails(BaseModel):
         description="The plugin variant",
         examples=["meltanolabs"],
     )
-    pip_url: str = Field(
+    pip_url: str | None = Field(
+        None,
         title="Pip URL",
         description=(
             "A string containing the command line arguments to pass to `pip install`. "
@@ -266,6 +258,7 @@ class BasePluginDetails(BaseModel):
         ],
     )
     logo_url: HttpUrl | None = Field(
+        None,
         description="URL to the plugin's logo",
         examples=["https://meltano.com/images/logo.png"],
     )
@@ -303,7 +296,19 @@ class BasePluginDetails(BaseModel):
         description="A list of lists of setting names that must be set together.",
     )
 
-    settings: list[PluginSetting]
+    keywords: list[str] = Field(
+        default_factory=list,
+        description="A list of keywords for the plugin",
+    )
+    maintenance_status: enums.MaintenanceStatusEnum | None = Field(
+        None,
+        description="The maintenance status of the plugin",
+    )
+    quality: enums.QualityEnum | None = Field(
+        None,
+        description="The quality of the plugin",
+    )
+    settings: list[PluginSetting] = Field(default_factory=list)
     commands: dict[str, str | Command] = Field(
         default_factory=dict,
         description=(
@@ -312,7 +317,7 @@ class BasePluginDetails(BaseModel):
             "plugin executable."
         ),
     )
-    requires: list[PluginRequires] = Field(default_factory=list)
+    requires: dict[enums.PluginTypeEnum, list[PluginRequires]] = Field(default_factory=dict)
 
     hidden: bool | None = Field(
         None,
@@ -360,7 +365,7 @@ class BasePluginDetails(BaseModel):
     )
 
 
-class ExtractorDetails(BasePluginDetails):
+class ExtractorDetails(BasePluginDetails, extra="forbid"):
     """Extractor details model."""
 
     capabilities: list[enums.ExtractorCapabilityEnum]
@@ -369,46 +374,55 @@ class ExtractorDetails(BasePluginDetails):
     select: list[str] = Field(default_factory=list)
 
 
-class LoaderDetails(BasePluginDetails):
+class LoaderDetails(BasePluginDetails, extra="forbid"):
     """Loader details model."""
 
-    capabilities: list[enums.LoaderCapabilityEnum]
+    capabilities: list[enums.LoaderCapabilityEnum] = Field(default_factory=list)
+    target_schema: str | None = Field(
+        None,
+        description="The target schema for the loader",
+    )
+    dialect: str | None = Field(
+        None,
+        description="The dialect for the loader",
+        examples=["postgres"],
+    )
 
 
-class UtilityDetails(BasePluginDetails):
+class UtilityDetails(BasePluginDetails, extra="forbid"):
     """Utility details model."""
 
     pass
 
 
-class OrchestrationDetails(BasePluginDetails):
+class OrchestrationDetails(BasePluginDetails, extra="forbid"):
     """Orchestration details model."""
 
     pass
 
 
-class TransformDetails(BasePluginDetails):
+class TransformDetails(BasePluginDetails, extra="forbid"):
     """Transform details model."""
 
-    pass
+    vars: dict[str, t.Any] = Field(default_factory=dict)
 
 
-class TransformerDetails(BasePluginDetails):
+class TransformerDetails(BasePluginDetails, extra="forbid"):
     """Transformer details model."""
 
     pass
 
 
-class MapperDetails(BasePluginDetails):
+class MapperDetails(BasePluginDetails, extra="forbid"):
     """Mapper details model."""
 
     pass
 
 
-class FileDetails(BasePluginDetails):
+class FileDetails(BasePluginDetails, extra="forbid"):
     """File details model."""
 
-    pass
+    update: dict[str, bool] = Field(default_factory=dict)
 
 
 type PluginDetails = (

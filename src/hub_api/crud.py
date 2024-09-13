@@ -90,7 +90,6 @@ class MeltanoHub:
             settings_groups[required.group_id].append(required.setting_name)
 
         result: dict[str, t.Any] = {
-            "capabilities": [c.name for c in capabilities],
             "description": variant.description,
             "executable": variant.executable,
             "docs": build_hub_url(
@@ -116,12 +115,14 @@ class MeltanoHub:
 
         match variant.plugin.plugin_type:
             case enums.PluginTypeEnum.extractors:
+                result["capabilities"] = [c.name for c in capabilities]
                 if select := await variant.awaitable_attrs.select:
                     result["select"] = [s.expression for s in select]
                 if metadata := await variant.awaitable_attrs.extractor_metadata:
                     result["metadata"] = {m.key: m.value for m in metadata}
                 return schemas.ExtractorDetails.model_validate(result)
             case enums.PluginTypeEnum.loaders:
+                result["capabilities"] = [c.name for c in capabilities]
                 return schemas.LoaderDetails.model_validate(result)
             case enums.PluginTypeEnum.utilities:
                 return schemas.UtilityDetails.model_validate(result)
