@@ -61,7 +61,10 @@ type PluginTypeIndex = dict[str, Plugin]
 type PluginIndex = dict[enums.PluginTypeEnum, PluginTypeIndex]
 
 
-class _BasePluginSetting(BaseModel):
+_T = t.TypeVar("_T")
+
+
+class _BasePluginSetting(BaseModel, t.Generic[_T]):
     """Plugin setting model."""
 
     aliases: list[str] | None = None
@@ -84,46 +87,46 @@ class _BasePluginSetting(BaseModel):
         None,
         description="Whether the setting is sensitive.",
     )
-    value: t.Any | None = Field(None, description="The setting value.")
+    value: _T | None = Field(None, description="The setting value.")
 
 
-class StringSetting(_BasePluginSetting):
+class StringSetting(_BasePluginSetting[str]):
     """String setting model."""
 
     kind: t.Literal["string"] | None = None
 
 
-class IntegerSetting(_BasePluginSetting):
+class IntegerSetting(_BasePluginSetting[int]):
     """Integer setting model."""
 
     kind: t.Literal["integer"]
 
 
-class BooleanSetting(_BasePluginSetting):
+class BooleanSetting(_BasePluginSetting[bool]):
     """Boolean setting model."""
 
     kind: t.Literal["boolean"]
 
 
-class DateIso8601Setting(_BasePluginSetting):
+class DateIso8601Setting(_BasePluginSetting[str]):
     """Date ISO8601 setting model."""
 
     kind: t.Literal["date_iso8601"]
 
 
-class EmailSetting(_BasePluginSetting):
+class EmailSetting(_BasePluginSetting[str]):
     """Email setting model."""
 
     kind: t.Literal["email"]
 
 
-class PasswordSetting(_BasePluginSetting):
+class PasswordSetting(_BasePluginSetting[str]):
     """Password setting model."""
 
     kind: t.Literal["password"]
 
 
-class OAuthSetting(_BasePluginSetting):
+class OAuthSetting(_BasePluginSetting[str]):
     """OAuth setting model."""
 
     kind: t.Literal["oauth"]
@@ -136,7 +139,7 @@ class Option(BaseModel):
     label: str | None = Field(None, description="The option label")
 
 
-class OptionsSetting(_BasePluginSetting):
+class OptionsSetting(_BasePluginSetting[str]):
     """Options setting model."""
 
     kind: t.Literal["options"]
@@ -146,37 +149,37 @@ class OptionsSetting(_BasePluginSetting):
     )
 
 
-class FileSetting(_BasePluginSetting):
+class FileSetting(_BasePluginSetting[str]):
     """File setting model."""
 
     kind: t.Literal["file"]
 
 
-class ArraySetting(_BasePluginSetting):
+class ArraySetting(_BasePluginSetting[list[t.Any]]):
     """Array setting model."""
 
     kind: t.Literal["array"]
 
 
-class ObjectSetting(_BasePluginSetting):
+class ObjectSetting(_BasePluginSetting[dict[str, t.Any]]):
     """Object setting model."""
 
     kind: t.Literal["object"]
 
 
-class HiddenSetting(_BasePluginSetting):
+class HiddenSetting(_BasePluginSetting[str]):
     """Hidden setting model."""
 
     kind: t.Literal["hidden"]
 
 
-def _kind_discriminator(setting: dict[str, t.Any] | _BasePluginSetting) -> str:
+def _kind_discriminator(setting: dict[str, t.Any] | _BasePluginSetting[t.Any]) -> str:
     if isinstance(setting, dict):
         return setting.get("kind") or "string"  # pragma: no cover
     return getattr(setting, "kind", None) or "string"
 
 
-class PluginSetting(RootModel[_BasePluginSetting]):
+class PluginSetting(RootModel[_BasePluginSetting[t.Any]]):
     root: t.Annotated[
         t.Annotated[StringSetting, Tag("string")]
         | t.Annotated[IntegerSetting, Tag("integer")]
