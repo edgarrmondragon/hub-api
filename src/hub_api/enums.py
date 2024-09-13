@@ -63,6 +63,10 @@ class LoaderCapabilityEnum(_HyphenatedEnum):
     """Loader capabilities."""
 
     about = enum.auto()
-    stream_maps = enum.auto()
-    schema_flattening = enum.auto()
+    activate_version = enum.auto()
+    datatype_failsafe = enum.auto()
     hard_delete = enum.auto()
+    schema_flattening = enum.auto()
+    soft_delete = enum.auto()
+    stream_maps = enum.auto()
+    validate_records = enum.auto()
