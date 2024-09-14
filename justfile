@@ -15,6 +15,9 @@ pre-commit-autoupdate:
 lock:
     uv lock
 
+serve: build-db
+    uv run uvicorn hub_api.main:app --reload
+
 test: build-db
     uv run pytest
 

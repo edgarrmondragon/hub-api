@@ -8,7 +8,9 @@ import pydantic
 import sqlalchemy as sa
 from sqlalchemy.orm import aliased
 
-from hub_api import enums, exceptions, models, schemas
+from hub_api import enums, exceptions, models
+from hub_api.schemas import api as api_schemas
+from hub_api.schemas import meltano
 
 if t.TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -78,7 +80,7 @@ class MeltanoHub:
         self.base_api_url = base_api_url
         self.base_hub_url = base_hub_url
 
-    async def _variant_details(self: MeltanoHub, variant: models.PluginVariant) -> schemas.PluginDetails:  # noqa: C901, PLR0911, PLR0912
+    async def _variant_details(self: MeltanoHub, variant: models.PluginVariant) -> api_schemas.PluginResponse:  # noqa: C901, PLR0911, PLR0912
         settings: list[models.Setting] = await variant.awaitable_attrs.settings
         capabilities: list[models.Capability] = await variant.awaitable_attrs.capabilities
         commands: list[models.Command] = await variant.awaitable_attrs.commands
@@ -105,13 +107,13 @@ class MeltanoHub:
             "pip_url": variant.pip_url,
             "repo": variant.repo,
             "ext_repo": variant.ext_repo,
-            "settings": [schemas.PluginSetting.model_validate(s) for s in settings],
+            "settings": [meltano.PluginSetting.model_validate(s) for s in settings],
             "settings_group_validation": list(settings_groups.values()),
             "variant": variant.name,
         }
 
         if commands:
-            result["commands"] = {cmd.name: schemas.Command.model_validate(cmd) for cmd in commands}
+            result["commands"] = {cmd.name: meltano.Command.model_validate(cmd) for cmd in commands}
 
         match variant.plugin.plugin_type:
             case enums.PluginTypeEnum.extractors:
@@ -120,26 +122,26 @@ class MeltanoHub:
                     result["select"] = [s.expression for s in select]
                 if metadata := await variant.awaitable_attrs.extractor_metadata:
                     result["metadata"] = {m.key: m.value for m in metadata}
-                return schemas.ExtractorDetails.model_validate(result)
+                return api_schemas.ExtractorResponse.model_validate(result)
             case enums.PluginTypeEnum.loaders:
                 result["capabilities"] = [c.name for c in capabilities]
-                return schemas.LoaderDetails.model_validate(result)
+                return api_schemas.LoaderResponse.model_validate(result)
             case enums.PluginTypeEnum.utilities:
-                return schemas.UtilityDetails.model_validate(result)
+                return api_schemas.UtilityResponse.model_validate(result)
             case enums.PluginTypeEnum.orchestrators:
-                return schemas.OrchestrationDetails.model_validate(result)
+                return api_schemas.OrchestratorResponse.model_validate(result)
             case enums.PluginTypeEnum.transforms:
-                return schemas.TransformDetails.model_validate(result)
+                return api_schemas.TransformResponse.model_validate(result)
             case enums.PluginTypeEnum.transformers:
-                return schemas.TransformerDetails.model_validate(result)
+                return api_schemas.TransformerResponse.model_validate(result)
             case enums.PluginTypeEnum.mappers:
-                return schemas.MapperDetails.model_validate(result)
+                return api_schemas.MapperResponse.model_validate(result)
             case enums.PluginTypeEnum.files:
-                return schemas.FileDetails.model_validate(result)
+                return api_schemas.FileResponse.model_validate(result)
             case _:  # pragma: no cover
                 raise ValueError(f"Unknown plugin type: {variant.plugin.plugin_type}")
 
-    async def get_plugin_details(self, variant_id: str) -> schemas.PluginDetails:
+    async def get_plugin_details(self, variant_id: str) -> api_schemas.PluginResponse:
         variant = await self.db.get(models.PluginVariant, variant_id)
 
         if not variant:
@@ -196,20 +198,22 @@ class MeltanoHub:
 
         return (await self.db.execute(q)).all()
 
-    async def get_plugin_index(self: MeltanoHub) -> schemas.PluginIndex:
+    async def get_plugin_index(self: MeltanoHub) -> api_schemas.PluginIndex:
         """Get all plugins.
 
         Returns:
             Mapping of plugin name to variants.
         """
-        plugins: schemas.PluginIndex = {key: {} for key in enums.PluginTypeEnum}
+        plugins: api_schemas.PluginIndex = {key: {} for key in enums.PluginTypeEnum}
 
         for row in await self._get_all_plugins(plugin_type=None):
             plugin_name, plugin_type, variant_name, logo_url, default_variant = row._tuple()  # noqa: SLF001
             if plugin_name not in plugins[plugin_type]:
-                plugins[plugin_type][plugin_name] = schemas.Plugin(default_variant=default_variant, logo_url=logo_url)
+                plugins[plugin_type][plugin_name] = api_schemas.PluginRef(
+                    default_variant=default_variant, logo_url=logo_url
+                )
 
-            plugins[plugin_type][plugin_name].variants[variant_name] = schemas.VariantReference(
+            plugins[plugin_type][plugin_name].variants[variant_name] = api_schemas.VariantReference(
                 ref=build_variant_url(
                     base_url=self.base_api_url,
                     plugin_type=plugin_type,
@@ -224,7 +228,7 @@ class MeltanoHub:
         self: MeltanoHub,
         *,
         plugin_type: enums.PluginTypeEnum,
-    ) -> schemas.PluginTypeIndex:
+    ) -> api_schemas.PluginTypeIndex:
         """Get all plugins of a given type.
 
         Args:
@@ -233,14 +237,14 @@ class MeltanoHub:
         Returns:
             Mapping of plugin name to variants.
         """
-        plugins: schemas.PluginTypeIndex = {}
+        plugins: api_schemas.PluginTypeIndex = {}
 
         for row in await self._get_all_plugins(plugin_type=plugin_type):
             plugin_name, _, variant_name, logo_url, default_variant = row._tuple()  # noqa: SLF001
             if plugin_name not in plugins:
-                plugins[plugin_name] = schemas.Plugin(default_variant=default_variant, logo_url=logo_url)
+                plugins[plugin_name] = api_schemas.PluginRef(default_variant=default_variant, logo_url=logo_url)
 
-            plugins[plugin_name].variants[variant_name] = schemas.VariantReference(
+            plugins[plugin_name].variants[variant_name] = api_schemas.VariantReference(
                 ref=build_variant_url(
                     base_url=self.base_api_url,
                     plugin_type=plugin_type,
@@ -303,16 +307,16 @@ class MeltanoHub:
         result = await self.db.execute(q)
         return dict(row._tuple() for row in result.all())  # noqa: SLF001
 
-    async def get_maintainers(self: MeltanoHub) -> list[schemas.Maintainer]:
+    async def get_maintainers(self: MeltanoHub) -> list[api_schemas.Maintainer]:
         """Get maintainers.
 
         Returns:
             List of maintainers.
         """
         result = await self.db.execute(sa.select(models.Maintainer))
-        return [schemas.Maintainer.model_validate(row) for row in result.scalars().all()]
+        return [api_schemas.Maintainer.model_validate(row) for row in result.scalars().all()]
 
-    async def get_maintainer(self: MeltanoHub, maintainer_id: str) -> schemas.MaintainerDetails:
+    async def get_maintainer(self: MeltanoHub, maintainer_id: str) -> api_schemas.MaintainerDetails:
         """Get maintainer, with links to plugins.
 
         Args:
@@ -327,7 +331,7 @@ class MeltanoHub:
 
         variants: list[models.PluginVariant] = await maintainer.awaitable_attrs.plugins
 
-        return schemas.MaintainerDetails(
+        return api_schemas.MaintainerDetails(
             id=maintainer.id,
             label=maintainer.label,
             url=pydantic.HttpUrl(maintainer.url) if maintainer.url else None,
@@ -342,7 +346,7 @@ class MeltanoHub:
             },
         )
 
-    async def get_top_maintainers(self: MeltanoHub, n: int) -> list[schemas.MaintainerPluginCount]:
+    async def get_top_maintainers(self: MeltanoHub, n: int) -> list[api_schemas.MaintainerPluginCount]:
         """Get top maintainers.
 
         Returns:
@@ -362,4 +366,4 @@ class MeltanoHub:
         )
 
         result = await self.db.execute(q)
-        return [schemas.MaintainerPluginCount.model_validate(row) for row in result.all()]
+        return [api_schemas.MaintainerPluginCount.model_validate(row) for row in result.all()]

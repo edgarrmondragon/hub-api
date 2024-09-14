@@ -1,67 +1,17 @@
-"""Response schemas for the API."""
-
 from __future__ import annotations
 
 import typing as t
 
 from pydantic import BaseModel as PydanticBaseModel
-from pydantic import ConfigDict, Discriminator, Field, HttpUrl, RootModel, Tag
+from pydantic import BaseModel, ConfigDict, Discriminator, Field, HttpUrl, RootModel, Tag
 
 from hub_api import enums
+
+_T = t.TypeVar("_T")
 
 
 class BaseModel(PydanticBaseModel):
     model_config = ConfigDict(from_attributes=True)
-
-
-class Maintainer(BaseModel):
-    """Maintainer model."""
-
-    id: str = Field(description="The maintainer identifier", examples=["meltano"])
-    label: str | None = Field(description="The maintainer label", examples=["Meltano"])
-    url: HttpUrl | None = Field(description="The maintainer URL", examples=["https://meltano.com"])
-
-
-class MaintainerPluginCount(BaseModel):
-    """Maintainer model."""
-
-    id: str = Field(description="The maintainer identifier", examples=["meltano"])
-    label: str | None = Field(description="The maintainer label", examples=["Meltano"])
-    url: HttpUrl | None = Field(description="The maintainer URL", examples=["https://meltano.com"])
-    plugin_count: int = Field(description="The number of plugins the maintainer maintains", examples=[10])
-
-
-class MaintainerDetails(BaseModel):
-    """Maintainer details model."""
-
-    id: str = Field(description="The maintainer identifier", examples=["meltano"])
-    label: str | None = Field(description="The maintainer label", examples=["Meltano"])
-    url: HttpUrl | None = Field(description="The maintainer URL", examples=["https://meltano.com"])
-    links: dict[str, HttpUrl] = Field(description="Links to the maintainer's plugins", default_factory=dict)
-
-
-class VariantReference(BaseModel):
-    """Variant reference model."""
-
-    ref: HttpUrl = Field(
-        description="API URL for the variant",
-        examples=["https://hub.meltano.com/meltano/api/v1/plugins/extractors/tap-github--singer-io"],
-    )
-
-
-class Plugin(BaseModel):
-    """Plugin entry."""
-
-    default_variant: str = Field(description="The default variant of the plugin", examples=["singer-io"])
-    variants: dict[str, VariantReference] = Field(description="The variants of the plugin", default_factory=dict)
-    logo_url: str | None = Field(None, description="URL to the plugin's logo")
-
-
-type PluginTypeIndex = dict[str, Plugin]
-type PluginIndex = dict[enums.PluginTypeEnum, PluginTypeIndex]
-
-
-_T = t.TypeVar("_T")
 
 
 class _BasePluginSetting(BaseModel, t.Generic[_T]):
@@ -224,12 +174,14 @@ class PluginRequires(BaseModel):
     variant: str = Field(description="The required plugin variant")
 
 
-class BasePluginDetails(BaseModel):
+class Plugin(BaseModel):
     """Base plugin details model."""
 
     name: str = Field(description="The plugin name", examples=["tap-csv"])
     namespace: str
-    label: str | None = Field(None, description="The plugin label", examples=["CSV Tap"])
+    label: str | None = Field(
+        None, description="The plugin label", examples=["CSV Tap"]
+    )
     description: str | None = Field(
         None,
         description="The plugin description",
@@ -264,7 +216,8 @@ class BasePluginDetails(BaseModel):
     )
     executable: str | None = Field(
         None,
-        description="The plugin's executable name, as defined in setup.py (if a Python based " "plugin)",
+        description="The plugin's executable name, as defined in setup.py (if a Python based "
+        "plugin)",
         examples=[
             "tap-stripe",
             "tap-covid-19",
@@ -296,18 +249,6 @@ class BasePluginDetails(BaseModel):
         description="A list of lists of setting names that must be set together.",
     )
 
-    keywords: list[str] = Field(
-        default_factory=list,
-        description="A list of keywords for the plugin",
-    )
-    maintenance_status: enums.MaintenanceStatusEnum | None = Field(
-        None,
-        description="The maintenance status of the plugin",
-    )
-    quality: enums.QualityEnum | None = Field(
-        None,
-        description="The quality of the plugin",
-    )
     settings: list[PluginSetting] = Field(default_factory=list)
     commands: dict[str, str | Command] = Field(
         default_factory=dict,
@@ -317,55 +258,17 @@ class BasePluginDetails(BaseModel):
             "plugin executable."
         ),
     )
-    requires: dict[enums.PluginTypeEnum, list[PluginRequires]] = Field(default_factory=dict)
+    requires: dict[enums.PluginTypeEnum, list[PluginRequires]] = Field(
+        default_factory=dict
+    )
 
     hidden: bool | None = Field(
         None,
         description="Whether the plugin should be shown when listing or not.",
     )
 
-    domain_url: HttpUrl | None = Field(
-        None,
-        description="Links to the website representing the database, api, etc.",
-    )
-    definition: str | None = Field(
-        None,
-        description="A brief description of the plugin.",
-    )
-    next_steps: str | None = Field(
-        None,
-        description=(
-            "A markdown string that gets added after the auto generated installation "
-            "section. Commonly used for next steps following "
-            "installation/configuration i.e. how to turn on a service or init a system "
-            "database."
-        ),
-    )
-    settings_preamble: str | None = Field(
-        None,
-        description=(
-            "A markdown string that gets added to the beginning of the setting section "
-            "on the plugin pages. Commonly used for adding notes on advanced settings."
-        ),
-    )
-    usage: str | None = Field(
-        None,
-        description=(
-            "A markdown string that gets appended to the bottom of the plugin pages. "
-            "Commonly used for troubleshooting notes or additional setup instructions."
-        ),
-    )
-    prereq: str | None = Field(
-        None,
-        description=(
-            "A markdown string that included at the end of the auto generated "
-            "`Prerequisites` section on the plugin page. Can be used to include custom "
-            "prerequisites other than the default set."
-        ),
-    )
 
-
-class ExtractorDetails(BasePluginDetails, extra="forbid"):
+class Extractor(Plugin, extra="forbid"):
     """Extractor details model."""
 
     capabilities: list[enums.ExtractorCapabilityEnum]
@@ -374,7 +277,7 @@ class ExtractorDetails(BasePluginDetails, extra="forbid"):
     select: list[str] = Field(default_factory=list)
 
 
-class LoaderDetails(BasePluginDetails, extra="forbid"):
+class Loader(Plugin, extra="forbid"):
     """Loader details model."""
 
     capabilities: list[enums.LoaderCapabilityEnum] = Field(default_factory=list)
@@ -389,49 +292,37 @@ class LoaderDetails(BasePluginDetails, extra="forbid"):
     )
 
 
-class UtilityDetails(BasePluginDetails, extra="forbid"):
+class Utility(Plugin, extra="forbid"):
     """Utility details model."""
 
     pass
 
 
-class OrchestrationDetails(BasePluginDetails, extra="forbid"):
+class Orchestrator(Plugin, extra="forbid"):
     """Orchestration details model."""
 
     pass
 
 
-class TransformDetails(BasePluginDetails, extra="forbid"):
+class Transform(Plugin, extra="forbid"):
     """Transform details model."""
 
     vars: dict[str, t.Any] = Field(default_factory=dict)
 
 
-class TransformerDetails(BasePluginDetails, extra="forbid"):
+class Transformer(Plugin, extra="forbid"):
     """Transformer details model."""
 
     pass
 
 
-class MapperDetails(BasePluginDetails, extra="forbid"):
+class Mapper(Plugin, extra="forbid"):
     """Mapper details model."""
 
     pass
 
 
-class FileDetails(BasePluginDetails, extra="forbid"):
+class File(Plugin, extra="forbid"):
     """File details model."""
 
     update: dict[str, bool] = Field(default_factory=dict)
-
-
-type PluginDetails = (
-    ExtractorDetails
-    | LoaderDetails
-    | UtilityDetails
-    | OrchestrationDetails
-    | TransformDetails
-    | TransformerDetails
-    | MapperDetails
-    | FileDetails
-)

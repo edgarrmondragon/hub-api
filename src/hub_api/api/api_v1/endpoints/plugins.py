@@ -5,7 +5,8 @@ from __future__ import annotations
 import fastapi
 import fastapi.responses
 
-from hub_api import dependencies, enums, schemas  # noqa: TCH001
+from hub_api import dependencies, enums  # noqa: TCH001
+from hub_api.schemas import api as api_schemas  # noqa: TCH001
 
 router = fastapi.APIRouter()
 
@@ -15,7 +16,7 @@ router = fastapi.APIRouter()
     summary="Get plugin index",
     response_model_exclude_none=True,
 )
-async def get_index(hub: dependencies.Hub) -> schemas.PluginIndex:
+async def get_index(hub: dependencies.Hub) -> api_schemas.PluginIndex:
     """Retrieve global index of plugins."""
     return await hub.get_plugin_index()
 
@@ -25,7 +26,7 @@ async def get_index(hub: dependencies.Hub) -> schemas.PluginIndex:
     summary="Get plugin type index",
     response_model_exclude_none=True,
 )
-async def get_type_index(hub: dependencies.Hub, plugin_type: enums.PluginTypeEnum) -> schemas.PluginTypeIndex:
+async def get_type_index(hub: dependencies.Hub, plugin_type: enums.PluginTypeEnum) -> api_schemas.PluginTypeIndex:
     """Retrieve index of plugins of a given type."""
     return await hub.get_plugin_type_index(plugin_type=plugin_type)
 
@@ -55,7 +56,7 @@ async def get_plugin_variant(
     plugin_type: enums.PluginTypeEnum,
     plugin_name: str,
     plugin_variant: str,
-) -> schemas.PluginDetails:
+) -> api_schemas.PluginResponse:
     """Retrieve details of a plugin variant."""
     plugin_id = f"{plugin_type.value}.{plugin_name}"
     variant_id = f"{plugin_id}.{plugin_variant}"
