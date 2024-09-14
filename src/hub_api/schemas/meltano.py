@@ -3,9 +3,9 @@ from __future__ import annotations
 import typing as t
 
 from pydantic import BaseModel as PydanticBaseModel
-from pydantic import BaseModel, ConfigDict, Discriminator, Field, HttpUrl, RootModel, Tag
+from pydantic import ConfigDict, Discriminator, Field, HttpUrl, RootModel, Tag
 
-from hub_api import enums
+from hub_api import enums  # noqa: TCH001
 
 _T = t.TypeVar("_T")
 
@@ -179,9 +179,7 @@ class Plugin(BaseModel):
 
     name: str = Field(description="The plugin name", examples=["tap-csv"])
     namespace: str
-    label: str | None = Field(
-        None, description="The plugin label", examples=["CSV Tap"]
-    )
+    label: str | None = Field(None, description="The plugin label", examples=["CSV Tap"])
     description: str | None = Field(
         None,
         description="The plugin description",
@@ -216,8 +214,7 @@ class Plugin(BaseModel):
     )
     executable: str | None = Field(
         None,
-        description="The plugin's executable name, as defined in setup.py (if a Python based "
-        "plugin)",
+        description="The plugin's executable name, as defined in setup.py (if a Python based " "plugin)",
         examples=[
             "tap-stripe",
             "tap-covid-19",
@@ -258,9 +255,7 @@ class Plugin(BaseModel):
             "plugin executable."
         ),
     )
-    requires: dict[enums.PluginTypeEnum, list[PluginRequires]] = Field(
-        default_factory=dict
-    )
+    requires: dict[enums.PluginTypeEnum, list[PluginRequires]] = Field(default_factory=dict)
 
     hidden: bool | None = Field(
         None,

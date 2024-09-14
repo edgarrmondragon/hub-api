@@ -1,4 +1,5 @@
 """Pydantic models used to validate API responses."""
+
 from __future__ import annotations
 
 from pydantic import BaseModel as PydanticBaseModel
@@ -17,9 +18,7 @@ class Maintainer(BaseModel):
 
     id: str = Field(description="The maintainer identifier", examples=["meltano"])
     label: str | None = Field(description="The maintainer label", examples=["Meltano"])
-    url: HttpUrl | None = Field(
-        description="The maintainer URL", examples=["https://meltano.com"]
-    )
+    url: HttpUrl | None = Field(description="The maintainer URL", examples=["https://meltano.com"])
 
 
 class MaintainerPluginCount(BaseModel):
@@ -27,12 +26,8 @@ class MaintainerPluginCount(BaseModel):
 
     id: str = Field(description="The maintainer identifier", examples=["meltano"])
     label: str | None = Field(description="The maintainer label", examples=["Meltano"])
-    url: HttpUrl | None = Field(
-        description="The maintainer URL", examples=["https://meltano.com"]
-    )
-    plugin_count: int = Field(
-        description="The number of plugins the maintainer maintains", examples=[10]
-    )
+    url: HttpUrl | None = Field(description="The maintainer URL", examples=["https://meltano.com"])
+    plugin_count: int = Field(description="The number of plugins the maintainer maintains", examples=[10])
 
 
 class MaintainerDetails(BaseModel):
@@ -40,12 +35,8 @@ class MaintainerDetails(BaseModel):
 
     id: str = Field(description="The maintainer identifier", examples=["meltano"])
     label: str | None = Field(description="The maintainer label", examples=["Meltano"])
-    url: HttpUrl | None = Field(
-        description="The maintainer URL", examples=["https://meltano.com"]
-    )
-    links: dict[str, HttpUrl] = Field(
-        description="Links to the maintainer's plugins", default_factory=dict
-    )
+    url: HttpUrl | None = Field(description="The maintainer URL", examples=["https://meltano.com"])
+    links: dict[str, HttpUrl] = Field(description="Links to the maintainer's plugins", default_factory=dict)
 
 
 class VariantReference(BaseModel):
@@ -53,21 +44,15 @@ class VariantReference(BaseModel):
 
     ref: HttpUrl = Field(
         description="API URL for the variant",
-        examples=[
-            "https://hub.meltano.com/meltano/api/v1/plugins/extractors/tap-github--singer-io"
-        ],
+        examples=["https://hub.meltano.com/meltano/api/v1/plugins/extractors/tap-github--singer-io"],
     )
 
 
 class PluginRef(BaseModel):
     """Plugin entry."""
 
-    default_variant: str = Field(
-        description="The default variant of the plugin", examples=["singer-io"]
-    )
-    variants: dict[str, VariantReference] = Field(
-        description="The variants of the plugin", default_factory=dict
-    )
+    default_variant: str = Field(description="The default variant of the plugin", examples=["singer-io"])
+    variants: dict[str, VariantReference] = Field(description="The variants of the plugin", default_factory=dict)
     logo_url: str | None = Field(None, description="URL to the plugin's logo")
 
 

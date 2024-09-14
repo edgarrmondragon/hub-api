@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field, HttpUrl
 
-from hub_api import enums
+from hub_api import enums  # noqa: TCH001
 from hub_api.schemas import meltano
 
 
