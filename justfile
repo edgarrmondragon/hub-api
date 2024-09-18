@@ -1,3 +1,4 @@
+set dotenv-load
 source := "meltano-hub/_data"
 
 build-db:
@@ -16,7 +17,7 @@ lock:
     uv lock
 
 serve: build-db
-    uv run uvicorn hub_api.main:app --reload
+    uv run granian hub_api.main:app
 
 test: build-db
     uv run pytest

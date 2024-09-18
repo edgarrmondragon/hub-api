@@ -28,7 +28,10 @@ COPY plugins.db /app/plugins.db
 ENV SQLALCHEMY_DATABASE_URL="sqlite+aiosqlite:///app/plugins.db"
 
 # Place executables in the environment at the front of the path
-ENV PATH="/app/.venv/bin:$PATH"
+ENV PATH="/app/.venv/bin:$PATH" \
+    GRANIAN_HOST='0.0.0.0' \
+    GRANIAN_INTERFACE=asgi \
+    GRANIAN_LOG_ACCESS_ENABLED=1
 
 # Run the FastAPI application by default
-CMD ["uvicorn", "--host", "0.0.0.0", "hub_api.main:app"]
+CMD ["granian", "hub_api.main:app"]
