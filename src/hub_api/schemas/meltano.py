@@ -83,7 +83,7 @@ class OAuthSetting(_BasePluginSetting[str]):
 class Option(BaseModel):
     """Option model."""
 
-    value: str = Field(description="The option value")
+    value: t.Any = Field(description="The option value")
     label: str | None = Field(None, description="The option label")
 
 
@@ -205,11 +205,6 @@ class Plugin(BaseModel):
             "-e path/to/local/tap",
         ],
     )
-    logo_url: HttpUrl | None = Field(
-        None,
-        description="URL to the plugin's logo",
-        examples=["https://meltano.com/images/logo.png"],
-    )
     executable: str | None = Field(
         None,
         description="The plugin's executable name, as defined in setup.py (if a Python based " "plugin)",
@@ -312,7 +307,7 @@ class Transformer(Plugin, extra="forbid"):
 class Mapper(Plugin, extra="forbid"):
     """Mapper details model."""
 
-    pass
+    capabilities: list[enums.MapperCapabilityEnum]
 
 
 class File(Plugin, extra="forbid"):

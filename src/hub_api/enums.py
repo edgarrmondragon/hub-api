@@ -70,3 +70,9 @@ class LoaderCapabilityEnum(_HyphenatedEnum):
     soft_delete = enum.auto()
     stream_maps = enum.auto()
     validate_records = enum.auto()
+
+
+class MapperCapabilityEnum(_HyphenatedEnum):
+    """Mapper capabilities."""
+
+    stream_maps = enum.auto()

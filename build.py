@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session as SessionBase
 from sqlalchemy.orm import sessionmaker
 
 from hub_api import enums, models
+from hub_api.schemas import meltano, validation
 
 
 def get_default_variants(path: Path) -> dict[str, dict[str, str]]:
@@ -33,22 +34,30 @@ def get_plugins_of_type(
         yield from get_plugin_variants(plugin_path)
 
 
-def _build_setting(variant_id: str, setting: dict[str, t.Any]) -> models.Setting:
-    return models.Setting(
-        id=f"{variant_id}.setting_{setting["name"]}",
+def _build_setting(variant_id: str, setting: meltano.PluginSetting) -> models.Setting:
+    """Build setting object."""
+    instance = models.Setting(
+        id=f"{variant_id}.setting_{setting.root.name}",
         variant_id=variant_id,
-        name=setting["name"],
-        label=setting.get("label"),
-        description=setting.get("description"),
-        env=setting.get("env"),
-        kind=setting.get("kind"),
-        value=setting.get("value"),
-        options=setting.get("options"),
-        sensitive=setting.get("sensitive"),
+        name=setting.root.name,
+        label=setting.root.label,
+        description=setting.root.description,
+        env=setting.root.env,
+        kind=setting.root.kind,
+        value=setting.root.value,
+        sensitive=setting.root.sensitive,
     )
 
+    match setting.root:
+        case meltano.OptionsSetting():
+            instance.options = [opt.model_dump() for opt in setting.root.options]
+        case _:
+            pass
 
-def load_db(path: Path, session: SessionBase) -> None:  # noqa: C901, PLR0912, PLR0914
+    return instance
+
+
+def load_db(path: Path, session: SessionBase) -> None:  # noqa: C901, PLR0912, PLR0914, PLR0915
     """Load database."""
 
     default_variants = get_default_variants(path.joinpath("default_variants.yml"))
@@ -70,33 +79,54 @@ def load_db(path: Path, session: SessionBase) -> None:  # noqa: C901, PLR0912, P
             default_variant_id = f"{plugin_id}.{default_variant}"
 
             for variant, definition in get_plugin_variants(plugin_path):
+                plugin: validation.HubPluginDefinition
+                match plugin_type:
+                    case enums.PluginTypeEnum.extractors:
+                        plugin = validation.ExtractorDefinition.model_validate(definition)
+                    case enums.PluginTypeEnum.loaders:
+                        plugin = validation.LoaderDefinition.model_validate(definition)
+                    case enums.PluginTypeEnum.utilities:
+                        plugin = validation.UtilityDefinition.model_validate(definition)
+                    case enums.PluginTypeEnum.transformers:
+                        plugin = validation.TransformerDefinition.model_validate(definition)
+                    case enums.PluginTypeEnum.transforms:
+                        plugin = validation.TransformDefinition.model_validate(definition)
+                    case enums.PluginTypeEnum.orchestrators:
+                        plugin = validation.OrchestratorDefinition.model_validate(definition)
+                    case enums.PluginTypeEnum.mappers:
+                        plugin = validation.MapperDefinition.model_validate(definition)
+                    case enums.PluginTypeEnum.files:
+                        plugin = validation.FileDefinition.model_validate(definition)
+                    case _:
+                        continue
+
                 variant_id = f"{plugin_id}.{variant}"
                 variant_object = models.PluginVariant(
                     plugin_id=plugin_id,
                     id=variant_id,
-                    description=definition.get("description"),
-                    executable=definition.get("executable"),
-                    docs=definition.get("docs"),
+                    description=plugin.description,
+                    executable=plugin.executable,
+                    docs=str(plugin.docs) if plugin.docs else None,
                     name=variant,
-                    label=definition.get("label"),
-                    logo_url=definition.get("logo_url"),
-                    pip_url=definition.get("pip_url"),
-                    repo=definition.get("repo"),
-                    ext_repo=definition.get("ext_repo"),
-                    namespace=definition.get("namespace"),
-                    hidden=definition.get("hidden"),
-                    maintenance_status=definition.get("maintenance_status"),
-                    quality=definition.get("quality"),
-                    domain_url=definition.get("domain_url"),
-                    definition=definition.get("definition"),
-                    next_steps=definition.get("next_steps"),
-                    settings_preamble=definition.get("settings_preamble"),
-                    usage=definition.get("usage"),
-                    prereq=definition.get("prereq"),
+                    label=plugin.label,
+                    logo_url=plugin.logo_url,
+                    pip_url=plugin.pip_url,
+                    repo=str(plugin.repo),
+                    ext_repo=str(plugin.ext_repo) if plugin.ext_repo else None,
+                    namespace=plugin.namespace,
+                    hidden=plugin.hidden,
+                    maintenance_status=plugin.maintenance_status,
+                    quality=plugin.quality,
+                    domain_url=str(plugin.domain_url) if plugin.domain_url else None,
+                    definition=plugin.definition,
+                    next_steps=plugin.next_steps,
+                    settings_preamble=plugin.settings_preamble,
+                    usage=plugin.usage,
+                    prereq=plugin.prereq,
                 )
                 session.add(variant_object)
 
-                for setting in definition.get("settings", []):
+                for setting in plugin.settings:
                     session.add(_build_setting(variant_id, setting))
 
                 for group_idx, setting_group in enumerate(

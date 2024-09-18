@@ -62,7 +62,7 @@ class PluginRef(BaseModel):
 
     default_variant: str = Field(description="The default variant of the plugin", examples=["singer-io"])
     variants: dict[str, VariantReference] = Field(description="The variants of the plugin", default_factory=dict)
-    logo_url: str | None = Field(None, description="URL to the plugin's logo")
+    logo_url: HttpUrl | None = Field(None, description="URL to the plugin's logo")
 
 
 type PluginTypeIndex = dict[str, PluginRef]
