@@ -13,30 +13,39 @@ class BaseModel(PydanticBaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class Maintainer(BaseModel):
-    """Maintainer model."""
+class _BaseMaintainerSchema(BaseModel):
+    """Base maintainer schema."""
 
     id: str = Field(description="The maintainer identifier", examples=["meltano"])
     label: str | None = Field(description="The maintainer label", examples=["Meltano"])
     url: HttpUrl | None = Field(description="The maintainer URL", examples=["https://meltano.com"])
 
 
-class MaintainerPluginCount(BaseModel):
+class Maintainer(_BaseMaintainerSchema):
     """Maintainer model."""
 
-    id: str = Field(description="The maintainer identifier", examples=["meltano"])
-    label: str | None = Field(description="The maintainer label", examples=["Meltano"])
-    url: HttpUrl | None = Field(description="The maintainer URL", examples=["https://meltano.com"])
+    class Links(BaseModel):
+        """Maintainer links."""
+
+        details: str = Field(description="Links to maintainer details")
+
+    links: Links
+
+
+class MaintainersList(BaseModel):
+    maintainers: list[Maintainer]
+
+
+class MaintainerPluginCount(_BaseMaintainerSchema):
+    """Maintainer model."""
+
     plugin_count: int = Field(description="The number of plugins the maintainer maintains", examples=[10])
 
 
-class MaintainerDetails(BaseModel):
+class MaintainerDetails(_BaseMaintainerSchema):
     """Maintainer details model."""
 
-    id: str = Field(description="The maintainer identifier", examples=["meltano"])
-    label: str | None = Field(description="The maintainer label", examples=["Meltano"])
-    url: HttpUrl | None = Field(description="The maintainer URL", examples=["https://meltano.com"])
-    links: dict[str, HttpUrl] = Field(description="Links to the maintainer's plugins", default_factory=dict)
+    links: dict[str, str] = Field(description="Links to the maintainer's plugins", default_factory=dict)
 
 
 class VariantReference(BaseModel):

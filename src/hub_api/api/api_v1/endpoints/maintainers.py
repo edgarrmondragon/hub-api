@@ -15,7 +15,7 @@ router = fastapi.APIRouter()
     summary="Get maintainers list",
     response_model_exclude_none=True,
 )
-async def get_maintainers(hub: dependencies.Hub) -> list[api_schemas.Maintainer]:
+async def get_maintainers(hub: dependencies.Hub) -> api_schemas.MaintainersList:
     """Retrieve global index of plugins."""
     return await hub.get_maintainers()
 

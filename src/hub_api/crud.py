@@ -57,7 +57,7 @@ def build_hub_url(
     """Build hub URL.
 
     Args:
-        base_url: Base API URL.
+        base_url: Base Hub URL.
         plugin_type: Plugin type.
         plugin_name: Plugin name.
         plugin_variant: Plugin variant
@@ -66,6 +66,17 @@ def build_hub_url(
         Hub URL for the plugin.
     """
     return pydantic.HttpUrl(f"{base_url}/{plugin_type.value}/{plugin_name}--{plugin_variant}")
+
+
+def build_maintainer_url(*, base_url: str, maintainer: str) -> pydantic.HttpUrl:
+    """Build maintainer URL.
+
+    Args:
+        base_url: Base API URL.
+        maintainer: Maintainer ID.
+    """
+    prefix = "/meltano/api/v1/maintainers"
+    return pydantic.HttpUrl(f"{base_url}{prefix}/{maintainer}")
 
 
 class MeltanoHub:
@@ -307,14 +318,16 @@ class MeltanoHub:
         result = await self.db.execute(q)
         return dict(row._tuple() for row in result.all())  # noqa: SLF001
 
-    async def get_maintainers(self: MeltanoHub) -> list[api_schemas.Maintainer]:
+    async def get_maintainers(self: MeltanoHub) -> api_schemas.MaintainersList:
         """Get maintainers.
 
         Returns:
             List of maintainers.
         """
         result = await self.db.execute(sa.select(models.Maintainer))
-        return [api_schemas.Maintainer.model_validate(row) for row in result.scalars().all()]
+        return api_schemas.MaintainersList(
+            maintainers=[api_schemas.Maintainer.model_validate(row) for row in result.scalars().all()],
+        )
 
     async def get_maintainer(self: MeltanoHub, maintainer_id: str) -> api_schemas.MaintainerDetails:
         """Get maintainer, with links to plugins.

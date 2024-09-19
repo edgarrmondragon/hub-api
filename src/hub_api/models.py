@@ -83,6 +83,12 @@ class PluginVariant(EntityBase):
 
     maintainer: Mapped[Maintainer] = relationship(back_populates="plugins")
 
+    @property
+    def links(self) -> dict[str, str]:
+        return {
+            "details": f"/meltano/api/v1/plugins/{self.plugin.plugin_type}/{self.plugin.name}--{self.name}",
+        }
+
 
 class Setting(EntityBase):
     __tablename__ = "settings"
@@ -241,3 +247,10 @@ class Maintainer(EntityBase):
     url: Mapped[str | None]
 
     plugins: Mapped[list[PluginVariant]] = relationship(back_populates="maintainer")
+
+    @property
+    def links(self) -> dict[str, str]:
+        """Maintainer links."""
+        return {
+            "details": f"/meltano/v1/maintainers/{self.id}",
+        }
