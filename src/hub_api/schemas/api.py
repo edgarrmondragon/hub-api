@@ -45,7 +45,7 @@ class MaintainerPluginCount(_BaseMaintainerSchema):
 class MaintainerDetails(_BaseMaintainerSchema):
     """Maintainer details model."""
 
-    links: dict[str, str] = Field(description="Links to the maintainer's plugins", default_factory=dict)
+    links: dict[str, HttpUrl] = Field(description="Links to the maintainer's plugins", default_factory=dict)
 
 
 class VariantReference(BaseModel):
