@@ -43,20 +43,20 @@ depends_on = []
 
 [[modules]]
 path = "hub_api.main"
+strict = true
 depends_on = [
     { path = "hub_api.api" },
     { path = "hub_api.exceptions" },
     { path = "hub_api.helpers.etag" },
     { path = "hub_api.static" },
 ]
-strict = true
 
 [[modules]]
 path = "hub_api.models"
+strict = true
 depends_on = [
     { path = "hub_api.enums" },
 ]
-strict = true
 
 [[modules]]
 path = "hub_api.schemas"

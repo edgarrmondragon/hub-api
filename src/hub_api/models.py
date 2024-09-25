@@ -241,3 +241,10 @@ class Maintainer(EntityBase):
     url: Mapped[str | None]
 
     plugins: Mapped[list[PluginVariant]] = relationship(back_populates="maintainer")
+
+    @property
+    def links(self) -> dict[str, str]:
+        """Maintainer links."""
+        return {
+            "details": f"/meltano/v1/maintainers/{self.id}",
+        }

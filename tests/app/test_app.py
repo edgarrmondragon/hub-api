@@ -104,8 +104,8 @@ async def test_maintainers(api: httpx.AsyncClient) -> None:
     response = await api.get("/meltano/api/v1/maintainers", follow_redirects=True)
     assert response.status_code == http.HTTPStatus.OK
 
-    maintainers = response.json()
-    maintainer = next(filter(lambda m: m["id"] == "edgarrmondragon", maintainers))
+    data = response.json()
+    maintainer = next(filter(lambda m: m["id"] == "edgarrmondragon", data["maintainers"]))
     assert maintainer["id"] == "edgarrmondragon"
     assert maintainer["url"] == "https://github.com/edgarrmondragon"
 

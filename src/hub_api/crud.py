@@ -25,6 +25,27 @@ class PluginVariantNotFoundError(exceptions.NotFoundError):
     pass
 
 
+def _build_variant_path(
+    *,
+    plugin_type: enums.PluginTypeEnum,
+    plugin_name: str,
+    plugin_variant: str,
+) -> str:
+    """Build variant URL.
+
+    Args:
+        base_url: Base API URL.
+        plugin_type: Plugin type.
+        plugin_name: Plugin name.
+        plugin_variant: Plugin variant.
+
+    Returns:
+        Variant URL.
+    """
+    prefix = "/meltano/api/v1/plugins"
+    return f"{prefix}/{plugin_type.value}/{plugin_name}--{plugin_variant}"
+
+
 def build_variant_url(
     *,
     base_url: str,
@@ -43,8 +64,12 @@ def build_variant_url(
     Returns:
         Variant URL.
     """
-    prefix = "/meltano/api/v1/plugins"
-    return pydantic.HttpUrl(f"{base_url}{prefix}/{plugin_type.value}/{plugin_name}--{plugin_variant}")
+    path = _build_variant_path(
+        plugin_type=plugin_type,
+        plugin_name=plugin_name,
+        plugin_variant=plugin_variant,
+    )
+    return pydantic.HttpUrl(f"{base_url}{path}")
 
 
 def build_hub_url(
@@ -57,7 +82,7 @@ def build_hub_url(
     """Build hub URL.
 
     Args:
-        base_url: Base API URL.
+        base_url: Base Hub URL.
         plugin_type: Plugin type.
         plugin_name: Plugin name.
         plugin_variant: Plugin variant
@@ -149,7 +174,7 @@ class MeltanoHub:
 
         return await self._variant_details(variant)
 
-    async def get_default_variant_url(self, plugin_id: str) -> pydantic.HttpUrl:
+    async def get_default_variant_url(self, plugin_id: str) -> str:
         q = (
             sa.select(
                 models.Plugin,
@@ -160,8 +185,7 @@ class MeltanoHub:
         )
         if result := (await self.db.execute(q)).first():
             plugin, variant = result
-            return build_variant_url(
-                base_url=self.base_api_url,
+            return _build_variant_path(
                 plugin_type=plugin.plugin_type,
                 plugin_name=plugin.name,
                 plugin_variant=variant,
@@ -307,14 +331,16 @@ class MeltanoHub:
         result = await self.db.execute(q)
         return dict(row._tuple() for row in result.all())  # noqa: SLF001
 
-    async def get_maintainers(self: MeltanoHub) -> list[api_schemas.Maintainer]:
+    async def get_maintainers(self: MeltanoHub) -> api_schemas.MaintainersList:
         """Get maintainers.
 
         Returns:
             List of maintainers.
         """
         result = await self.db.execute(sa.select(models.Maintainer))
-        return [api_schemas.Maintainer.model_validate(row) for row in result.scalars().all()]
+        return api_schemas.MaintainersList(
+            maintainers=[api_schemas.Maintainer.model_validate(row) for row in result.scalars().all()],
+        )
 
     async def get_maintainer(self: MeltanoHub, maintainer_id: str) -> api_schemas.MaintainerDetails:
         """Get maintainer, with links to plugins.
@@ -336,8 +362,7 @@ class MeltanoHub:
             label=maintainer.label,
             url=pydantic.HttpUrl(maintainer.url) if maintainer.url else None,
             links={
-                v.plugin.name: build_variant_url(
-                    base_url=self.base_api_url,
+                v.plugin.name: _build_variant_path(
                     plugin_type=v.plugin.plugin_type,
                     plugin_name=v.plugin.name,
                     plugin_variant=v.name,

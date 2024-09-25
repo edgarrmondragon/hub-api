@@ -99,9 +99,8 @@ async def test_get_plugin_stats(hub: crud.MeltanoHub) -> None:
 @pytest.mark.asyncio
 async def test_get_maintainers(hub: crud.MeltanoHub) -> None:
     """Test get_maintainers."""
-    maintainers = await hub.get_maintainers()
-    assert isinstance(maintainers, list)
-    assert len(maintainers) > 0
+    data = await hub.get_maintainers()
+    assert len(data.maintainers) > 0
 
 
 @pytest.mark.asyncio
