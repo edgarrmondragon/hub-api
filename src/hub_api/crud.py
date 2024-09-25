@@ -174,7 +174,7 @@ class MeltanoHub:
 
         return await self._variant_details(variant)
 
-    async def get_default_variant_url(self, plugin_id: str) -> pydantic.HttpUrl:
+    async def get_default_variant_url(self, plugin_id: str) -> str:
         q = (
             sa.select(
                 models.Plugin,
@@ -185,8 +185,7 @@ class MeltanoHub:
         )
         if result := (await self.db.execute(q)).first():
             plugin, variant = result
-            return build_variant_url(
-                base_url=self.base_api_url,
+            return _build_variant_path(
                 plugin_type=plugin.plugin_type,
                 plugin_name=plugin.name,
                 plugin_variant=variant,
