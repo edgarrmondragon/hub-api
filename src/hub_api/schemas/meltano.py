@@ -7,14 +7,12 @@ from pydantic import ConfigDict, Discriminator, Field, HttpUrl, RootModel, Tag
 
 from hub_api import enums  # noqa: TCH001
 
-_T = t.TypeVar("_T")
-
 
 class BaseModel(PydanticBaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class _BasePluginSetting(BaseModel, t.Generic[_T]):
+class _BasePluginSetting[T](BaseModel):
     """Plugin setting model."""
 
     aliases: list[str] | None = None
@@ -37,7 +35,7 @@ class _BasePluginSetting(BaseModel, t.Generic[_T]):
         None,
         description="Whether the setting is sensitive.",
     )
-    value: _T | None = Field(None, description="The setting value.")
+    value: T | None = Field(None, description="The setting value.")
 
 
 class StringSetting(_BasePluginSetting[str]):
