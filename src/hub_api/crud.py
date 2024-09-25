@@ -68,17 +68,6 @@ def build_hub_url(
     return pydantic.HttpUrl(f"{base_url}/{plugin_type.value}/{plugin_name}--{plugin_variant}")
 
 
-def build_maintainer_url(*, base_url: str, maintainer: str) -> pydantic.HttpUrl:
-    """Build maintainer URL.
-
-    Args:
-        base_url: Base API URL.
-        maintainer: Maintainer ID.
-    """
-    prefix = "/meltano/api/v1/maintainers"
-    return pydantic.HttpUrl(f"{base_url}{prefix}/{maintainer}")
-
-
 class MeltanoHub:
     def __init__(
         self: MeltanoHub,

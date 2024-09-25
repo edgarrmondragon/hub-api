@@ -84,7 +84,7 @@ class PluginVariant(EntityBase):
     maintainer: Mapped[Maintainer] = relationship(back_populates="plugins")
 
     @property
-    def links(self) -> dict[str, str]:
+    def links(self) -> dict[str, str]:  # pragma: no cover
         return {
             "details": f"/meltano/api/v1/plugins/{self.plugin.plugin_type}/{self.plugin.name}--{self.name}",
         }
