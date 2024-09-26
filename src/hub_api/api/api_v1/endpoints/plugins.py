@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import typing as t
+
 import fastapi
 import fastapi.responses
 
@@ -26,7 +28,16 @@ async def get_index(hub: dependencies.Hub) -> api_schemas.PluginIndex:
     summary="Get plugin type index",
     response_model_exclude_none=True,
 )
-async def get_type_index(hub: dependencies.Hub, plugin_type: enums.PluginTypeEnum) -> api_schemas.PluginTypeIndex:
+async def get_type_index(
+    hub: dependencies.Hub,
+    plugin_type: t.Annotated[
+        enums.PluginTypeEnum,
+        fastapi.Path(
+            ...,
+            description="The plugin type",
+        ),
+    ],
+) -> api_schemas.PluginTypeIndex:
     """Retrieve index of plugins of a given type."""
     return await hub.get_plugin_type_index(plugin_type=plugin_type)
 
@@ -35,11 +46,27 @@ async def get_type_index(hub: dependencies.Hub, plugin_type: enums.PluginTypeEnu
     "/{plugin_type}/{plugin_name}/default",
     status_code=fastapi.status.HTTP_307_TEMPORARY_REDIRECT,
     summary="Get the default plugin variant",
+    responses={
+        404: {"description": "Plugin not found"},
+    },
 )
 async def get_default_plugin(
     hub: dependencies.Hub,
-    plugin_type: enums.PluginTypeEnum,
-    plugin_name: str,
+    plugin_type: t.Annotated[
+        enums.PluginTypeEnum,
+        fastapi.Path(
+            ...,
+            description="The plugin type",
+        ),
+    ],
+    plugin_name: t.Annotated[
+        str,
+        fastapi.Path(
+            ...,
+            description="The plugin name",
+            pattern=r"^[A-Za-z0-9-]+$",
+        ),
+    ],
 ) -> fastapi.responses.RedirectResponse:
     """Retrieve details of a plugin variant."""
     plugin_id = f"{plugin_type.value}.{plugin_name}"
@@ -50,12 +77,29 @@ async def get_default_plugin(
     "/{plugin_type}/{plugin_name}--{plugin_variant}",
     response_model_exclude_none=True,
     summary="Get plugin variant",
+    responses={
+        404: {"description": "Plugin variant not found"},
+    },
 )
 async def get_plugin_variant(
     hub: dependencies.Hub,
     plugin_type: enums.PluginTypeEnum,
-    plugin_name: str,
-    plugin_variant: str,
+    plugin_name: t.Annotated[
+        str,
+        fastapi.Path(
+            ...,
+            description="The plugin name",
+            pattern=r"^[A-Za-z0-9-]+$",
+        ),
+    ],
+    plugin_variant: t.Annotated[
+        str,
+        fastapi.Path(
+            ...,
+            description="The plugin variant",
+            pattern=r"^[A-Za-z0-9-]+$",
+        ),
+    ],
 ) -> api_schemas.PluginResponse:
     """Retrieve details of a plugin variant."""
     plugin_id = f"{plugin_type.value}.{plugin_name}"
@@ -67,7 +111,15 @@ async def get_plugin_variant(
 async def sdk(
     hub: dependencies.Hub,
     *,
-    limit: int = 100,
+    limit: t.Annotated[
+        int,
+        fastapi.Query(
+            ...,
+            ge=1,
+            le=100,
+            description="The number of plugins to return",
+        ),
+    ] = 25,
     plugin_type: enums.PluginTypeEnum | None = None,
 ) -> list[dict[str, str]]:
     """Retrieve plugins made with the Singer SDK."""

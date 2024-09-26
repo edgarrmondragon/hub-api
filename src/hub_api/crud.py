@@ -170,7 +170,7 @@ class MeltanoHub:
         variant = await self.db.get(models.PluginVariant, variant_id)
 
         if not variant:
-            raise PluginVariantNotFoundError(f"Plugin variant {variant_id} not found")
+            raise PluginVariantNotFoundError("Plugin variant not found")
 
         return await self._variant_details(variant)
 
@@ -194,7 +194,7 @@ class MeltanoHub:
                 plugin_variant=variant,
             )
 
-        raise exceptions.NotFoundError(f"Plugin {plugin_id} not found")
+        raise exceptions.NotFoundError("Plugin not found")
 
     async def _get_all_plugins(
         self: MeltanoHub,

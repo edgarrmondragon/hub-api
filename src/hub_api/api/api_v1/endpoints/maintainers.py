@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import typing as t
+
 import fastapi
 
 from hub_api import dependencies  # noqa: TCH001
@@ -21,11 +23,22 @@ async def get_maintainers(hub: dependencies.Hub) -> api_schemas.MaintainersList:
 
 
 @router.get(
-    "/top/{count}",
+    "/top",
     summary="Get top plugin maintainers",
     response_model_exclude_none=True,
 )
-async def get_top_maintainers(hub: dependencies.Hub, count: int) -> list[api_schemas.MaintainerPluginCount]:
+async def get_top_maintainers(
+    hub: dependencies.Hub,
+    count: t.Annotated[
+        int,
+        fastapi.Query(
+            ...,
+            ge=1,
+            lt=50,
+            description="The number of maintainers to return",
+        ),
+    ],
+) -> list[api_schemas.MaintainerPluginCount]:
     """Retrieve top maintainers."""
     return await hub.get_top_maintainers(count)
 
@@ -34,7 +47,20 @@ async def get_top_maintainers(hub: dependencies.Hub, count: int) -> list[api_sch
     "/{maintainer}",
     summary="Get maintainer details",
     response_model_exclude_none=True,
+    responses={
+        404: {"description": "Maintainer not found"},
+    },
 )
-async def get_maintainer(hub: dependencies.Hub, maintainer: str) -> api_schemas.MaintainerDetails:
+async def get_maintainer(
+    hub: dependencies.Hub,
+    maintainer: t.Annotated[
+        str,
+        fastapi.Path(
+            ...,
+            description="The maintainer identifier",
+            pattern=r"^[A-Za-z0-9-]+$",
+        ),
+    ],
+) -> api_schemas.MaintainerDetails:
     """Retrieve maintainer details."""
     return await hub.get_maintainer(maintainer)
