@@ -170,7 +170,7 @@ class MeltanoHub:
         variant = await self.db.get(models.PluginVariant, variant_id)
 
         if not variant:
-            raise PluginVariantNotFoundError(f"Plugin variant {variant_id} not found")
+            raise PluginVariantNotFoundError("Plugin variant not found")
 
         return await self._variant_details(variant)
 
@@ -180,7 +180,10 @@ class MeltanoHub:
                 models.Plugin,
                 models.PluginVariant.name.label("variant"),
             )
-            .join(models.PluginVariant, models.PluginVariant.id == models.Plugin.default_variant_id)
+            .join(
+                models.PluginVariant,
+                models.PluginVariant.id == models.Plugin.default_variant_id,
+            )
             .where(models.PluginVariant.plugin_id == plugin_id)
         )
         if result := (await self.db.execute(q)).first():
@@ -191,7 +194,7 @@ class MeltanoHub:
                 plugin_variant=variant,
             )
 
-        raise exceptions.NotFoundError(f"Plugin {plugin_id} not found")
+        raise exceptions.NotFoundError("Plugin not found")
 
     async def _get_all_plugins(
         self: MeltanoHub,
@@ -232,9 +235,11 @@ class MeltanoHub:
 
         for row in await self._get_all_plugins(plugin_type=None):
             plugin_name, plugin_type, variant_name, logo_url, default_variant = row._tuple()  # noqa: SLF001
+            logo_http_url = pydantic.HttpUrl(f"{self.base_hub_url}/assets{logo_url}") if logo_url else None
             if plugin_name not in plugins[plugin_type]:
                 plugins[plugin_type][plugin_name] = api_schemas.PluginRef(
-                    default_variant=default_variant, logo_url=logo_url
+                    default_variant=default_variant,
+                    logo_url=logo_http_url,
                 )
 
             plugins[plugin_type][plugin_name].variants[variant_name] = api_schemas.VariantReference(
@@ -265,8 +270,12 @@ class MeltanoHub:
 
         for row in await self._get_all_plugins(plugin_type=plugin_type):
             plugin_name, _, variant_name, logo_url, default_variant = row._tuple()  # noqa: SLF001
+            logo_http_url = pydantic.HttpUrl(f"{self.base_hub_url}/assets{logo_url}") if logo_url else None
             if plugin_name not in plugins:
-                plugins[plugin_name] = api_schemas.PluginRef(default_variant=default_variant, logo_url=logo_url)
+                plugins[plugin_name] = api_schemas.PluginRef(
+                    default_variant=default_variant,
+                    logo_url=logo_http_url,
+                )
 
             plugins[plugin_name].variants[variant_name] = api_schemas.VariantReference(
                 ref=build_variant_url(

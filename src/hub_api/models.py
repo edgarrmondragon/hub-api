@@ -99,7 +99,7 @@ class Setting(EntityBase):
     env: Mapped[str | None]
     kind: Mapped[str | None]
     value: Mapped[t.Any | None] = mapped_column(sa.JSON)
-    options: Mapped[list[str] | None] = mapped_column(sa.JSON)
+    options: Mapped[list[dict[str, t.Any]] | None] = mapped_column(sa.JSON)
     sensitive: Mapped[bool | None]
 
     variant: Mapped[PluginVariant] = relationship(back_populates="settings")

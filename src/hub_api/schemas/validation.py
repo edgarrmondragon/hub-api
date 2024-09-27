@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, Field, HttpUrl
+import typing as t
+
+from pydantic import BaseModel, Field, HttpUrl, StringConstraints
 
 from hub_api import enums  # noqa: TCH001
 from hub_api.schemas import meltano
@@ -63,38 +65,38 @@ class HubPluginMetadata(BaseModel):
 
 
 class HubPluginDefinition(meltano.Plugin, HubPluginMetadata):
+    logo_url: t.Annotated[str | None, StringConstraints(pattern=r"^(\/[^\/]+)+$")] = None
+
+
+class ExtractorDefinition(HubPluginDefinition, meltano.Extractor):
     pass
 
 
-class ExtractorDefinition(meltano.Extractor, HubPluginMetadata):
+class LoaderDefinition(HubPluginDefinition, meltano.Loader):
     pass
 
 
-class LoaderDefinition(meltano.Loader, HubPluginMetadata):
+class UtilityDefinition(HubPluginDefinition, meltano.Utility):
     pass
 
 
-class UtilityDefinition(meltano.Utility, HubPluginMetadata):
+class OrchestratorDefinition(HubPluginDefinition, meltano.Orchestrator):
     pass
 
 
-class OrchestratorDefinition(meltano.Orchestrator, HubPluginMetadata):
+class TransformDefinition(HubPluginDefinition, meltano.Transform):
     pass
 
 
-class TransformDefinition(meltano.Transform, HubPluginMetadata):
+class TransformerDefinition(HubPluginDefinition, meltano.Transformer):
     pass
 
 
-class TransformerDefinition(meltano.Transformer, HubPluginMetadata):
+class MapperDefinition(HubPluginDefinition, meltano.Mapper):
     pass
 
 
-class MapperDefinition(meltano.Mapper, HubPluginMetadata):
-    pass
-
-
-class FileDefinition(meltano.File, HubPluginMetadata):
+class FileDefinition(HubPluginDefinition, meltano.File):
     pass
 
 
