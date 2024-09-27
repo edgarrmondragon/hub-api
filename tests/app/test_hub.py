@@ -44,12 +44,7 @@ async def test_get_plugin_type_index(hub: crud.MeltanoHub, plugin_type: enums.Pl
         pytest.param("tap-mssql", enums.PluginTypeEnum.extractors, "wintersrd"),
         pytest.param("tap-mssql", enums.PluginTypeEnum.extractors, "airbyte"),
         pytest.param("target-postgres", enums.PluginTypeEnum.loaders, "meltanolabs"),
-        pytest.param(
-            "target-bigquery",
-            enums.PluginTypeEnum.loaders,
-            "z3z1ma",
-            marks=pytest.mark.xfail(strict=True),
-        ),
+        pytest.param("target-bigquery", enums.PluginTypeEnum.loaders, "z3z1ma"),
         pytest.param("dbt-postgres", enums.PluginTypeEnum.utilities, "dbt-labs"),
         pytest.param("dbt-postgres", enums.PluginTypeEnum.transformers, "dbt-labs"),
         pytest.param("tap-gitlab", enums.PluginTypeEnum.transforms, "meltano"),

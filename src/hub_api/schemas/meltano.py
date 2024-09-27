@@ -36,7 +36,7 @@ class _BasePluginSetting(BaseModel):
         None,
         description="Whether the setting is sensitive.",
     )
-    value: str | dict[str, t.Any] | list | bool | int | None = Field(None, description="The setting value.")
+    value: str | dict[str, t.Any] | list[t.Any] | bool | int | None = Field(None, description="The setting value.")
 
 
 class StringSetting(_BasePluginSetting):

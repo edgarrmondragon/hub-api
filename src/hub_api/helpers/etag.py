@@ -53,7 +53,7 @@ def check_etag(
 
                 https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match
             """),
-            pattern=r'^"[A-Za-z0-9-]+"$',
+            pattern=r"^etag-[A-Za-z0-9-]+$",
         ),
     ] = None,
 ) -> None:

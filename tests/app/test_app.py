@@ -127,7 +127,7 @@ async def test_maintainer_details(api: httpx.AsyncClient) -> None:
 async def test_top_maintainers(api: httpx.AsyncClient) -> None:
     """Test /meltano/api/v1/maintainers."""
     n = 3
-    response = await api.get(f"/meltano/api/v1/maintainers/top/{n}")
+    response = await api.get("/meltano/api/v1/maintainers/top", params={"count": n})
     assert response.status_code == http.HTTPStatus.OK
 
     maintainers = response.json()
