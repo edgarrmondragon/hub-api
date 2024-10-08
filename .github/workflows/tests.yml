@@ -64,6 +64,7 @@ jobs:
       with:
         name: hub-data
     - run: uv run coverage run -m pytest -v
+      continue-on-error: true # Continue on error to combine coverage.
     - uses: actions/upload-artifact@604373da6381bf24206979c74d06a550515601b9 # v4.4.1
       with:
         include-hidden-files: true
