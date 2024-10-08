@@ -15,9 +15,12 @@ repos:
     -   id: trailing-whitespace
 
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.6.4
+    rev: v0.6.8
     hooks:
     -   id: ruff
+        args:
+        - --fix
+        - --show-fixes
     -   id: ruff-format
 
 -   repo: https://github.com/pre-commit/mirrors-mypy
@@ -43,11 +46,11 @@ repos:
     -   id: validate_manifest
 
 -   repo: https://github.com/gauge-sh/tach-pre-commit
-    rev: v0.10.7
+    rev: v0.11.3
     hooks:
     -   id: tach
 
 -   repo: https://github.com/crate-ci/typos
-    rev: v1.24.5
+    rev: v1.25.0
     hooks:
     -   id: typos
