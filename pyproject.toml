@@ -27,6 +27,7 @@ dev-dependencies = [
     "requests>=2.32.3",
     "types-PyYAML>=6.0.12.20240808",
 ]
+prerelease = "allow"
 
 [tool.ruff]
 line-length = 120
