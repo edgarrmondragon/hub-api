@@ -36,7 +36,7 @@ jobs:
         ref: main
         path: meltano-hub
     - run: uv run python -I build.py meltano-hub/_data
-    - uses: actions/upload-artifact@604373da6381bf24206979c74d06a550515601b9 # v4.4.1
+    - uses: actions/upload-artifact@84480863f228bb9747b473957fcc9e309aa96097 # v4.4.2
       with:
         name: hub-data
         path: plugins.db
@@ -65,11 +65,34 @@ jobs:
         name: hub-data
     - run: uv run coverage run -m pytest -v
       continue-on-error: true # Continue on error to combine coverage.
-    - uses: actions/upload-artifact@604373da6381bf24206979c74d06a550515601b9 # v4.4.1
+    - uses: actions/upload-artifact@84480863f228bb9747b473957fcc9e309aa96097 # v4.4.2
       with:
         include-hidden-files: true
         name: coverage-${{ matrix.python-version }}
         path: .coverage.*
+
+  schemathesis:
+    name: Schemathesis Test
+    runs-on: ubuntu-latest
+    needs: [get-hub-data]
+    steps:
+    - uses: actions/checkout@eef61447b9ff4aafe5dcd4e0bbf5d482be7e7871 # v4.2.1
+    - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+      with:
+        name: hub-data
+    - name: Start containers
+      run: docker compose up -d --build
+    - uses: schemathesis/action@e8c36caf1285d9c955e282cf71793837f92308a4 # v1.0.4
+      with:
+        schema: 'http://127.0.0.1:8000/openapi.json'
+        base-url: http://127.0.0.1:8000
+        token: ${{ secrets.SCHEMATHESIS_TOKEN }}
+        api-name: meltano-hub-api
+        report: 'true'
+        args: '--experimental=openapi-3.1'
+    - name: Stop containers
+      if: always()
+      run: docker compose down
 
   coverage:
     name: Coverage
@@ -93,7 +116,7 @@ jobs:
 
         # Report again and fail if under 100%.
         uv run coverage report --fail-under=100 --show-missing
-    - uses: actions/upload-artifact@604373da6381bf24206979c74d06a550515601b9 # v4.4.1
+    - uses: actions/upload-artifact@84480863f228bb9747b473957fcc9e309aa96097 # v4.4.2
       if: failure()
       with:
         name: html-report
