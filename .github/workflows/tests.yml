@@ -36,7 +36,7 @@ jobs:
         ref: main
         path: meltano-hub
     - run: uv run python -I build.py meltano-hub/_data
-    - uses: actions/upload-artifact@84480863f228bb9747b473957fcc9e309aa96097 # v4.4.2
+    - uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
       with:
         name: hub-data
         path: plugins.db
@@ -65,7 +65,7 @@ jobs:
         name: hub-data
     - run: uv run coverage run -m pytest -v
       continue-on-error: true # Continue on error to combine coverage.
-    - uses: actions/upload-artifact@84480863f228bb9747b473957fcc9e309aa96097 # v4.4.2
+    - uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
       with:
         include-hidden-files: true
         name: coverage-${{ matrix.python-version }}
@@ -116,7 +116,7 @@ jobs:
 
         # Report again and fail if under 100%.
         uv run coverage report --fail-under=100 --show-missing
-    - uses: actions/upload-artifact@84480863f228bb9747b473957fcc9e309aa96097 # v4.4.2
+    - uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
       if: failure()
       with:
         name: html-report
