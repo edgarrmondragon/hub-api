@@ -9,15 +9,6 @@ resolution-markers = [
 prerelease-mode = "allow"
 
 [[package]]
-name = "aiofiles"
-version = "24.1.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/0b/03/a88171e277e8caa88a4c77808c20ebb04ba74cc4681bf1e9416c862de237/aiofiles-24.1.0.tar.gz", hash = "sha256:22a075c9e5a3810f0c2e48f3008c94d68c65d763b9b03857924c99e57355166c", size = 30247 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/a5/45/30bb92d442636f570cb5651bc661f52b610e2eec3f891a5dc3a4c3667db0/aiofiles-24.1.0-py3-none-any.whl", hash = "sha256:b4ec55f4195e3eb5d7abd1bf7e061763e864dd4954231fb8539a0ef8bb8260e5", size = 15896 },
-]
-
-[[package]]
 name = "aiosqlite"
 version = "0.20.0"
 source = { registry = "https://pypi.org/simple" }
@@ -240,17 +231,18 @@ name = "hub-api"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
-    { name = "aiofiles" },
     { name = "aiosqlite" },
     { name = "fastapi" },
     { name = "granian", extra = ["reload"] },
     { name = "python-json-logger" },
-    { name = "pyyaml" },
     { name = "sqlalchemy", extra = ["asyncio"] },
     { name = "starlette" },
 ]
 
 [package.dependency-groups]
+build = [
+    { name = "pyyaml" },
+]
 test = [
     { name = "coverage" },
     { name = "httpx" },
@@ -263,17 +255,16 @@ typing = [
 
 [package.metadata]
 requires-dist = [
-    { name = "aiofiles", specifier = ">=23.2.1" },
     { name = "aiosqlite", specifier = ">=0.19.0" },
     { name = "fastapi", specifier = ">=0.109.2" },
     { name = "granian", extras = ["reload"], specifier = ">=1.6.0" },
     { name = "python-json-logger", specifier = ">=2.0.7" },
-    { name = "pyyaml", specifier = ">=6.0.1" },
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.27" },
     { name = "starlette", specifier = ">=0.38.5" },
 ]
 
 [package.metadata.dependency-groups]
+build = [{ name = "pyyaml", specifier = ">=6.0.1" }]
 test = [
     { name = "coverage", specifier = ">=7.6.1" },
     { name = "httpx", specifier = ">=0.27.2" },

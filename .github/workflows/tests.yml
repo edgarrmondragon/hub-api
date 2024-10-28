@@ -35,7 +35,7 @@ jobs:
         repository: meltano/hub
         ref: main
         path: meltano-hub
-    - run: uv run python -I build.py meltano-hub/_data
+    - run: uv run --group=build python -I build.py meltano-hub/_data
     - uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
       with:
         name: hub-data
@@ -63,7 +63,7 @@ jobs:
     - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
       with:
         name: hub-data
-    - run: uv run coverage run -m pytest -v
+    - run: uv run --group=test coverage run -m pytest -v
       continue-on-error: true # Continue on error to combine coverage.
     - uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
       with:
@@ -108,14 +108,14 @@ jobs:
     - uses: hynek/setup-cached-uv@3e2b834ff80f67c4f272449b9f1aa388c294ae48 # v2.2.1
     - name: Combine coverage
       run: |
-        uv run coverage combine
-        uv run coverage html --skip-covered --skip-empty
+        uv run --group=test coverage combine
+        uv run --group=test coverage html --skip-covered --skip-empty
 
         # Report and write to summary.
-        uv run coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
+        uv run --group=test coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
 
         # Report again and fail if under 100%.
-        uv run coverage report --fail-under=100 --show-missing
+        uv run --group=test coverage report --fail-under=100 --show-missing
     - uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
       if: failure()
       with:
