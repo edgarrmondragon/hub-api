@@ -17,12 +17,12 @@ lock:
     uv lock
 
 serve: build-db
-    uv run granian hub_api.main:app
+    uv run --no-dev granian hub_api.main:app
 
 test: build-db
-    uv run --group=test pytest
+    uv run pytest
 
 coverage: build-db
-    uv run --group=test coverage run -m pytest -v
-    uv run --group=test coverage combine --keep
-    uv run --group=test coverage report --fail-under=100 --show-missing
+    uv run coverage run -m pytest -v
+    uv run coverage combine --keep
+    uv run coverage report --fail-under=100 --show-missing

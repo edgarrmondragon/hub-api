@@ -20,7 +20,7 @@ dependencies = [
 build = [
     "PyYAML>=6.0.1",
 ]
-test = [
+dev = [
     "coverage>=7.6.1",
     "httpx>=0.27.2",
     "pytest>=8.3.2",
