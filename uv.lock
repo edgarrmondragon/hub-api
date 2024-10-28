@@ -243,7 +243,7 @@ dependencies = [
 build = [
     { name = "pyyaml" },
 ]
-test = [
+dev = [
     { name = "coverage" },
     { name = "httpx" },
     { name = "pytest" },
@@ -265,7 +265,7 @@ requires-dist = [
 
 [package.metadata.dependency-groups]
 build = [{ name = "pyyaml", specifier = ">=6.0.1" }]
-test = [
+dev = [
     { name = "coverage", specifier = ">=7.6.1" },
     { name = "httpx", specifier = ">=0.27.2" },
     { name = "pytest", specifier = ">=8.3.2" },
