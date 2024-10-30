@@ -6,7 +6,7 @@ build-db:
 
 [group('update')]
 gha-update:
-    uvx gha-update
+    uvx --python python3.12 gha-update
 
 [group('update')]
 pre-commit-autoupdate:
