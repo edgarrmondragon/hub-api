@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import enum
+import typing as t
 
 
 class PluginTypeEnum(enum.StrEnum):
@@ -39,7 +40,8 @@ class _HyphenatedEnum(enum.StrEnum):
     """Base class for hyphenated enums."""
 
     @staticmethod
-    def _generate_next_value_(name: str, start: int, count: int, last_values: list[str]) -> str:  # noqa: ARG004
+    @t.override
+    def _generate_next_value_(name: str, start: int, count: int, last_values: list[str]) -> str:
         return name.lower().replace("_", "-")
 
 

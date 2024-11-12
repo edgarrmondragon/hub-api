@@ -15,7 +15,7 @@ repos:
     -   id: trailing-whitespace
 
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.7.2
+    rev: v0.7.3
     hooks:
     -   id: ruff
         args:
@@ -36,8 +36,6 @@ repos:
         -   pytest-asyncio
         -   sqlalchemy
         -   types-PyYAML
-        args:
-        -   --enable-incomplete-feature=NewGenericSyntax
 
 -   repo: https://github.com/pre-commit/pre-commit
     rev: v4.0.1
@@ -50,6 +48,6 @@ repos:
     -   id: tach
 
 -   repo: https://github.com/crate-ci/typos
-    rev: typos-dict-v0.11.34
+    rev: typos-dict-v0.11.35
     hooks:
     -   id: typos
