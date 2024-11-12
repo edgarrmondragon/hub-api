@@ -101,7 +101,7 @@ testpaths = ["tests"]
 xfail_strict = true
 
 [tool.mypy]
-enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+enable_error_code = ["explicit-override", "ignore-without-code", "redundant-expr", "truthy-bool"]
 strict = true
 warn_unused_configs = true
 warn_unused_ignores = true
