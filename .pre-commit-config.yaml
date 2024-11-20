@@ -43,7 +43,7 @@ repos:
     -   id: validate_manifest
 
 -   repo: https://github.com/gauge-sh/tach-pre-commit
-    rev: v0.14.3
+    rev: v0.14.4
     hooks:
     -   id: tach
 
