@@ -43,7 +43,6 @@ depends_on = []
 
 [[modules]]
 path = "hub_api.main"
-strict = true
 depends_on = [
     { path = "hub_api.api" },
     { path = "hub_api.exceptions" },
@@ -53,7 +52,6 @@ depends_on = [
 
 [[modules]]
 path = "hub_api.models"
-strict = true
 depends_on = [
     { path = "hub_api.enums" },
 ]
@@ -67,3 +65,13 @@ depends_on = [
 [[modules]]
 path = "hub_api.static"
 depends_on = []
+
+[[interfaces]]
+expose = [
+    "api",
+    "meltano",
+    "validation",
+]
+from = [
+    "hub_api.schemas",
+]
