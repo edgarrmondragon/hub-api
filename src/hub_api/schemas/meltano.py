@@ -5,7 +5,7 @@ import typing as t
 from pydantic import BaseModel as PydanticBaseModel
 from pydantic import ConfigDict, Discriminator, Field, HttpUrl, RootModel, Tag
 
-from hub_api import enums  # noqa: TCH001
+from hub_api import enums  # noqa: TC001
 
 
 class BaseModel(PydanticBaseModel):

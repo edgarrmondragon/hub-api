@@ -6,7 +6,7 @@ import typing as t
 
 from pydantic import BaseModel, Field, HttpUrl, StringConstraints
 
-from hub_api import enums  # noqa: TCH001
+from hub_api import enums  # noqa: TC001
 from hub_api.schemas import meltano
 
 

@@ -6,8 +6,8 @@ import typing as t
 
 import fastapi
 
-from hub_api import dependencies  # noqa: TCH001
-from hub_api.schemas import api as api_schemas  # noqa: TCH001
+from hub_api import dependencies  # noqa: TC001
+from hub_api.schemas import api as api_schemas  # noqa: TC001
 
 router = fastapi.APIRouter()
 
