@@ -43,11 +43,11 @@ repos:
     -   id: validate_manifest
 
 -   repo: https://github.com/gauge-sh/tach-pre-commit
-    rev: v0.15.1
+    rev: v0.15.5
     hooks:
     -   id: tach
 
 -   repo: https://github.com/crate-ci/typos
-    rev: typos-dict-v0.11.35
+    rev: v1.28.1
     hooks:
     -   id: typos
