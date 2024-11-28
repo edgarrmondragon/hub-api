@@ -38,6 +38,7 @@ typing = [
 
 [tool.uv]
 prerelease = "allow"
+preview = true
 
 [tool.ruff]
 line-length = 120
