@@ -8,8 +8,11 @@ import fastapi
 
 from hub_api import crud, models
 
+if t.TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
 
-async def get_hub() -> t.AsyncGenerator[crud.MeltanoHub]:
+
+async def get_hub() -> AsyncGenerator[crud.MeltanoHub]:
     """Get a Meltano hub instance."""
     async with models.SessionLocal() as db:
         yield crud.MeltanoHub(db=db)

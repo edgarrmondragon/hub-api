@@ -9,9 +9,12 @@ import pytest_asyncio
 
 from hub_api import crud, enums, exceptions, models
 
+if t.TYPE_CHECKING:
+    from collections.abc import AsyncGenerator
+
 
 @pytest_asyncio.fixture
-async def hub() -> t.AsyncGenerator[crud.MeltanoHub]:
+async def hub() -> AsyncGenerator[crud.MeltanoHub]:
     """Get a Meltano hub instance."""
     async with models.SessionLocal() as db:
         yield crud.MeltanoHub(db=db)
