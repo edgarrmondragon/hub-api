@@ -11,6 +11,9 @@ from sqlalchemy.orm import sessionmaker
 from hub_api import enums, models
 from hub_api.schemas import meltano, validation
 
+if t.TYPE_CHECKING:
+    from collections.abc import Generator
+
 
 def get_default_variants(path: Path) -> dict[str, dict[str, str]]:
     """Get default variants of a given plugin."""
@@ -18,7 +21,7 @@ def get_default_variants(path: Path) -> dict[str, dict[str, str]]:
         return yaml.safe_load(f)  # type: ignore[no-any-return]
 
 
-def get_plugin_variants(plugin_path: Path) -> t.Generator[tuple[str, dict[str, t.Any]]]:
+def get_plugin_variants(plugin_path: Path) -> Generator[tuple[str, dict[str, t.Any]]]:
     """Get plugin variants of a given type."""
     for plugin_file in plugin_path.glob("*.yml"):
         with plugin_file.open() as f:
@@ -28,7 +31,7 @@ def get_plugin_variants(plugin_path: Path) -> t.Generator[tuple[str, dict[str, t
 def get_plugins_of_type(
     base_path: Path,
     plugin_type: enums.PluginTypeEnum,
-) -> t.Generator[tuple[str, dict[str, t.Any]]]:
+) -> Generator[tuple[str, dict[str, t.Any]]]:
     """Get plugins of a given type."""
     for plugin_path in base_path.joinpath(plugin_type).glob("*"):
         yield from get_plugin_variants(plugin_path)

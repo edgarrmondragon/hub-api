@@ -14,6 +14,7 @@ import os
 import textwrap
 import typing as t
 import uuid
+from collections.abc import Awaitable, Callable
 
 import fastapi.middleware
 from fastapi import Header, Request, Response
@@ -33,7 +34,7 @@ class ETagMiddleware(BaseHTTPMiddleware):
     async def dispatch(
         self,
         request: Request,
-        call_next: t.Callable[[Request], t.Awaitable[Response]],
+        call_next: Callable[[Request], Awaitable[Response]],
     ) -> fastapi.Response:
         """Add ETag header to response."""
         response = await call_next(request)

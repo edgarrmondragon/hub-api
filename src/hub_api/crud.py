@@ -13,6 +13,8 @@ from hub_api.schemas import api as api_schemas
 from hub_api.schemas import meltano
 
 if t.TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from sqlalchemy.ext.asyncio import AsyncSession
 
 BASE_API_URL = "http://localhost:8000"
@@ -200,7 +202,7 @@ class MeltanoHub:
         self: MeltanoHub,
         *,
         plugin_type: enums.PluginTypeEnum | None,
-    ) -> t.Sequence[sa.Row[tuple[str, enums.PluginTypeEnum, str, str | None, str]]]:
+    ) -> Sequence[sa.Row[tuple[str, enums.PluginTypeEnum, str, str | None, str]]]:
         aliased_plugin = aliased(models.PluginVariant, name="default_variant")
         q = (
             sa.select(
