@@ -129,6 +129,7 @@ class MeltanoHub:
             ),
             "label": variant.label,
             "logo_url": urllib.parse.urljoin(self.base_hub_url, variant.logo_url),
+            "documentation": variant.docs,
             "name": variant.plugin.name,
             "namespace": variant.namespace,
             "pip_url": variant.pip_url,
