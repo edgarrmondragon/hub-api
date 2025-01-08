@@ -271,9 +271,9 @@ class Extractor(Plugin, extra="forbid"):
     """Extractor details model."""
 
     capabilities: list[enums.ExtractorCapabilityEnum]
-    metadata: dict[str, t.Any] = Field(default_factory=dict)
+    metadata: dict[str, t.Any] | None = Field(None)
     extractor_schema: dict[str, t.Any] | None = Field(None, alias="schema")
-    select: list[str] = Field(default_factory=list)
+    select: list[str] | None = Field(None)
 
 
 class Loader(Plugin, extra="forbid"):
