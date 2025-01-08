@@ -37,6 +37,11 @@ class _BasePluginSetting(BaseModel):
         description="The setting name.",
         json_schema_extra={"example": "token"},
     )
+    placeholder: str | None = Field(
+        None,
+        description="The setting placeholder.",
+        examples=["my-api-token"],
+    )
     sensitive: bool | None = Field(
         None,
         description="Whether the setting is sensitive.",

@@ -97,6 +97,7 @@ class Setting(EntityBase):
     label: Mapped[str | None]
     description: Mapped[str | None]
     documentation: Mapped[str | None]
+    placeholder: Mapped[str | None]
     env: Mapped[str | None]
     kind: Mapped[str | None]
     value: Mapped[t.Any | None] = mapped_column(sa.JSON)
