@@ -72,34 +72,37 @@ type PluginIndex = dict[enums.PluginTypeEnum, PluginTypeIndex]
 class PluginResponse(meltano.Plugin):
     """Plugin response model."""
 
+    logo_url: HttpUrl | None = Field(None, description="URL to the plugin's logo")
+    documentation: HttpUrl | None = Field(None, description="URL to the plugin's documentation")
 
-class ExtractorResponse(PluginResponse):
+
+class ExtractorResponse(PluginResponse, meltano.Extractor):
     """Extractor response model."""
 
 
-class LoaderResponse(PluginResponse):
+class LoaderResponse(PluginResponse, meltano.Loader):
     """Loader response model."""
 
 
-class UtilityResponse(PluginResponse):
+class UtilityResponse(PluginResponse, meltano.Utility):
     """Utility response model."""
 
 
-class OrchestratorResponse(PluginResponse):
+class OrchestratorResponse(PluginResponse, meltano.Orchestrator):
     """Orchestrator response model."""
 
 
-class TransformResponse(PluginResponse):
+class TransformResponse(PluginResponse, meltano.Transform):
     """Transform response model."""
 
 
-class TransformerResponse(PluginResponse):
+class TransformerResponse(PluginResponse, meltano.Transformer):
     """Transformer response model."""
 
 
-class MapperResponse(PluginResponse):
+class MapperResponse(PluginResponse, meltano.Mapper):
     """Mapper response model."""
 
 
-class FileResponse(PluginResponse):
+class FileResponse(PluginResponse, meltano.File):
     """File response model."""

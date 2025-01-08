@@ -22,6 +22,11 @@ class _BasePluginSetting(BaseModel):
         description="The setting description.",
         examples=["The API token."],
     )
+    documentation: str | None = Field(
+        None,
+        description="A URL to the documentation for this setting.",
+        examples=["https://example.com/docs"],
+    )
     env: str | None = Field(None, description="The environment variable name.")
     label: str | None = Field(
         None,
@@ -31,6 +36,11 @@ class _BasePluginSetting(BaseModel):
     name: str = Field(
         description="The setting name.",
         json_schema_extra={"example": "token"},
+    )
+    placeholder: str | None = Field(
+        None,
+        description="The setting placeholder.",
+        examples=["my-api-token"],
     )
     sensitive: bool | None = Field(
         None,
@@ -84,8 +94,8 @@ class OAuthSetting(_BasePluginSetting):
 class Option(BaseModel):
     """Option model."""
 
-    value: t.Any = Field(description="The option value")
     label: str | None = Field(None, description="The option label")
+    value: t.Any = Field(description="The option value")
 
 
 class OptionsSetting(_BasePluginSetting):
@@ -261,9 +271,9 @@ class Extractor(Plugin, extra="forbid"):
     """Extractor details model."""
 
     capabilities: list[enums.ExtractorCapabilityEnum]
-    metadata: dict[str, t.Any] = Field(default_factory=dict)
+    metadata: dict[str, t.Any] | None = Field(None)
     extractor_schema: dict[str, t.Any] | None = Field(None, alias="schema")
-    select: list[str] = Field(default_factory=list)
+    select: list[str] | None = Field(None)
 
 
 class Loader(Plugin, extra="forbid"):
@@ -308,7 +318,7 @@ class Transformer(Plugin, extra="forbid"):
 class Mapper(Plugin, extra="forbid"):
     """Mapper details model."""
 
-    capabilities: list[enums.MapperCapabilityEnum]
+    capabilities: list[enums.MapperCapabilityEnum] | None = None
 
 
 class File(Plugin, extra="forbid"):

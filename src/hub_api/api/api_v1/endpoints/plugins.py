@@ -100,7 +100,16 @@ async def get_plugin_variant(
             pattern=r"^[A-Za-z0-9-]+$",
         ),
     ],
-) -> api_schemas.PluginResponse:
+) -> (
+    api_schemas.ExtractorResponse
+    | api_schemas.LoaderResponse
+    | api_schemas.UtilityResponse
+    | api_schemas.OrchestratorResponse
+    | api_schemas.TransformResponse
+    | api_schemas.TransformerResponse
+    | api_schemas.MapperResponse
+    | api_schemas.FileResponse
+):
     """Retrieve details of a plugin variant."""
     plugin_id = f"{plugin_type.value}.{plugin_name}"
     variant_id = f"{plugin_id}.{plugin_variant}"
