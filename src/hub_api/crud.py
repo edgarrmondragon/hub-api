@@ -107,7 +107,18 @@ class MeltanoHub:
         self.base_api_url = base_api_url
         self.base_hub_url = base_hub_url
 
-    async def _variant_details(self: MeltanoHub, variant: models.PluginVariant) -> api_schemas.PluginResponse:  # noqa: C901, PLR0911, PLR0912
+    async def _variant_details(  # noqa: C901, PLR0911, PLR0912
+        self: MeltanoHub, variant: models.PluginVariant
+    ) -> (
+        api_schemas.ExtractorResponse
+        | api_schemas.LoaderResponse
+        | api_schemas.UtilityResponse
+        | api_schemas.OrchestratorResponse
+        | api_schemas.TransformResponse
+        | api_schemas.TransformerResponse
+        | api_schemas.MapperResponse
+        | api_schemas.FileResponse
+    ):
         settings: list[models.Setting] = await variant.awaitable_attrs.settings
         capabilities: list[models.Capability] = await variant.awaitable_attrs.capabilities
         commands: list[models.Command] = await variant.awaitable_attrs.commands
@@ -169,7 +180,18 @@ class MeltanoHub:
             case _:  # pragma: no cover
                 raise ValueError(f"Unknown plugin type: {variant.plugin.plugin_type}")
 
-    async def get_plugin_details(self, variant_id: str) -> api_schemas.PluginResponse:
+    async def get_plugin_details(
+        self, variant_id: str
+    ) -> (
+        api_schemas.ExtractorResponse
+        | api_schemas.LoaderResponse
+        | api_schemas.UtilityResponse
+        | api_schemas.OrchestratorResponse
+        | api_schemas.TransformResponse
+        | api_schemas.TransformerResponse
+        | api_schemas.MapperResponse
+        | api_schemas.FileResponse
+    ):
         variant = await self.db.get(models.PluginVariant, variant_id)
 
         if not variant:
