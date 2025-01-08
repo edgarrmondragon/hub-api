@@ -17,7 +17,7 @@ if t.TYPE_CHECKING:
 
     from sqlalchemy.ext.asyncio import AsyncSession
 
-BASE_API_URL = "http://localhost:8000"
+BASE_API_URL = "http://127.0.0.1:8000"
 BASE_HUB_URL = "https://hub.meltano.com"
 
 
