@@ -318,7 +318,7 @@ class Transformer(Plugin, extra="forbid"):
 class Mapper(Plugin, extra="forbid"):
     """Mapper details model."""
 
-    capabilities: list[enums.MapperCapabilityEnum]
+    capabilities: list[enums.MapperCapabilityEnum] | None = None
 
 
 class File(Plugin, extra="forbid"):
