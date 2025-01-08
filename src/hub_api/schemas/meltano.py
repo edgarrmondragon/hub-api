@@ -94,8 +94,8 @@ class OAuthSetting(_BasePluginSetting):
 class Option(BaseModel):
     """Option model."""
 
-    value: t.Any = Field(description="The option value")
     label: str | None = Field(None, description="The option label")
+    value: t.Any = Field(description="The option value")
 
 
 class OptionsSetting(_BasePluginSetting):
