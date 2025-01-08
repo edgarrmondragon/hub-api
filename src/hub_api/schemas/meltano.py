@@ -22,6 +22,11 @@ class _BasePluginSetting(BaseModel):
         description="The setting description.",
         examples=["The API token."],
     )
+    documentation: str | None = Field(
+        None,
+        description="A URL to the documentation for this setting.",
+        examples=["https://example.com/docs"],
+    )
     env: str | None = Field(None, description="The environment variable name.")
     label: str | None = Field(
         None,

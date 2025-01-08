@@ -44,6 +44,7 @@ def _build_setting(variant_id: str, setting: meltano.PluginSetting) -> models.Se
         variant_id=variant_id,
         name=setting.root.name,
         label=setting.root.label,
+        documentation=setting.root.documentation,
         description=setting.root.description,
         env=setting.root.env,
         kind=setting.root.kind,
