@@ -1,6 +1,6 @@
 # hub-api
 
-Alternative [Meltano Hub API](https://hub.meltano.com/), using the same underlying data as the official API.
+Experimental 🧪 alternative [Meltano Hub API](https://hub.meltano.com/), using the same underlying data as the official API.
 
 ## Usage
 
