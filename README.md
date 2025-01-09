@@ -1,6 +1,6 @@
 # hub-api
 
-Alternative Meltano Hub API, using the same underlying data as the official API.
+Alternative [Meltano Hub API](https://hub.meltano.com/), using the same underlying data as the official API.
 
 ## Usage
 
@@ -10,7 +10,7 @@ Alternative Meltano Hub API, using the same underlying data as the official API.
     uv run --no-dev granian hub_api.main:app
     ```
 
-2. Configure Meltano to use the new API by setting the `HUB_API_URL` environment variable:
+2. [Configure Meltano to use the new API](https://docs.meltano.com/):
 
     ```bash
     meltano config meltano set hub_api_root "http://localhost:8000/meltano/api/v1"
