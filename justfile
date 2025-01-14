@@ -4,6 +4,8 @@ port := "8000"
 py := "3.13"
 source := "meltano-hub/_data"
 
+build: update pre-commit coverage
+
 build-db $ONLY_GROUP="build":
     uv run --python={{py}} python -I build.py {{source}}
 
@@ -24,6 +26,10 @@ lock:
 
 serve: build-db
     uv run --python={{py}} --no-dev granian --port={{port}} hub_api.main:app
+
+[group('test')]
+pre-commit:
+    uvx --python={{py}} --with pre-commit-uv pre-commit run --all-files
 
 [group('test')]
 test $ONLY_GROUP="tests": build-db
