@@ -22,3 +22,10 @@ Experimental 🧪 alternative [Meltano Hub API](https://hub.meltano.com/), using
     meltano add extractor tap-github
     meltano lock --all --update
     ```
+
+### Additional Features
+
+This API also includes additional features that are not available in the official API:
+
+- `/meltano/api/v1/plugins/<plugin type>/<plugin name>/default`: Returns the default variant for a plugin.
+- `/meltano/api/v1/maintainers`: Returns a list of maintainers for all plugins.
