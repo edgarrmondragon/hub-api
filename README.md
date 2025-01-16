@@ -12,19 +12,25 @@ Built with:
 
 ## Usage
 
-1. Run the following command to start the API server:
+1. Build the plugin database:
+
+    ```bash
+    uv run python -I build.py
+    ```
+
+2. Run the following command to start the API server:
 
     ```bash
     uv run --no-dev granian hub_api.main:app
     ```
 
-2. [Configure Meltano to use the new API](https://docs.meltano.com/):
+3. [Configure Meltano to use the new API](https://docs.meltano.com/):
 
     ```bash
     meltano config meltano set hub_api_root "http://localhost:8000/meltano/api/v1"
     ```
 
-3. Run Meltano as usual.
+4. Run Meltano as usual.
 
     ```bash
     meltano add extractor tap-github

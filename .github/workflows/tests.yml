@@ -21,7 +21,11 @@ on:
     - pyproject.toml
     - uv.lock
   workflow_dispatch:
-    inputs: {}
+    inputs:
+      git-ref:
+        description: Meltano Hub commit SHA, branch, or tag
+        required: false
+        default: main
   schedule:
     # Weekly on Monday at 12:00 PM UTC
   - cron: "0 12 * * 1"
@@ -53,7 +57,7 @@ jobs:
         repository: meltano/hub
         ref: main
         path: meltano-hub
-    - run: uv run python -I build.py meltano-hub/_data
+    - run: uv run python -I build.py --git-ref ${{ github.event.inputs.git-ref || 'main' }}
       env:
         ONLY_GROUP: build
     - uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0

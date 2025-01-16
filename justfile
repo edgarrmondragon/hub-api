@@ -2,12 +2,12 @@ set dotenv-load
 
 port := "8000"
 py := "3.13"
-source := "meltano-hub/_data"
+ref := "main"
 
 build: update pre-commit coverage
 
 build-db $ONLY_GROUP="build":
-    uv run --python={{py}} python -I build.py {{source}}
+    uv run --python={{py}} python -I build.py --git-ref={{ref}}
 
 [group('update')]
 update: gha-update pre-commit-autoupdate lock
