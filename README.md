@@ -8,7 +8,7 @@ Built with:
 - [FastAPI](https://github.com/fastapi/fastapi/)
 - [Granian](https://github.com/emmett-framework/granian/)
 - [SQLAlchemy](https://github.com/sqlalchemy/sqlalchemy/)
-- [Schemathesis](https://github.com/schemathesis/schemathesis/) (used for testing our OpenAPI spec)
+- [Schemathesis](https://github.com/schemathesis/schemathesis/) (used for testing the OpenAPI spec)
 
 ## Usage
 
