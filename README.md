@@ -2,6 +2,14 @@
 
 Experimental 🧪 alternative [Meltano Hub API](https://hub.meltano.com/), using the same underlying data as the official API.
 
+Built with:
+
+- SQLite
+- [FastAPI](https://github.com/fastapi/fastapi/)
+- [Granian](https://github.com/emmett-framework/granian/)
+- [SQLAlchemy](https://github.com/sqlalchemy/sqlalchemy/)
+- [Schemathesis](https://github.com/schemathesis/schemathesis/) (used for testing the OpenAPI spec)
+
 ## Usage
 
 1. Run the following command to start the API server:
