@@ -246,7 +246,7 @@ build = [{ name = "pyyaml", specifier = ">=6.0.1" }]
 dev = [
     { name = "coverage", specifier = ">=7.6.1" },
     { name = "httpx", specifier = ">=0.27.2" },
-    { name = "mypy", specifier = "==1.14.0" },
+    { name = "mypy", specifier = ">=1.14.0" },
     { name = "pytest", specifier = ">=8.3.2" },
     { name = "pytest-asyncio", specifier = ">=0.24" },
     { name = "pyyaml", specifier = ">=6.0.1" },
@@ -259,7 +259,7 @@ tests = [
     { name = "pytest-asyncio", specifier = ">=0.24" },
 ]
 typing = [
-    { name = "mypy", specifier = "==1.14.0" },
+    { name = "mypy", specifier = ">=1.14.0" },
     { name = "types-pyyaml", specifier = ">=6.0.12.20240808" },
 ]
 
