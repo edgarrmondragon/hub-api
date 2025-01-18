@@ -24,7 +24,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 @functools.lru_cache
 def get_etag() -> str:
     """Get ETag value."""
-    return os.environ.get("ETAG", f"etag-{uuid.uuid4()}")
+    return os.environ.get("ETAG", f'"etag-{uuid.uuid4()}"')
 
 
 class ETagMiddleware(BaseHTTPMiddleware):
@@ -55,7 +55,7 @@ def check_etag(
 
                 https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match
             """),
-            pattern=r"^etag-[A-Za-z0-9-]+$",
+            pattern=r'^"etag-[A-Za-z0-9-]+"$',
         ),
     ] = None,
 ) -> None:

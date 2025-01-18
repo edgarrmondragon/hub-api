@@ -5,10 +5,10 @@ Experimental 🧪 alternative [Meltano Hub API](https://hub.meltano.com/), using
 Built with:
 
 - SQLite
-- [FastAPI](https://github.com/fastapi/fastapi/)
-- [Granian](https://github.com/emmett-framework/granian/)
-- [SQLAlchemy](https://github.com/sqlalchemy/sqlalchemy/)
-- [Schemathesis](https://github.com/schemathesis/schemathesis/) (used for testing the OpenAPI spec)
+- [FastAPI]
+- [Granian]
+- [SQLAlchemy]
+- [Schemathesis] (used for testing the OpenAPI spec)
 
 ## Usage
 
@@ -31,9 +31,69 @@ Built with:
     meltano lock --all --update
     ```
 
-### Additional Features
+## Additional Features
 
-This API also includes additional features that are not available in the official API:
+This API also includes additional features that are not available in the official API.
 
-- `/meltano/api/v1/plugins/<plugin type>/<plugin name>/default`: Returns the default variant for a plugin.
+### Default Variant Endpoint
+
+The `/meltano/api/v1/plugins/<plugin type>/<plugin name>/default` endpoint returns the default variant for a plugin.
+
+### Maintainers Endpoints
+
 - `/meltano/api/v1/maintainers`: Returns a list of maintainers for all plugins.
+- `/meltano/api/v1/maintainers/<maintainer>`: Returns details for a specific maintainer.
+
+### ETag Support
+
+All endpoints respond with an [`ETag`][etag] header, which can be used to check if the data has changed since the last request to save bandwidth.
+
+```console
+$ curl -I http://localhost:8000/meltano/api/v1/plugins/index
+HTTP/1.1 200 OK
+server: granian
+content-length: 217962
+content-type: application/json
+etag: "etag-df7f7bd3-946d-4f48-99ae-eb64639eb76c"
+date: Sat, 18 Jan 2025 13:21:35 GMT
+```
+
+```console
+$ curl -I -X GET http://localhost:8000/meltano/api/v1/plugins/index -H 'If-None-Match: "etag-df7f7bd3-946d-4f48-99ae-eb64639eb76c"'
+HTTP/1.1 304 Not Modified
+server: granian
+etag: "etag-df7f7bd3-946d-4f48-99ae-eb64639eb76c"
+date: Sat, 18 Jan 2025 03:21:45 GMT
+```
+
+### GZip Compression
+
+Large responses are compressed using GZip to save bandwidth.
+
+```console
+$ curl -I -X GET http://localhost:8000/meltano/api/v1/plugins/index
+HTTP/1.1 200 OK
+server: granian
+content-length: 217962
+content-type: application/json
+etag: "etag-ad96ae68-5317-44c2-b700-0492035b741c"
+date: Sat, 18 Jan 2025 03:26:20 GMT
+```
+
+```console
+$ curl -I -X GET http://localhost:8000/meltano/api/v1/plugins/index -H 'Accept-Encoding: gzip'
+HTTP/1.1 200 OK
+server: granian
+content-length: 19895
+content-type: application/json
+content-encoding: gzip
+vary: Accept-Encoding
+etag: "etag-ad96ae68-5317-44c2-b700-0492035b741c"
+date: Sat, 18 Jan 2025 03:26:32 GMT
+```
+
+[etag]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
+[fastapi]: https://fastapi.tiangolo.com/
+[granian]: https://github.com/emmett-framework/granian/
+[sqlalchemy]: https://github.com/sqlalchemy/sqlalchemy/
+[schemathesis]: https://github.com/schemathesis/schemathesis/
