@@ -7,21 +7,21 @@ import typing as t
 import pytest
 import pytest_asyncio
 
-from hub_api import crud, enums, exceptions, models
+from hub_api import client, enums, exceptions, models
 
 if t.TYPE_CHECKING:
     from collections.abc import AsyncGenerator
 
 
 @pytest_asyncio.fixture
-async def hub() -> AsyncGenerator[crud.MeltanoHub]:
+async def hub() -> AsyncGenerator[client.MeltanoHub]:
     """Get a Meltano hub instance."""
     async with models.SessionLocal() as db:
-        yield crud.MeltanoHub(db=db)
+        yield client.MeltanoHub(db=db)
 
 
 @pytest.mark.asyncio
-async def test_get_plugin_index(hub: crud.MeltanoHub) -> None:
+async def test_get_plugin_index(hub: client.MeltanoHub) -> None:
     """Test get_plugin_index."""
     plugins = await hub.get_plugin_index()
     assert plugins
@@ -32,7 +32,7 @@ async def test_get_plugin_index(hub: crud.MeltanoHub) -> None:
     "plugin_type",
     list(enums.PluginTypeEnum),
 )
-async def test_get_plugin_type_index(hub: crud.MeltanoHub, plugin_type: enums.PluginTypeEnum) -> None:
+async def test_get_plugin_type_index(hub: client.MeltanoHub, plugin_type: enums.PluginTypeEnum) -> None:
     """Test get_plugin_type_index."""
     plugin_types = await hub.get_plugin_type_index(plugin_type=plugin_type)
     assert plugin_types
@@ -57,7 +57,7 @@ async def test_get_plugin_type_index(hub: crud.MeltanoHub, plugin_type: enums.Pl
     ],
 )
 async def test_get_plugin_details(
-    hub: crud.MeltanoHub,
+    hub: client.MeltanoHub,
     plugin: str,
     plugin_type: str,
     variant: str,
@@ -70,14 +70,14 @@ async def test_get_plugin_details(
 
 
 @pytest.mark.asyncio
-async def test_get_plugin_variant_not_found(hub: crud.MeltanoHub) -> None:
+async def test_get_plugin_variant_not_found(hub: client.MeltanoHub) -> None:
     """Test get_plugin_details."""
     with pytest.raises(exceptions.NotFoundError):
         await hub.get_plugin_details(variant_id="unknown")
 
 
 @pytest.mark.asyncio
-async def test_get_sdk_plugins(hub: crud.MeltanoHub) -> None:
+async def test_get_sdk_plugins(hub: client.MeltanoHub) -> None:
     """Test get_sdk_plugins."""
     n = 10
     plugins = await hub.get_sdk_plugins(limit=n, plugin_type=None)
@@ -88,21 +88,21 @@ async def test_get_sdk_plugins(hub: crud.MeltanoHub) -> None:
 
 
 @pytest.mark.asyncio
-async def test_get_plugin_stats(hub: crud.MeltanoHub) -> None:
+async def test_get_plugin_stats(hub: client.MeltanoHub) -> None:
     """Test get_plugin_stats."""
     stats = await hub.get_plugin_stats()
     assert stats
 
 
 @pytest.mark.asyncio
-async def test_get_maintainers(hub: crud.MeltanoHub) -> None:
+async def test_get_maintainers(hub: client.MeltanoHub) -> None:
     """Test get_maintainers."""
     data = await hub.get_maintainers()
     assert len(data.maintainers) > 0
 
 
 @pytest.mark.asyncio
-async def test_get_maintainer(hub: crud.MeltanoHub) -> None:
+async def test_get_maintainer(hub: client.MeltanoHub) -> None:
     """Test get_maintainer."""
     maintainer = await hub.get_maintainer("meltano")
     assert maintainer.id == "meltano"
@@ -112,14 +112,14 @@ async def test_get_maintainer(hub: crud.MeltanoHub) -> None:
 
 
 @pytest.mark.asyncio
-async def test_get_maintainer_not_found(hub: crud.MeltanoHub) -> None:
+async def test_get_maintainer_not_found(hub: client.MeltanoHub) -> None:
     """Test get_maintainer."""
     with pytest.raises(exceptions.NotFoundError):
         await hub.get_maintainer("unknown")
 
 
 @pytest.mark.asyncio
-async def test_get_top_maintainers(hub: crud.MeltanoHub) -> None:
+async def test_get_top_maintainers(hub: client.MeltanoHub) -> None:
     """Test get_top_maintainers."""
     n = 10
     maintainers = await hub.get_top_maintainers(n)
@@ -127,7 +127,7 @@ async def test_get_top_maintainers(hub: crud.MeltanoHub) -> None:
 
 
 @pytest.mark.asyncio
-async def test_get_default_variant_url(hub: crud.MeltanoHub) -> None:
+async def test_get_default_variant_url(hub: client.MeltanoHub) -> None:
     """Test get_variant_url."""
     url = await hub.get_default_variant_url("extractors.tap-github")
     assert str(url).endswith("extractors/tap-github--meltanolabs")

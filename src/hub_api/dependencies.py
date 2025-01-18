@@ -6,16 +6,16 @@ import typing as t
 
 import fastapi
 
-from hub_api import crud, models
+from hub_api import client, models
 
 if t.TYPE_CHECKING:
     from collections.abc import AsyncGenerator
 
 
-async def get_hub() -> AsyncGenerator[crud.MeltanoHub]:
+async def get_hub() -> AsyncGenerator[client.MeltanoHub]:
     """Get a Meltano hub instance."""
     async with models.SessionLocal() as db:
-        yield crud.MeltanoHub(db=db)
+        yield client.MeltanoHub(db=db)
 
 
-Hub = t.Annotated[crud.MeltanoHub, fastapi.Depends(get_hub)]
+Hub = t.Annotated[client.MeltanoHub, fastapi.Depends(get_hub)]
