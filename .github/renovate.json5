@@ -32,5 +32,8 @@
   "lockFileMaintenance": {
     "enabled": true,
     "schedule": ["before 5am on monday"]
-  }
+  },
+
+  // https://docs.renovatebot.com/configuration-options/#reviewers
+  "reviewers": ["edgarrmondragon"]
 }
