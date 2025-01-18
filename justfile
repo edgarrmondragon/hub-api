@@ -29,7 +29,11 @@ serve: build-db
 
 [group('test')]
 pre-commit:
-    uvx --python={{py}} --with pre-commit-uv pre-commit run --all-files
+    -uvx --python={{py}} --with pre-commit-uv pre-commit run --all-files
+
+[group('test')]
+typing:
+    uv run --python={{py}} mypy src tests
 
 [group('test')]
 test $ONLY_GROUP="tests": build-db
