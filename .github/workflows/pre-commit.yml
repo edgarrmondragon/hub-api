@@ -12,6 +12,10 @@ on:
 
 env:
   FORCE_COLOR: "1"
+  # renovate: datasource=pypi depName=pre-commit
+  PRE_COMMIT_VERSION: "4.0.1"
+  # renovate: datasource=pypi depName=pre-commit-uv
+  PRE_COMMIT_UV_VERSION: "4.1.4"
   # renovate: datasource=pypi depName=uv
   UV_VERSION: "0.5.21"
 
@@ -30,5 +34,9 @@ jobs:
     - uses: astral-sh/setup-uv@b5f58b2abc5763ade55e4e9d0fe52cd1ff7979ca # v5.2.1
       with:
         version: ${{ env.UV_VERSION }}
-    - run: uv tool install pre-commit --with pre-commit-uv
+    - run: >
+        uv tool install
+        --with pre-commit-uv==${{ env.PRE_COMMIT_UV_VERSION }}
+        --with pre-commit==${{ env.PRE_COMMIT_VERSION }}
+        pre-commit
     - run: pre-commit run --all-files
