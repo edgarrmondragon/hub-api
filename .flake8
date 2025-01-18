@@ -1,7 +1,0 @@
-[flake8]
-max-line-length = 88
-max-complexity = 10
-allow-star-arg-any = true
-per-file-ignores =
-    tests/*:ANN,DAR
-    app/api/api_v1/endpoints/*:DAR
