@@ -8,3 +8,4 @@ services:
     - ./src/:/app/src
     environment:
       GRANIAN_RELOAD: "1"
+      GRANIAN_WORKERS: "4"

@@ -61,14 +61,31 @@ async def test_plugin_details(
 
 
 @pytest.mark.asyncio
-async def test_plugin_details_etag_match(api: httpx.AsyncClient) -> None:
+async def test_plugin_index_etag_match(api: httpx.AsyncClient) -> None:
     """Test /meltano/api/v1/plugins/stats."""
     etag_value = etag.get_etag()
+
+    response = await api.get("/meltano/api/v1/plugins/index")
+    assert response.status_code == http.HTTPStatus.OK
+    assert response.headers["ETag"] == etag_value
+    assert "extractors" in response.json()
+
     response = await api.get(
-        "/meltano/api/v1/plugins/extractors/index",
+        "/meltano/api/v1/plugins/index",
         headers={"If-None-Match": etag_value},
     )
     assert response.status_code == http.HTTPStatus.NOT_MODIFIED
+    assert not response.content
+
+
+@pytest.mark.asyncio
+async def test_invalid_etag(api: httpx.AsyncClient) -> None:
+    """Test /meltano/api/v1/plugins/stats."""
+    response = await api.get(
+        "/meltano/api/v1/plugins/index",
+        headers={"If-None-Match": "not-a-valid-etag"},
+    )
+    assert response.status_code == http.HTTPStatus.UNPROCESSABLE_ENTITY
 
 
 @pytest.mark.asyncio
@@ -141,3 +158,19 @@ async def test_default_plugin(api: httpx.AsyncClient) -> None:
     assert response.status_code == http.HTTPStatus.TEMPORARY_REDIRECT
     assert response.is_redirect
     assert response.headers["Location"].endswith("extractors/tap-github--meltanolabs")
+
+
+@pytest.mark.asyncio
+async def test_gzip_encoding(api: httpx.AsyncClient) -> None:
+    """Test GZIP encoding."""
+    # Large response should be compressed
+    response = await api.get("/meltano/api/v1/plugins/index", headers={"Accept-Encoding": "gzip"})
+    assert response.status_code == http.HTTPStatus.OK
+    assert response.headers["Content-Encoding"] == "gzip"
+    assert response.headers["Content-Type"] == "application/json"
+
+    # Small response should not be compressed
+    response = await api.get("/meltano/api/v1/plugins/orchestrators/index", headers={"Accept-Encoding": "gzip"})
+    assert response.status_code == http.HTTPStatus.OK
+    assert "Content-Encoding" not in response.headers
+    assert response.headers["Content-Type"] == "application/json"
