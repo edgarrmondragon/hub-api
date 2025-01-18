@@ -72,7 +72,7 @@ async def test_plugin_index_etag_match(api: httpx.AsyncClient) -> None:
 
     response = await api.get(
         "/meltano/api/v1/plugins/index",
-        headers={"If-None-Match": etag_value},
+        headers={"If-None-Match": etag_value + "---"},
     )
     assert response.status_code == http.HTTPStatus.NOT_MODIFIED
     assert not response.content
