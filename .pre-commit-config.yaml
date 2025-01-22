@@ -42,5 +42,7 @@ repos:
     rev: 0.31.0
     hooks:
     -   id: check-github-workflows
-    - id: check-renovate
-      additional_dependencies: [pyjson5]
+    -   id: check-renovate
+        language: python
+        additional_dependencies:
+        - pyjson5==1.6.8
