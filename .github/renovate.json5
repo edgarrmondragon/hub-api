@@ -35,5 +35,13 @@
   },
 
   // https://docs.renovatebot.com/configuration-options/#reviewers
-  "reviewers": ["edgarrmondragon"]
+  "reviewers": ["edgarrmondragon"],
+
+  // https://docs.renovatebot.com/configuration-options/#packagerules
+  "packageRules": [
+    {
+      "matchPackageNames": ["pre-commit", "pre-commit/pre-commit"],
+      "groupName": "pre-commit-version"
+    },
+  ]
 }
