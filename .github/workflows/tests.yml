@@ -109,7 +109,7 @@ jobs:
         name: hub-data
     - name: Start containers
       run: docker compose up -d --build
-    - uses: edgarrmondragon/action@use-uv
+    - uses: schemathesis/action@main
       with:
         schema: 'http://127.0.0.1:8000/openapi.json'
         base-url: http://127.0.0.1:8000
