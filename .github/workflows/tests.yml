@@ -29,7 +29,7 @@ on:
 env:
   FORCE_COLOR: "1"
   # renovate: datasource=pypi depName=schemathesis
-  SCHEMATHESIS_VERSION: "3.39.7"
+  SCHEMATHESIS_VERSION: "3.39.8"
   # renovate: datasource=pypi depName=uv
   UV_VERSION: "0.5.22"
 
