@@ -15,8 +15,8 @@
     // https://docs.renovatebot.com/presets-default/#rebasestaleprs
     ":rebaseStalePrs",
 
-    // https://docs.renovatebot.com/presets-default/#automergepatch
-    ":automergePatch",
+    // https://docs.renovatebot.com/presets-default/#automergeminor
+    ":automergeMinor",
 
     // https://docs.renovatebot.com/presets-customManagers/#custommanagersgithubactionsversions
     "customManagers:githubActionsVersions"
