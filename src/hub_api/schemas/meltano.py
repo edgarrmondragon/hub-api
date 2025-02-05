@@ -138,7 +138,7 @@ def _kind_discriminator(setting: dict[str, t.Any] | _BasePluginSetting) -> str:
     return getattr(setting, "kind", None) or "string"
 
 
-class PluginSetting(RootModel[_BasePluginSetting]):  # type: ignore[override]
+class PluginSetting(RootModel[_BasePluginSetting]):
     root: t.Annotated[
         t.Annotated[StringSetting, Tag("string")]
         | t.Annotated[IntegerSetting, Tag("integer")]

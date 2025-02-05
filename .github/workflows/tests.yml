@@ -2,24 +2,8 @@ name: Tests
 
 on:
   pull_request:
-    paths:
-    - .github/workflows/tests.yml
-    - src/**
-    - tests/**
-    - Dockerfile
-    - docker-compose.yml
-    - pyproject.toml
-    - uv.lock
   push:
     branches: [main]
-    paths:
-    - .github/workflows/tests.yml
-    - src/**
-    - tests/**
-    - Dockerfile
-    - docker-compose.yml
-    - pyproject.toml
-    - uv.lock
   workflow_dispatch:
     inputs: {}
   schedule:
