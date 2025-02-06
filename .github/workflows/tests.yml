@@ -97,11 +97,14 @@ jobs:
       with:
         schema: 'http://127.0.0.1:8000/openapi.json'
         base-url: http://127.0.0.1:8000
-        token: ${{ secrets.SCHEMATHESIS_TOKEN }}
         api-name: meltano-hub-api
-        report: 'true'
-        args: '--experimental=openapi-3.1'
+        report: 'false'
+        args: '--experimental=openapi-3.1 --junit-xml=junit.xml'
         version: ${{ env.SCHEMATHESIS_VERSION }}
+    - uses: mikepenz/action-junit-report@ee6b445351cd81e2f73a16a0e52d598aeac2197f # v5.3.0
+      if: success() || failure() # always run even if the previous step fails
+      with:
+        report_paths: junit.xml
     - name: Stop containers
       if: always()
       run: docker compose down
