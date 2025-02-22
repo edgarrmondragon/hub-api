@@ -12,6 +12,8 @@ on:
 
 env:
   FORCE_COLOR: "1"
+  # renovate: datasource=pypi depName=offat
+  OFFAT_VERSION: "0.19.3"
   # renovate: datasource=pypi depName=schemathesis
   SCHEMATHESIS_VERSION: "3.39.9"
   # renovate: datasource=pypi depName=uv
@@ -121,11 +123,28 @@ jobs:
         name: hub-data
     - name: Start containers
       run: docker compose up -d --build
-    - uses: OWASP/OFFAT@3622dbce6fe0975ad1a0bd67f06b72e0a81e8f9d # v0.19.3
+    - uses: astral-sh/setup-uv@4db96194c378173c656ce18a155ffc14a9fc4355 # v5.2.2
       with:
-        file: http://127.0.0.1:8000/openapi.json
-        rate_limit: 120
-        artifact_retention_days: 1
+        version: ${{ env.UV_VERSION }}
+    - run: >
+        uvx --with offat==${{ env.OFFAT_VERSION }}
+        offat
+        --file http://127.0.0.1:8000/openapi.json
+        --rate-limit 120
+        --capture-failed
+        --headers 'User-Agent: offat/${{ env.OFFAT_VERSION }}'
+        --format json
+        --output ./offat-tmp/results.json
+    - uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+      with:
+        name: offat-results.json
+        path: ./offat-tmp/results.json
+        # retention period docs: https://docs.github.com/en/actions/learn-github-actions/usage-limits-billing-and-administration#artifact-and-log-retention-policy
+        retention-days: 2
+
+    - name: Stop containers
+      if: always()
+      run: docker compose down
 
   coverage:
     name: Coverage
