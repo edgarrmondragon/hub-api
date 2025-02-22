@@ -214,7 +214,9 @@ def load_db(path: Path, session: SessionBase) -> None:  # noqa: C901, PLR0912, P
 if __name__ == "__main__":
     import sys
 
-    engine = sa.create_engine("sqlite:///plugins.db")
+    from hub_api import database
+
+    engine = sa.create_engine(f"sqlite:///{database.get_db_path()}")
     SyncSession = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     session = SyncSession()
 
