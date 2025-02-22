@@ -42,7 +42,7 @@ jobs:
     - run: uv run python -I build.py meltano-hub/_data
       env:
         ONLY_GROUP: build
-    - uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+    - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
       with:
         name: hub-data
         path: plugins.db
@@ -65,7 +65,7 @@ jobs:
       continue-on-error: true # Continue on error to combine coverage.
       env:
         ONLY_GROUP: tests
-    - uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+    - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
       with:
         include-hidden-files: true
         name: coverage
@@ -135,7 +135,7 @@ jobs:
         --headers 'User-Agent: offat/${{ env.OFFAT_VERSION }}'
         --format json
         --output ./offat-tmp/results.json
-    - uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+    - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
       with:
         name: offat-results.json
         path: ./offat-tmp/results.json
@@ -171,7 +171,7 @@ jobs:
 
         # Report again and fail if under 100%.
         uv run coverage report --fail-under=100 --show-missing
-    - uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+    - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
       if: failure()
       with:
         name: html-report
