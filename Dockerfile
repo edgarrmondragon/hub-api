@@ -25,7 +25,7 @@ COPY --from=builder --chown=app:app /app /app
 
 # Copy the plugins database
 COPY plugins.db /app/plugins.db
-ENV SQLALCHEMY_DATABASE_URL="sqlite+aiosqlite:///app/plugins.db"
+ENV DB_PATH="/app/plugins.db"
 
 # Place executables in the environment at the front of the path
 ENV PATH="/app/.venv/bin:$PATH" \

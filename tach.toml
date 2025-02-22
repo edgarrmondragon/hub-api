@@ -26,7 +26,7 @@ depends_on = [
 path = "hub_api.dependencies"
 depends_on = [
     "hub_api.client",
-    "hub_api.models",
+    "hub_api.database",
 ]
 
 [[modules]]
@@ -64,6 +64,10 @@ depends_on = [
 
 [[modules]]
 path = "hub_api.static"
+depends_on = []
+
+[[modules]]
+path = "hub_api.database"
 depends_on = []
 
 [[interfaces]]

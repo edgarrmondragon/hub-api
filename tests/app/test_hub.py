@@ -7,7 +7,7 @@ import typing as t
 import pytest
 import pytest_asyncio
 
-from hub_api import client, enums, exceptions, models
+from hub_api import client, database, enums, exceptions
 
 if t.TYPE_CHECKING:
     from collections.abc import AsyncGenerator
@@ -16,7 +16,8 @@ if t.TYPE_CHECKING:
 @pytest_asyncio.fixture
 async def hub() -> AsyncGenerator[client.MeltanoHub]:
     """Get a Meltano hub instance."""
-    async with models.SessionLocal() as db:
+    session_maker = database.get_session_maker()
+    async with session_maker() as db:
         yield client.MeltanoHub(db=db)
 
 
