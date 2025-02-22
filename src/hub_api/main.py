@@ -25,6 +25,12 @@ app = fastapi.FastAPI(
     """),
     version=metadata.version("hub-api"),
     dependencies=[fastapi.Depends(etag.check_etag)],
+    servers=[
+        {
+            "url": "http://localhost:8000",
+            "description": "Local development server",
+        },
+    ],
 )
 app.add_middleware(gzip.GZipMiddleware, minimum_size=1000)
 app.add_middleware(etag.ETagMiddleware)

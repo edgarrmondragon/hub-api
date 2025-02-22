@@ -109,6 +109,23 @@ jobs:
       if: always()
       run: docker compose down
 
+  owasp:
+    name: OWASP OFFAT
+    runs-on: ubuntu-24.04
+    needs: [get-hub-data]
+    steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+      with:
+        name: hub-data
+    - name: Start containers
+      run: docker compose up -d --build
+    - uses: OWASP/OFFAT@3622dbce6fe0975ad1a0bd67f06b72e0a81e8f9d # v0.19.3
+      with:
+        file: http://127.0.0.1:8000/openapi.json
+        rate_limit: 120
+        artifact_retention_days: 1
+
   coverage:
     name: Coverage
     runs-on: ubuntu-24.04
