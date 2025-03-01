@@ -1,8 +1,15 @@
 from __future__ import annotations
 
+import gzip
+import logging
+import shutil
+import tarfile
+import tempfile
 import typing as t
 from pathlib import Path
 
+import platformdirs
+import requests
 import sqlalchemy as sa
 import yaml
 from sqlalchemy.orm import Session as SessionBase
@@ -13,6 +20,39 @@ from hub_api.schemas import meltano, validation
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+def download_meltano_hub_archive(*, ref: str = "main", use_cache: bool = True) -> Path:
+    """Download Meltano Hub archive."""
+    cached_tree = Path(platformdirs.user_cache_dir()) / "hub-api"
+    if use_cache and cached_tree.exists():
+        logger.info("Using cached directory %s", cached_tree)
+
+    else:
+        shutil.rmtree(cached_tree, ignore_errors=True)
+        url = f"https://github.com/meltano/hub/archive/{ref}.tar.gz"
+        logger.info("Downloading archive %s", url)
+
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+
+        with tempfile.NamedTemporaryFile(suffix=".tar.gz") as tmp_file:
+            tmp_file.write(gzip.decompress(response.content))
+            tmp_file.seek(0)
+            with tempfile.TemporaryDirectory() as extract_dir, tarfile.open(tmp_file.name) as tar:
+                tar.extractall(extract_dir, filter="data")
+                extracted = tar.getnames()[0]
+
+                # Move each item in the extracted directory to the cache
+                extracted_dir = Path(extract_dir) / extracted
+                cached_tree.mkdir(parents=True)
+                for item in extracted_dir.iterdir():
+                    shutil.move(item, cached_tree / item.name)
+
+    return cached_tree
 
 
 def get_default_variants(path: Path) -> dict[str, dict[str, str]]:
@@ -212,7 +252,15 @@ def load_db(path: Path, session: SessionBase) -> None:  # noqa: C901, PLR0912, P
 
 
 if __name__ == "__main__":
-    import sys
+    import argparse
+
+    class CLINamespace(argparse.Namespace):
+        git_ref: str
+        cache: bool
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--git-ref", default="main")
+    parser.add_argument("--no-cache", action="store_false", dest="cache")
 
     from hub_api import database
 
@@ -223,5 +271,7 @@ if __name__ == "__main__":
     models.EntityBase.metadata.drop_all(engine)
     models.EntityBase.metadata.create_all(engine)
 
-    hub_data = sys.argv[1] if len(sys.argv) > 1 else "../../meltano/hub/_data"
-    load_db(Path(hub_data).resolve(), session)
+    args = parser.parse_args(namespace=CLINamespace())
+
+    hub_dir = download_meltano_hub_archive(ref=args.git_ref, use_cache=args.cache)
+    load_db(hub_dir / "_data", session)

@@ -5,7 +5,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
-    inputs: {}
+    inputs:
+      git-ref:
+        description: Meltano Hub commit SHA, branch, or tag
+        required: false
+        default: main
   schedule:
     # Weekly on Monday at 12:00 PM UTC
   - cron: "0 12 * * 1"
@@ -39,7 +43,7 @@ jobs:
         repository: meltano/hub
         ref: main
         path: meltano-hub
-    - run: uv run python -I build.py meltano-hub/_data
+    - run: uv run python -I build.py --git-ref ${{ github.event.inputs.git-ref || 'main' }}
       env:
         ONLY_GROUP: build
     - uses: actions/upload-artifact@4cec3d8aa04e39d1a68397de0c4cd6fb9dce8ec1 # v4.6.1
