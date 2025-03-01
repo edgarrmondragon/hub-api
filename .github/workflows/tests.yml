@@ -31,7 +31,7 @@ jobs:
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
-    - uses: astral-sh/setup-uv@1edb52594c857e2b5b13128931090f0640537287 # v5.3.0
+    - uses: astral-sh/setup-uv@f94ec6bedd8674c4426838e6b50417d36b6ab231 # v5.3.1
       with:
         version: ${{ env.UV_VERSION }}
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -55,7 +55,7 @@ jobs:
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
-    - uses: astral-sh/setup-uv@1edb52594c857e2b5b13128931090f0640537287 # v5.3.0
+    - uses: astral-sh/setup-uv@f94ec6bedd8674c4426838e6b50417d36b6ab231 # v5.3.1
       with:
         version: ${{ env.UV_VERSION }}
     - uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4.1.9
@@ -77,7 +77,7 @@ jobs:
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
     - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
-    - uses: astral-sh/setup-uv@1edb52594c857e2b5b13128931090f0640537287 # v5.3.0
+    - uses: astral-sh/setup-uv@f94ec6bedd8674c4426838e6b50417d36b6ab231 # v5.3.1
       with:
         version: ${{ env.UV_VERSION }}
     - run: uv run mypy src tests
@@ -123,7 +123,7 @@ jobs:
         name: hub-data
     - name: Start containers
       run: docker compose up -d --build
-    - uses: astral-sh/setup-uv@1edb52594c857e2b5b13128931090f0640537287 # v5.3.0
+    - uses: astral-sh/setup-uv@f94ec6bedd8674c4426838e6b50417d36b6ab231 # v5.3.1
       with:
         version: ${{ env.UV_VERSION }}
     - run: >
@@ -156,7 +156,7 @@ jobs:
     - uses: actions/download-artifact@cc203385981b70ca67e1cc392babf9cc229d5806 # v4.1.9
       with:
         name: coverage
-    - uses: astral-sh/setup-uv@1edb52594c857e2b5b13128931090f0640537287 # v5.3.0
+    - uses: astral-sh/setup-uv@f94ec6bedd8674c4426838e6b50417d36b6ab231 # v5.3.1
       with:
         version: ${{ env.UV_VERSION }}
     - name: Combine coverage
