@@ -31,12 +31,12 @@ repos:
     -   id: validate_manifest
 
 -   repo: https://github.com/gauge-sh/tach-pre-commit
-    rev: v0.27.1
+    rev: v0.27.2
     hooks:
     -   id: tach
 
 -   repo: https://github.com/crate-ci/typos
-    rev: v1.29.10
+    rev: v1.30.0
     hooks:
     -   id: typos
 
