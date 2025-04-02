@@ -17,7 +17,7 @@ repos:
     -   id: trailing-whitespace
 
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.1
+    rev: v0.11.2
     hooks:
     -   id: ruff
         args:
@@ -31,17 +31,17 @@ repos:
     -   id: validate_manifest
 
 -   repo: https://github.com/gauge-sh/tach-pre-commit
-    rev: v0.28.2
+    rev: v0.28.3
     hooks:
     -   id: tach
 
 -   repo: https://github.com/crate-ci/typos
-    rev: v1.30.2
+    rev: v1.30.3
     hooks:
     -   id: typos
 
 -   repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: 0.31.3
+    rev: 0.32.1
     hooks:
     -   id: check-github-workflows
     -   id: check-renovate
@@ -50,7 +50,7 @@ repos:
         - pyjson5==1.6.8
 
 -   repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.6.8
+    rev: 0.6.10
     hooks:
     -   id: uv-lock
     -   id: uv-sync
