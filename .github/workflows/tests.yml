@@ -103,7 +103,7 @@ jobs:
         report: 'false'
         args: '--experimental=openapi-3.1 --junit-xml=junit.xml'
         version: ${{ env.SCHEMATHESIS_VERSION }}
-    - uses: mikepenz/action-junit-report@97744eca465b8df9e6e33271cb155003f85327f1 # v5.5.0
+    - uses: mikepenz/action-junit-report@cf701569b05ccdd861a76b8607a66d76f6fd4857 # v5.5.1
       if: success() || failure() # always run even if the previous step fails
       with:
         include_passed: true
