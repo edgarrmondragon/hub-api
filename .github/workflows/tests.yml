@@ -101,7 +101,7 @@ jobs:
         base-url: http://127.0.0.1:8000
         api-name: meltano-hub-api
         report: 'false'
-        args: '--experimental=openapi-3.1 --junit-xml=junit.xml'
+        args: '--experimental=openapi-3.1 --junit-xml=junit.xml --show-trace'
         version: ${{ env.SCHEMATHESIS_VERSION }}
     - uses: mikepenz/action-junit-report@cf701569b05ccdd861a76b8607a66d76f6fd4857 # v5.5.1
       if: success() || failure() # always run even if the previous step fails
