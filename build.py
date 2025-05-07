@@ -118,6 +118,8 @@ def load_db(path: Path, session: SessionBase) -> None:  # noqa: C901, PLR0912, P
         session.add(maintainer_object)
 
     for plugin_type in enums.PluginTypeEnum:
+        variant_count = 0  # Counter for processed plugin variants
+        plugin_count = 0  # Counter for processed plugins
         for plugin_path in path.joinpath("meltano", plugin_type).glob("*"):
             default_variant = default_variants[plugin_type].get(plugin_path.name)
             plugin_id = f"{plugin_type}.{plugin_path.name}"
@@ -170,6 +172,7 @@ def load_db(path: Path, session: SessionBase) -> None:  # noqa: C901, PLR0912, P
                     prereq=plugin.prereq,
                 )
                 session.add(variant_object)
+                variant_count += 1
 
                 for setting in plugin.settings:
                     session.add(_build_setting(variant_id, setting))
@@ -240,13 +243,16 @@ def load_db(path: Path, session: SessionBase) -> None:  # noqa: C901, PLR0912, P
                         )
                     session.add(command_object)
 
-            default_variant_object = models.Plugin(
+            plugin_object = models.Plugin(
                 id=plugin_id,
                 default_variant_id=default_variant_id,
                 plugin_type=plugin_type.value,
                 name=plugin_path.name,
             )
-            session.add(default_variant_object)
+            session.add(plugin_object)
+            plugin_count += 1
+
+        logger.info("Processed %d %s variants for %d plugins", variant_count, plugin_type.value, plugin_count)
 
     session.commit()
 
