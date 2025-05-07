@@ -87,12 +87,8 @@ jobs:
   schemathesis:
     name: Schemathesis Test
     runs-on: ubuntu-24.04
-    needs: [get-hub-data]
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-    - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      with:
-        name: hub-data
     - name: Start containers
       run: docker compose up -d --build
     - uses: schemathesis/action@e8c36caf1285d9c955e282cf71793837f92308a4 # v1.0.4
@@ -115,12 +111,8 @@ jobs:
   owasp:
     name: OWASP OFFAT
     runs-on: ubuntu-24.04
-    needs: [get-hub-data]
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-    - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
-      with:
-        name: hub-data
     - name: Start containers
       run: docker compose up -d --build
     - uses: astral-sh/setup-uv@0c5e2b8115b80b4c7c5ddf6ffdd634974642d182 # v5.4.1
