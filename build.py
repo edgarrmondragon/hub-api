@@ -21,7 +21,7 @@ from hub_api.schemas import meltano, validation
 if t.TYPE_CHECKING:
     from collections.abc import Generator
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
 
 
