@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-import os
 import typing as t
 
 import sqlalchemy as sa
-from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import (
     DeclarativeBase,
     Mapped,
@@ -13,14 +12,6 @@ from sqlalchemy.orm import (
 )
 
 from hub_api import enums  # noqa: TC001
-
-SQLALCHEMY_DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL", "sqlite+aiosqlite:///./plugins.db")
-
-engine = create_async_engine(
-    SQLALCHEMY_DATABASE_URL,
-    connect_args={"check_same_thread": False},
-)
-SessionLocal = async_sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 class EntityBase(AsyncAttrs, DeclarativeBase):

@@ -4,7 +4,7 @@ port := "8000"
 py := "3.13"
 ref := "main"
 
-build: update pre-commit coverage
+build: update pre-commit typing coverage
 
 build-db $ONLY_GROUP="build":
     uv run --python={{py}} python -I build.py --git-ref={{ref}}

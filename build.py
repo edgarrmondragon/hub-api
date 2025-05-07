@@ -262,7 +262,9 @@ if __name__ == "__main__":
     parser.add_argument("--git-ref", default="main")
     parser.add_argument("--no-cache", action="store_false", dest="cache")
 
-    engine = sa.create_engine("sqlite:///plugins.db")
+    from hub_api import database
+
+    engine = sa.create_engine(f"sqlite:///{database.get_db_path()}")
     SyncSession = sessionmaker(autocommit=False, autoflush=False, bind=engine)
     session = SyncSession()
 

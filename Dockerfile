@@ -13,6 +13,26 @@ ADD . /app
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev
 
+FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim AS database
+ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy
+WORKDIR /app
+
+# Copy the application from the builder
+COPY --from=builder --chown=app:app /app /app
+
+# Download and extract the meltano/hub repository archive
+RUN apt-get update && apt-get install -y curl && \
+    curl -L https://github.com/meltano/hub/archive/refs/heads/main.tar.gz | tar xz && \
+    mv hub-main /app/meltano-hub && \
+    apt-get remove -y curl && \
+    apt-get autoremove -y && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --only-group build
+
+# Build the database
+RUN uv run python -I build.py meltano-hub/_data
 
 # Then, use a final image without uv
 FROM python:3.13-slim-bookworm
@@ -24,8 +44,9 @@ FROM python:3.13-slim-bookworm
 COPY --from=builder --chown=app:app /app /app
 
 # Copy the plugins database
-COPY plugins.db /app/plugins.db
-ENV SQLALCHEMY_DATABASE_URL="sqlite+aiosqlite:///app/plugins.db"
+COPY --from=database /app/plugins.db /app/plugins.db
+
+ENV DB_PATH="/app/plugins.db"
 
 # Place executables in the environment at the front of the path
 ENV PATH="/app/.venv/bin:$PATH" \

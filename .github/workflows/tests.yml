@@ -2,24 +2,8 @@ name: Tests
 
 on:
   pull_request:
-    paths:
-    - .github/workflows/tests.yml
-    - src/**
-    - tests/**
-    - Dockerfile
-    - docker-compose.yml
-    - pyproject.toml
-    - uv.lock
   push:
     branches: [main]
-    paths:
-    - .github/workflows/tests.yml
-    - src/**
-    - tests/**
-    - Dockerfile
-    - docker-compose.yml
-    - pyproject.toml
-    - uv.lock
   workflow_dispatch:
     inputs:
       git-ref:
@@ -32,10 +16,12 @@ on:
 
 env:
   FORCE_COLOR: "1"
+  # renovate: datasource=pypi depName=offat
+  OFFAT_VERSION: "0.19.3"
   # renovate: datasource=pypi depName=schemathesis
-  SCHEMATHESIS_VERSION: "3.39.7"
+  SCHEMATHESIS_VERSION: "3.39.16"
   # renovate: datasource=pypi depName=uv
-  UV_VERSION: "0.5.21"
+  UV_VERSION: "0.6.15"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -48,8 +34,8 @@ jobs:
     continue-on-error: false
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-    - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
-    - uses: astral-sh/setup-uv@b5f58b2abc5763ade55e4e9d0fe52cd1ff7979ca # v5.2.1
+    - uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # v5.5.0
+    - uses: astral-sh/setup-uv@0c5e2b8115b80b4c7c5ddf6ffdd634974642d182 # v5.4.1
       with:
         version: ${{ env.UV_VERSION }}
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
@@ -60,7 +46,7 @@ jobs:
     - run: uv run python -I build.py --git-ref ${{ github.event.inputs.git-ref || 'main' }}
       env:
         ONLY_GROUP: build
-    - uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with:
         name: hub-data
         path: plugins.db
@@ -72,18 +58,18 @@ jobs:
     needs: [get-hub-data]
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-    - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
-    - uses: astral-sh/setup-uv@b5f58b2abc5763ade55e4e9d0fe52cd1ff7979ca # v5.2.1
+    - uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # v5.5.0
+    - uses: astral-sh/setup-uv@0c5e2b8115b80b4c7c5ddf6ffdd634974642d182 # v5.4.1
       with:
         version: ${{ env.UV_VERSION }}
-    - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+    - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
       with:
         name: hub-data
     - run: uv run coverage run -m pytest -v
       continue-on-error: true # Continue on error to combine coverage.
       env:
         ONLY_GROUP: tests
-    - uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with:
         include-hidden-files: true
         name: coverage
@@ -94,8 +80,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-    - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
-    - uses: astral-sh/setup-uv@b5f58b2abc5763ade55e4e9d0fe52cd1ff7979ca # v5.2.1
+    - uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # v5.5.0
+    - uses: astral-sh/setup-uv@0c5e2b8115b80b4c7c5ddf6ffdd634974642d182 # v5.4.1
       with:
         version: ${{ env.UV_VERSION }}
     - run: uv run mypy src tests
@@ -105,23 +91,53 @@ jobs:
   schemathesis:
     name: Schemathesis Test
     runs-on: ubuntu-24.04
-    needs: [get-hub-data]
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-    - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
-      with:
-        name: hub-data
     - name: Start containers
       run: docker compose up -d --build
     - uses: schemathesis/action@e8c36caf1285d9c955e282cf71793837f92308a4 # v1.0.4
       with:
-        schema: 'http://127.0.0.1:8000/openapi.json'
-        base-url: http://127.0.0.1:8000
-        token: ${{ secrets.SCHEMATHESIS_TOKEN }}
+        schema: 'http://127.0.0.1:8080/openapi.json'
+        base-url: http://127.0.0.1:8080
         api-name: meltano-hub-api
-        report: 'true'
-        args: '--experimental=openapi-3.1'
+        report: 'false'
+        args: '--experimental=openapi-3.1 --junit-xml=junit.xml'
         version: ${{ env.SCHEMATHESIS_VERSION }}
+    - uses: mikepenz/action-junit-report@cf701569b05ccdd861a76b8607a66d76f6fd4857 # v5.5.1
+      if: success() || failure() # always run even if the previous step fails
+      with:
+        include_passed: true
+        report_paths: junit.xml
+    - name: Stop containers
+      if: always()
+      run: docker compose down
+
+  owasp:
+    name: OWASP OFFAT
+    runs-on: ubuntu-24.04
+    steps:
+    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+    - name: Start containers
+      run: docker compose up -d --build
+    - uses: astral-sh/setup-uv@0c5e2b8115b80b4c7c5ddf6ffdd634974642d182 # v5.4.1
+      with:
+        version: ${{ env.UV_VERSION }}
+    - run: >
+        uvx --with offat==${{ env.OFFAT_VERSION }}
+        offat
+        --file http://127.0.0.1:8080/openapi.json
+        --rate-limit 120
+        --capture-failed
+        --headers 'User-Agent: offat/${{ env.OFFAT_VERSION }}'
+        --format json
+        --output ./offat-tmp/results.json
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      with:
+        name: offat-results.json
+        path: ./offat-tmp/results.json
+        # retention period docs: https://docs.github.com/en/actions/learn-github-actions/usage-limits-billing-and-administration#artifact-and-log-retention-policy
+        retention-days: 2
+
     - name: Stop containers
       if: always()
       run: docker compose down
@@ -133,10 +149,10 @@ jobs:
     needs: [tests]
     steps:
     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-    - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+    - uses: actions/download-artifact@95815c38cf2ff2164869cbab79da8d1f422bc89e # v4.2.1
       with:
         name: coverage
-    - uses: astral-sh/setup-uv@b5f58b2abc5763ade55e4e9d0fe52cd1ff7979ca # v5.2.1
+    - uses: astral-sh/setup-uv@0c5e2b8115b80b4c7c5ddf6ffdd634974642d182 # v5.4.1
       with:
         version: ${{ env.UV_VERSION }}
     - name: Combine coverage
@@ -151,7 +167,7 @@ jobs:
 
         # Report again and fail if under 100%.
         uv run coverage report --fail-under=100 --show-missing
-    - uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       if: failure()
       with:
         name: html-report

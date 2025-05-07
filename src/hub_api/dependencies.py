@@ -6,7 +6,7 @@ import typing as t
 
 import fastapi
 
-from hub_api import client, models
+from hub_api import client, database
 
 if t.TYPE_CHECKING:
     from collections.abc import AsyncGenerator
@@ -14,7 +14,8 @@ if t.TYPE_CHECKING:
 
 async def get_hub() -> AsyncGenerator[client.MeltanoHub]:
     """Get a Meltano hub instance."""
-    async with models.SessionLocal() as db:
+    session_maker = database.get_session_maker()
+    async with session_maker() as db:
         yield client.MeltanoHub(db=db)
 
 
