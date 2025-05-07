@@ -3,9 +3,10 @@ services:
     build:
       context: .
     ports:
-    - "8000:8000"
+    - "8080:8080"
     volumes:
     - ./src/:/app/src
     environment:
+      GRANIAN_PORT: "8080"
       GRANIAN_RELOAD: "1"
       GRANIAN_WORKERS: "4"

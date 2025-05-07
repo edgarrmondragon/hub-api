@@ -97,8 +97,8 @@ jobs:
       run: docker compose up -d --build
     - uses: schemathesis/action@e8c36caf1285d9c955e282cf71793837f92308a4 # v1.0.4
       with:
-        schema: 'http://127.0.0.1:8000/openapi.json'
-        base-url: http://127.0.0.1:8000
+        schema: 'http://127.0.0.1:8080/openapi.json'
+        base-url: http://127.0.0.1:8080
         api-name: meltano-hub-api
         report: 'false'
         args: '--experimental=openapi-3.1 --junit-xml=junit.xml'
@@ -129,7 +129,7 @@ jobs:
     - run: >
         uvx --with offat==${{ env.OFFAT_VERSION }}
         offat
-        --file http://127.0.0.1:8000/openapi.json
+        --file http://127.0.0.1:8080/openapi.json
         --rate-limit 120
         --capture-failed
         --headers 'User-Agent: offat/${{ env.OFFAT_VERSION }}'
