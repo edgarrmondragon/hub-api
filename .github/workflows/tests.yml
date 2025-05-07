@@ -38,11 +38,6 @@ jobs:
     - uses: astral-sh/setup-uv@0c5e2b8115b80b4c7c5ddf6ffdd634974642d182 # v5.4.1
       with:
         version: ${{ env.UV_VERSION }}
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      with:
-        repository: meltano/hub
-        ref: main
-        path: meltano-hub
     - run: uv run python -I build.py --git-ref ${{ github.event.inputs.git-ref || 'main' }}
       env:
         ONLY_GROUP: build
