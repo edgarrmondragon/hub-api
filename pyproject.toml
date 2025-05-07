@@ -18,7 +18,9 @@ dependencies = [
 
 [dependency-groups]
 build = [
+    "platformdirs>=4.3.6",
     "PyYAML>=6.0.1",
+    "requests>=2.32.3",
 ]
 dev = [
     { include-group = "build" },
@@ -35,6 +37,7 @@ tests = [
 typing = [
     "mypy>=1.14.0",
     "types-PyYAML>=6.0.12.20240808",
+    "types-requests>=2.32.0",
 ]
 
 [tool.hatch.version]
