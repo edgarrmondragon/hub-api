@@ -127,14 +127,10 @@ jobs:
         --rate-limit 120
         --capture-failed
         --headers 'User-Agent: offat/${{ env.OFFAT_VERSION }}'
-        --format json
-        --output ./offat-tmp/results.json
-    - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-      with:
-        name: offat-results.json
-        path: ./offat-tmp/results.json
-        # retention period docs: https://docs.github.com/en/actions/learn-github-actions/usage-limits-billing-and-administration#artifact-and-log-retention-policy
-        retention-days: 2
+        --format table
+        --output ./offat-tmp/results.txt
+    - run:
+        cat ./offat-tmp/results.txt > $GITHUB_STEP_SUMMARY
 
     - name: Stop containers
       if: always()
