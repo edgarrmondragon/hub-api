@@ -20,11 +20,13 @@ WORKDIR /app
 # Copy the application from the builder
 COPY --from=builder --chown=app:app /app /app
 
-# Install git
-RUN apt-get update && apt-get install -y git
-
-# Clone the meltano/hub repository
-RUN git clone --depth 1 https://github.com/meltano/hub.git /app/meltano-hub
+# Download and extract the meltano/hub repository archive
+RUN apt-get update && apt-get install -y curl && \
+    curl -L https://github.com/meltano/hub/archive/refs/heads/main.tar.gz | tar xz && \
+    mv hub-main /app/meltano-hub && \
+    apt-get remove -y curl && \
+    apt-get autoremove -y && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --only-group build
