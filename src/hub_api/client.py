@@ -387,7 +387,7 @@ class MeltanoHub:
         """
         maintainer = await self.db.get(models.Maintainer, maintainer_id)
         if not maintainer:
-            raise exceptions.NotFoundError(f"Maintainer {maintainer} not found")
+            raise exceptions.NotFoundError(f"Maintainer {maintainer_id} not found")
 
         variants: list[models.PluginVariant] = await maintainer.awaitable_attrs.plugins
 
