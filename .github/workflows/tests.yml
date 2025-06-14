@@ -17,7 +17,7 @@ on:
 env:
   FORCE_COLOR: "1"
   # renovate: datasource=pypi depName=offat
-  OFFAT_VERSION: "0.19.3"
+  OFFAT_VERSION: "0.19.4"
   # renovate: datasource=pypi depName=schemathesis
   SCHEMATHESIS_VERSION: "3.39.16"
   # renovate: datasource=pypi depName=uv
