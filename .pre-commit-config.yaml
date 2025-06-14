@@ -17,7 +17,7 @@ repos:
     -   id: trailing-whitespace
 
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.7
+    rev: v0.11.12
     hooks:
     -   id: ruff
         args:
@@ -36,7 +36,7 @@ repos:
     -   id: tach
 
 -   repo: https://github.com/crate-ci/typos
-    rev: v1.31.1
+    rev: v1.31.2
     hooks:
     -   id: typos
 
@@ -47,7 +47,7 @@ repos:
     -   id: check-renovate
         language: python
         additional_dependencies:
-        - pyjson5==1.6.8
+        - pyjson5==1.6.9
 
 -   repo: https://github.com/astral-sh/uv-pre-commit
     rev: 0.6.17
