@@ -17,7 +17,7 @@ repos:
     -   id: trailing-whitespace
 
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.11.12
+    rev: v0.11.13
     hooks:
     -   id: ruff
         args:
@@ -50,7 +50,7 @@ repos:
         - pyjson5==1.6.9
 
 -   repo: https://github.com/astral-sh/uv-pre-commit
-    rev: 0.7.9
+    rev: 0.7.12
     hooks:
     -   id: uv-lock
     -   id: uv-sync
