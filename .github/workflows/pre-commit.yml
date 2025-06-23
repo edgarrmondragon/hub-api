@@ -17,7 +17,7 @@ env:
   # renovate: datasource=pypi depName=pre-commit-uv
   PRE_COMMIT_UV_VERSION: "4.1.4"
   # renovate: datasource=pypi depName=uv
-  UV_VERSION: "0.7.9"
+  UV_VERSION: "0.7.12"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

@@ -21,7 +21,7 @@ env:
   # renovate: datasource=pypi depName=schemathesis
   SCHEMATHESIS_VERSION: "3.39.16"
   # renovate: datasource=pypi depName=uv
-  UV_VERSION: "0.7.9"
+  UV_VERSION: "0.7.12"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
