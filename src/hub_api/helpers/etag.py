@@ -44,7 +44,7 @@ class ETagMiddleware(BaseHTTPMiddleware):
 
 def check_etag(
     if_none_match: t.Annotated[
-        str | None,
+        str,  # noqa: RUF013
         Header(
             description=textwrap.dedent("""\
                 The `If-None-Match` HTTP request header makes the request conditional. \
@@ -55,9 +55,10 @@ def check_etag(
 
                 https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match
             """),
+            # pattern=r'^"W/etag-[A-Za-z0-9-]+"$',
             pattern=r'^"etag-[A-Za-z0-9-]+"$',
         ),
-    ] = None,
+    ] = None,  # type: ignore[assignment]
 ) -> None:
     """Get ETag value."""
     if if_none_match == get_etag():
