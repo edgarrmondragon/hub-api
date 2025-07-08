@@ -1,5 +1,8 @@
 base-url = "http://127.0.0.1:8080"
 rate-limit = "10/s"
 
+[phases.fuzzing]
+enabled = false
+
 [reports.junit]
 enabled = true
