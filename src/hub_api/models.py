@@ -27,7 +27,7 @@ class Plugin(EntityBase):
     default_variant_id: Mapped[str]
 
     plugin_type: Mapped[enums.PluginTypeEnum]
-    name: Mapped[str]
+    name: Mapped[str] = mapped_column(sa.String(63))
 
     variants: Mapped[list[PluginVariant]] = relationship(back_populates="plugin")
 

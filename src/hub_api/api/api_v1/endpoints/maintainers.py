@@ -58,7 +58,7 @@ async def get_maintainer(
         fastapi.Path(
             ...,
             description="The maintainer identifier",
-            pattern=r"^[A-Za-z0-9-]+$",
+            pattern=r"^[A-Za-z0-9-_]+$",
         ),
     ],
 ) -> api_schemas.MaintainerDetails:
