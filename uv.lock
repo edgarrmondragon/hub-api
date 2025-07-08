@@ -2,9 +2,6 @@ version = 1
 revision = 2
 requires-python = ">=3.13"
 
-[options]
-prerelease-mode = "allow"
-
 [[package]]
 name = "aiosqlite"
 version = "0.21.0"
@@ -222,16 +219,31 @@ wheels = [
 ]
 
 [[package]]
-name = "httpx"
-version = "1.0.dev1"
+name = "httpcore"
+version = "1.0.9"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
+    { name = "certifi" },
     { name = "h11" },
-    { name = "truststore" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/85/93/5d9ca697697028ee22fe549d05ea69dbb7ab788c0271104e90eb40aeec4c/httpx-1.0.dev1.tar.gz", hash = "sha256:1486ffdbc9bef6ae3c3f5c4b24c1860b053def9bc62c6fad8bdbcb8c7b280c29", size = 889731, upload-time = "2025-07-02T18:49:50.669Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/06/94/82699a10bca87a5556c9c59b5963f2d039dbd239f25bc2a63907a05a14cb/httpcore-1.0.9.tar.gz", hash = "sha256:6e34463af53fd2ab5d807f399a9b45ea31c3dfa2276f15a2c3f00afff6e176e8", size = 85484, upload-time = "2025-04-24T22:06:22.219Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b4/81/d65a66fce59b891e0b3dbc09f222b438d8fddb2b8fe08aa9004516378a0e/httpx-1.0.dev1-py3-none-any.whl", hash = "sha256:45888416cd91a79ad016ffa90e2a053ec5fe269059df7bc1b0824924259745dd", size = 30258, upload-time = "2025-07-02T18:49:48.96Z" },
+    { url = "https://files.pythonhosted.org/packages/7e/f5/f66802a942d491edb555dd61e3a9961140fd64c90bce1eafd741609d334d/httpcore-1.0.9-py3-none-any.whl", hash = "sha256:2d400746a40668fc9dec9810239072b40b4484b640a8c38fd654a024c7a1bf55", size = 78784, upload-time = "2025-04-24T22:06:20.566Z" },
+]
+
+[[package]]
+name = "httpx"
+version = "0.28.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+    { name = "certifi" },
+    { name = "httpcore" },
+    { name = "idna" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/b1/df/48c586a5fe32a0f01324ee087459e112ebb7224f646c0b5023f5e79e9956/httpx-0.28.1.tar.gz", hash = "sha256:75e98c5f16b0f35b567856f597f06ff2270a374470a5c2392242528e3e3e42fc", size = 141406, upload-time = "2024-12-06T15:37:23.222Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/2a/39/e50c7c3a983047577ee07d2a9e53faf5a69493943ec3f6a384bdc792deb2/httpx-0.28.1-py3-none-any.whl", hash = "sha256:d909fcccc110f8c7faf814ca82a9a4d816bc5a6dbfea25d6591d6985b8ba59ad", size = 73517, upload-time = "2024-12-06T15:37:21.509Z" },
 ]
 
 [[package]]
@@ -283,7 +295,7 @@ requires-dist = [
     { name = "aiosqlite", specifier = ">=0.19.0" },
     { name = "fastapi", specifier = ">=0.109.2" },
     { name = "granian", extras = ["reload"], specifier = ">=1.6.0" },
-    { name = "python-json-logger", specifier = ">=2.0.7" },
+    { name = "python-json-logger", specifier = ">=4.0.0.dev0" },
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.27" },
     { name = "starlette", specifier = ">=0.38.5" },
 ]
@@ -300,7 +312,7 @@ dev = [
     { name = "mypy", specifier = ">=1.14.0" },
     { name = "platformdirs", specifier = ">=4.3.6" },
     { name = "pytest", specifier = ">=8.3.2" },
-    { name = "pytest-asyncio", specifier = ">=0.24" },
+    { name = "pytest-asyncio", specifier = ">=1.1.0a1" },
     { name = "pytest-github-actions-annotate-failures", specifier = ">=0.3.0" },
     { name = "pyyaml", specifier = ">=6.0.1" },
     { name = "requests", specifier = ">=2.32.3" },
@@ -311,7 +323,7 @@ tests = [
     { name = "coverage", specifier = ">=7.6.1" },
     { name = "httpx", specifier = ">=0.27.2" },
     { name = "pytest", specifier = ">=8.3.2" },
-    { name = "pytest-asyncio", specifier = ">=0.24" },
+    { name = "pytest-asyncio", specifier = ">=1.1.0a1" },
     { name = "pytest-github-actions-annotate-failures", specifier = ">=0.3.0" },
 ]
 typing = [
@@ -581,15 +593,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/ce/20/08dfcd9c983f6a6f4a1000d934b9e6d626cff8d2eeb77a89a68eef20a2b7/starlette-0.46.2.tar.gz", hash = "sha256:7f7361f34eed179294600af672f565727419830b54b7b084efe44bb82d2fccd5", size = 2580846, upload-time = "2025-04-13T13:56:17.942Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8b/0c/9d30a4ebeb6db2b25a841afbb80f6ef9a854fc3b41be131d249a977b4959/starlette-0.46.2-py3-none-any.whl", hash = "sha256:595633ce89f8ffa71a015caed34a5b2dc1c0cdb3f0f1fbd1e69339cf2abeec35", size = 72037, upload-time = "2025-04-13T13:56:16.21Z" },
-]
-
-[[package]]
-name = "truststore"
-version = "0.10.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/01/a8/cdcf418e067b8ae539012a3f1a51f90b30b26f5e1952a8f60304396babbc/truststore-0.10.0.tar.gz", hash = "sha256:5da347c665714fdfbd46f738c823fe9f0d8775e41ac5fb94f325749091187896", size = 24810, upload-time = "2024-10-23T22:11:21.193Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/d1/c9/bab5a5dda14af36fe31e2215f0f87bf34408951972fa7220055926dab2e0/truststore-0.10.0-py3-none-any.whl", hash = "sha256:b3798548e421ffe2ca2a6217cca49e7a17baf40b72d86a5505dc7d701e77d15b", size = 18231, upload-time = "2024-10-23T22:11:19.72Z" },
 ]
 
 [[package]]
