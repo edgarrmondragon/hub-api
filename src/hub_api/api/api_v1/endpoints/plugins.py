@@ -9,7 +9,7 @@ import fastapi.responses
 from pydantic import BaseModel, ConfigDict, Field
 
 from hub_api import dependencies, enums  # noqa: TC001
-from hub_api.schemas import api as api_schemas  # noqa: TC001
+from hub_api.schemas import api as api_schemas
 
 router = fastapi.APIRouter()
 
@@ -120,10 +120,15 @@ async def get_plugin_variant(
 class MadeWithSDKParams(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    limit: int = Field(ge=1, le=100, description="The number of plugins to return", default=25)
-    plugin_type: enums.PluginTypeEnum | None = Field(
+    limit: int = Field(
+        25,
+        ge=1,
+        le=100,
+        description="The number of plugins to return",
+    )
+    plugin_type: api_schemas.PluginTypeOrAnyEnum = Field(
+        api_schemas.PluginTypeOrAnyEnum.any,
         description="The plugin type",
-        default=None,
     )
 
 
