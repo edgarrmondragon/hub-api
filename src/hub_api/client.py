@@ -317,7 +317,7 @@ class MeltanoHub:
         self: MeltanoHub,
         *,
         limit: int,
-        plugin_type: enums.PluginTypeEnum | None,
+        plugin_type: api_schemas.PluginTypeOrAnyEnum,
     ) -> list[dict[str, str]]:
         """Get all plugins with the sdk keyword.
 
@@ -330,8 +330,8 @@ class MeltanoHub:
             models.PluginVariant.name.label("variant"),
         )
 
-        if plugin_type:
-            q = q.where(models.Plugin.plugin_type == plugin_type)
+        if plugin_type != api_schemas.PluginTypeOrAnyEnum.any:
+            q = q.where(models.Plugin.plugin_type == enums.PluginTypeEnum(plugin_type))
 
         q = (
             q.join(
@@ -387,7 +387,7 @@ class MeltanoHub:
         """
         maintainer = await self.db.get(models.Maintainer, maintainer_id)
         if not maintainer:
-            raise exceptions.NotFoundError(f"Maintainer {maintainer} not found")
+            raise exceptions.NotFoundError(f"Maintainer {maintainer_id} not found")
 
         variants: list[models.PluginVariant] = await maintainer.awaitable_attrs.plugins
 

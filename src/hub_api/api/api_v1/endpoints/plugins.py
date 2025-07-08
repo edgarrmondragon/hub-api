@@ -6,9 +6,10 @@ import typing as t
 
 import fastapi
 import fastapi.responses
+from pydantic import BaseModel, ConfigDict, Field
 
 from hub_api import dependencies, enums  # noqa: TC001
-from hub_api.schemas import api as api_schemas  # noqa: TC001
+from hub_api.schemas import api as api_schemas
 
 router = fastapi.APIRouter()
 
@@ -116,23 +117,29 @@ async def get_plugin_variant(
     return await hub.get_plugin_details(variant_id)
 
 
+class MadeWithSDKParams(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    limit: int = Field(
+        25,
+        ge=1,
+        le=100,
+        description="The number of plugins to return",
+    )
+    plugin_type: api_schemas.PluginTypeOrAnyEnum = Field(
+        api_schemas.PluginTypeOrAnyEnum.any,
+        description="The plugin type",
+    )
+
+
 @router.get("/made-with-sdk", summary="Get SDK plugins")
 async def sdk(
     hub: dependencies.Hub,
     *,
-    limit: t.Annotated[
-        int,
-        fastapi.Query(
-            ...,
-            ge=1,
-            le=100,
-            description="The number of plugins to return",
-        ),
-    ] = 25,
-    plugin_type: enums.PluginTypeEnum | None = None,
+    filter_query: t.Annotated[MadeWithSDKParams, fastapi.Query()],
 ) -> list[dict[str, str]]:
     """Retrieve plugins made with the Singer SDK."""
-    return await hub.get_sdk_plugins(limit=limit, plugin_type=plugin_type)
+    return await hub.get_sdk_plugins(limit=filter_query.limit, plugin_type=filter_query.plugin_type)
 
 
 @router.get("/stats", summary="Hub statistics")

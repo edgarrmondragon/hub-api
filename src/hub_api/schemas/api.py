@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import enum
+
 from pydantic import BaseModel as PydanticBaseModel
 from pydantic import ConfigDict, Field, HttpUrl
 
@@ -46,6 +48,20 @@ class MaintainerDetails(_BaseMaintainerSchema):
     """Maintainer details model."""
 
     links: dict[str, str] = Field(description="Links to the maintainer's plugins", default_factory=dict)
+
+
+class PluginTypeOrAnyEnum(enum.StrEnum):
+    """Plugin type or any enum."""
+
+    extractors = enum.auto()
+    loaders = enum.auto()
+    transformers = enum.auto()
+    utilities = enum.auto()
+    transforms = enum.auto()
+    orchestrators = enum.auto()
+    mappers = enum.auto()
+    files = enum.auto()
+    any = enum.auto()
 
 
 class VariantReference(BaseModel):

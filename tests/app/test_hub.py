@@ -8,6 +8,7 @@ import pytest
 import pytest_asyncio
 
 from hub_api import client, database, enums, exceptions
+from hub_api.schemas import api as api_schemas
 
 if t.TYPE_CHECKING:
     from collections.abc import AsyncGenerator
@@ -81,10 +82,10 @@ async def test_get_plugin_variant_not_found(hub: client.MeltanoHub) -> None:
 async def test_get_sdk_plugins(hub: client.MeltanoHub) -> None:
     """Test get_sdk_plugins."""
     n = 10
-    plugins = await hub.get_sdk_plugins(limit=n, plugin_type=None)
+    plugins = await hub.get_sdk_plugins(limit=n, plugin_type=api_schemas.PluginTypeOrAnyEnum.any)
     assert len(plugins) == n
 
-    extractors = await hub.get_sdk_plugins(limit=n, plugin_type=enums.PluginTypeEnum.extractors)
+    extractors = await hub.get_sdk_plugins(limit=n, plugin_type=api_schemas.PluginTypeOrAnyEnum.extractors)
     assert len(extractors) == n
 
 

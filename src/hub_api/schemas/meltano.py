@@ -186,7 +186,13 @@ class PluginRequires(BaseModel):
 class Plugin(BaseModel):
     """Base plugin details model."""
 
-    name: str = Field(description="The plugin name", examples=["tap-csv"])
+    name: str = Field(
+        description="The plugin name",
+        examples=["tap-csv"],
+        min_length=1,
+        max_length=63,
+        pattern=r"^[A-Za-z0-9-_]+$",
+    )
     namespace: str
     label: str | None = Field(None, description="The plugin label", examples=["CSV Tap"])
     description: str | None = Field(
