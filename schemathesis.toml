@@ -6,3 +6,15 @@ enabled = false
 
 [reports.junit]
 enabled = true
+
+[[operations]]
+include-name = "GET /meltano/api/v1/plugins/{plugin_type}/{plugin_name}/default"
+parameters = { plugin_type = "extractors", plugin_name = "tap-github" }
+
+[[operations]]
+include-name = "GET /meltano/api/v1/plugins/{plugin_type}/{plugin_name}--{plugin_variant}"
+parameters = { plugin_type = "extractors", plugin_name = "tap-github", plugin_variant = "meltanolabs" }
+
+[[operations]]
+include-name = "GET /meltano/api/v1/maintainers/{maintainer}"
+parameters = { maintainer = "meltanolabs" }
