@@ -19,7 +19,7 @@ env:
   # renovate: datasource=pypi depName=offat
   OFFAT_VERSION: "0.19.4"
   # renovate: datasource=pypi depName=schemathesis
-  SCHEMATHESIS_VERSION: "3.39.16"
+  SCHEMATHESIS_VERSION: "4.0.2"
   # renovate: datasource=pypi depName=uv
   UV_VERSION: "0.7.14"
 
