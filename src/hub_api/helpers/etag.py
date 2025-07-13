@@ -11,13 +11,15 @@ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
 import http
 import textwrap
 import uuid
-from collections.abc import Awaitable, Callable
-from typing import Annotated, override
+from typing import TYPE_CHECKING, Annotated, override
 
 from fastapi import Header, HTTPException, Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from . import compatibility
+
+if TYPE_CHECKING:
+    from collections.abc import Awaitable, Callable
 
 
 def get_new_etag() -> str:

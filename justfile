@@ -1,7 +1,7 @@
 set dotenv-load
 
 port := "8000"
-py := "3.13"
+py := "3.14"
 ref := "main"
 
 build: update pre-commit typing coverage
