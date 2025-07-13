@@ -6,11 +6,12 @@ authors = [
     { name = "Edgar Ramírez Mondragón", email = "edgarrm358@gmail.com" },
 ]
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 dependencies = [
     "aiosqlite>=0.19.0",
     "fastapi>=0.109.2",
     "granian[reload]>=1.6.0",
+    "pydantic",
     "python-json-logger>=4.0.0.dev0",
     "SQLAlchemy[asyncio]>=2.0.27",
     "starlette>=0.38.5",
@@ -47,6 +48,9 @@ source = "vcs"
 [tool.uv]
 preview = true
 required-version = ">=0.5.19"
+
+[tool.uv.sources]
+pydantic = { git = "https://github.com/pydantic/pydantic" }
 
 [tool.ruff]
 line-length = 120
@@ -109,7 +113,10 @@ addopts = [
     "--strict-markers",
 ]
 asyncio_default_fixture_loop_scope = "session"
-filterwarnings = ["error"]
+filterwarnings = [
+    "error",
+    "ignore:'asyncio.iscoroutinefunction' is deprecated:DeprecationWarning",  # https://github.com/fastapi/fastapi/pull/13890
+]
 log_cli_level = "INFO"
 minversion = "8"
 testpaths = ["tests"]

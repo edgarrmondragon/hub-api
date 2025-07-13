@@ -1,10 +1,13 @@
 # First, build the application in the `/app` directory.
 # See `Dockerfile` for details.
-FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim AS builder
+FROM ghcr.io/astral-sh/uv:python3.14-rc-bookworm-slim AS builder
 ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy
 
 WORKDIR /app
+
+# Install git
+RUN apt-get update && apt-get install -y git
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=bind,source=uv.lock,target=uv.lock \
@@ -14,7 +17,7 @@ ADD . /app
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev
 
-FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim AS database
+FROM ghcr.io/astral-sh/uv:python3.14-rc-bookworm-slim AS database
 ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy
 
@@ -22,6 +25,9 @@ WORKDIR /app
 
 # Copy the application from the builder
 COPY --from=builder --chown=app:app /app /app
+
+# Install git
+RUN apt-get update && apt-get install -y git
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --only-group build
@@ -31,7 +37,7 @@ ARG HUB_REF=main
 RUN uv run python -I build.py --git-ref $HUB_REF
 
 # Then, use a final image without uv
-FROM python:3.13-slim-bookworm
+FROM python:3.14-rc-slim-bookworm
 # It is important to use the image that matches the builder, as the path to the
 # Python executable must be the same, e.g., using `python:3.11-slim-bookworm`
 # will fail.
