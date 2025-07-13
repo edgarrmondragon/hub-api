@@ -14,10 +14,12 @@ import os
 import textwrap
 import typing as t
 import uuid
-from collections.abc import Awaitable, Callable
 
 from fastapi import Header, HTTPException, Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
+
+if t.TYPE_CHECKING:
+    from collections.abc import Awaitable, Callable
 
 
 @functools.lru_cache
