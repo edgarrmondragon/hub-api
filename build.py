@@ -127,25 +127,29 @@ def load_db(path: Path, session: SessionBase) -> None:  # noqa: C901, PLR0912, P
 
             for variant, definition in get_plugin_variants(plugin_path):
                 plugin: validation.HubPluginDefinition
-                match plugin_type:
-                    case enums.PluginTypeEnum.extractors:
-                        plugin = validation.ExtractorDefinition.model_validate(definition)
-                    case enums.PluginTypeEnum.loaders:
-                        plugin = validation.LoaderDefinition.model_validate(definition)
-                    case enums.PluginTypeEnum.utilities:
-                        plugin = validation.UtilityDefinition.model_validate(definition)
-                    case enums.PluginTypeEnum.transformers:
-                        plugin = validation.TransformerDefinition.model_validate(definition)
-                    case enums.PluginTypeEnum.transforms:
-                        plugin = validation.TransformDefinition.model_validate(definition)
-                    case enums.PluginTypeEnum.orchestrators:
-                        plugin = validation.OrchestratorDefinition.model_validate(definition)
-                    case enums.PluginTypeEnum.mappers:
-                        plugin = validation.MapperDefinition.model_validate(definition)
-                    case enums.PluginTypeEnum.files:
-                        plugin = validation.FileDefinition.model_validate(definition)
-                    case _:
-                        continue
+                try:
+                    match plugin_type:
+                        case enums.PluginTypeEnum.extractors:
+                            plugin = validation.ExtractorDefinition.model_validate(definition)
+                        case enums.PluginTypeEnum.loaders:
+                            plugin = validation.LoaderDefinition.model_validate(definition)
+                        case enums.PluginTypeEnum.utilities:
+                            plugin = validation.UtilityDefinition.model_validate(definition)
+                        case enums.PluginTypeEnum.transformers:
+                            plugin = validation.TransformerDefinition.model_validate(definition)
+                        case enums.PluginTypeEnum.transforms:
+                            plugin = validation.TransformDefinition.model_validate(definition)
+                        case enums.PluginTypeEnum.orchestrators:
+                            plugin = validation.OrchestratorDefinition.model_validate(definition)
+                        case enums.PluginTypeEnum.mappers:
+                            plugin = validation.MapperDefinition.model_validate(definition)
+                        case enums.PluginTypeEnum.files:
+                            plugin = validation.FileDefinition.model_validate(definition)
+                        case _:
+                            continue
+                except Exception:
+                    logger.exception("Error validating plugin %s", plugin_id)
+                    continue
 
                 variant_id = f"{plugin_id}.{variant}"
                 variant_object = models.PluginVariant(
