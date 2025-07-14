@@ -35,7 +35,7 @@ tests = [
     "pytest-github-actions-annotate-failures>=0.3.0",
 ]
 typing = [
-    "mypy>=1.14.0",
+    "mypy>=1.17.0",
     "types-PyYAML>=6.0.12.20240808",
     "types-requests>=2.32.0",
 ]
@@ -116,7 +116,13 @@ testpaths = ["tests"]
 xfail_strict = true
 
 [tool.mypy]
-enable_error_code = ["explicit-override", "ignore-without-code", "redundant-expr", "truthy-bool"]
+enable_error_code = [
+    "explicit-override",
+    "ignore-without-code",
+    "redundant-expr",
+    "truthy-bool",
+    "exhaustive-match",  # https://mypy.readthedocs.io/en/stable/error_code_list2.html#check-that-match-statements-match-exhaustively-exhaustive-match
+]
 strict = true
 warn_unused_configs = true
 warn_unused_ignores = true
