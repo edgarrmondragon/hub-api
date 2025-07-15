@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 import gzip
 import logging
 import shutil
@@ -9,6 +10,7 @@ import typing as t
 from pathlib import Path
 
 import platformdirs
+import pydantic
 import requests
 import sqlalchemy as sa
 import yaml
@@ -20,6 +22,8 @@ from hub_api.schemas import meltano, validation
 
 if t.TYPE_CHECKING:
     from collections.abc import Generator
+
+    import pydantic_core
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
@@ -102,9 +106,32 @@ def _build_setting(variant_id: str, setting: meltano.PluginSetting) -> models.Se
     return instance
 
 
-def load_db(path: Path, session: SessionBase) -> None:  # noqa: C901, PLR0912, PLR0914, PLR0915
+@dataclasses.dataclass
+class LoadError:
+    plugin_name: str
+    variant: str
+    link: str
+    error: pydantic_core.ErrorDetails
+
+
+@dataclasses.dataclass
+class LoadResult:
+    errors: list[LoadError]
+
+    def to_markdown(self) -> str:
+        """Convert errors to a markdown table."""
+        result = "| Plugin | Error | Link |\n"
+        result += "|--------|---------|------|\n"
+        result += "\n".join([
+            f"| [{error.variant}/{error.plugin_name}]({error.link}) | {error.error['msg']} |" for error in self.errors
+        ])
+        return result
+
+
+def load_db(path: Path, session: SessionBase) -> LoadResult:  # noqa: C901, PLR0912, PLR0914, PLR0915
     """Load database."""
 
+    result = LoadResult(errors=[])
     default_variants = get_default_variants(path.joinpath("default_variants.yml"))
     maintainers = get_default_variants(path.joinpath("maintainers.yml"))
 
@@ -121,8 +148,9 @@ def load_db(path: Path, session: SessionBase) -> None:  # noqa: C901, PLR0912, P
         variant_count = 0  # Counter for processed plugin variants
         plugin_count = 0  # Counter for processed plugins
         for plugin_path in path.joinpath("meltano", plugin_type).glob("*"):
-            default_variant = default_variants[plugin_type].get(plugin_path.name)
-            plugin_id = f"{plugin_type}.{plugin_path.name}"
+            plugin_name = plugin_path.name
+            default_variant = default_variants[plugin_type].get(plugin_name)
+            plugin_id = f"{plugin_type}.{plugin_name}"
             default_variant_id = f"{plugin_id}.{default_variant}"
 
             for variant, definition in get_plugin_variants(plugin_path):
@@ -147,8 +175,17 @@ def load_db(path: Path, session: SessionBase) -> None:  # noqa: C901, PLR0912, P
                             plugin = validation.FileDefinition.model_validate(definition)
                         case _:
                             continue
-                except Exception:
-                    logger.exception("Error validating plugin %s", plugin_id)
+                except pydantic.ValidationError as exc:
+                    logger.error("Error validating plugin %s", plugin_id)
+                    for error in exc.errors():
+                        result.errors.append(
+                            LoadError(
+                                plugin_name=plugin_name,
+                                variant=variant,
+                                link=f"https://github.com/meltano/hub/blob/main/_data/meltano/{plugin_type}/{plugin_name}/{variant}.yml",
+                                error=error,
+                            )
+                        )
                     continue
 
                 variant_id = f"{plugin_id}.{variant}"
@@ -251,7 +288,7 @@ def load_db(path: Path, session: SessionBase) -> None:  # noqa: C901, PLR0912, P
                 id=plugin_id,
                 default_variant_id=default_variant_id,
                 plugin_type=plugin_type.value,
-                name=plugin_path.name,
+                name=plugin_name,
             )
             session.add(plugin_object)
             plugin_count += 1
@@ -259,6 +296,7 @@ def load_db(path: Path, session: SessionBase) -> None:  # noqa: C901, PLR0912, P
         logger.info("Processed %d %s variants for %d plugins", variant_count, plugin_type.value, plugin_count)
 
     session.commit()
+    return result
 
 
 if __name__ == "__main__":
@@ -284,4 +322,5 @@ if __name__ == "__main__":
     args = parser.parse_args(namespace=CLINamespace())
 
     hub_dir = download_meltano_hub_archive(ref=args.git_ref, use_cache=args.cache)
-    load_db(hub_dir / "_data", session)
+    result = load_db(hub_dir / "_data", session)
+    print(result.to_markdown())
