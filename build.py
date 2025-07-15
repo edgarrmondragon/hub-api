@@ -121,7 +121,7 @@ class LoadResult:
 
     def to_markdown(self) -> str:
         """Convert errors to a markdown table."""
-        result = "| Plugin | Error | Value | Location |\n"
+        result = "## Build Errors\n\n| Plugin | Error | Value | Location |\n"
         result += "|--------|---------|------|----------|\n"
         result += "\n".join([
             (
