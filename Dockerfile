@@ -28,7 +28,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 # Build the database
 ARG HUB_REF=main
-RUN uv run python -I build.py --git-ref $HUB_REF
+RUN uv run python -I build.py --git-ref $HUB_REF --exit-zero
 
 # Then, use a final image without uv
 FROM python:3.13-slim-bookworm
