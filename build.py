@@ -120,10 +120,15 @@ class LoadResult:
 
     def to_markdown(self) -> str:
         """Convert errors to a markdown table."""
-        result = "| Plugin | Error | Link |\n"
-        result += "|--------|---------|------|\n"
+        result = "| Plugin | Error | Value | Location |\n"
+        result += "|--------|---------|------|----------|\n"
         result += "\n".join([
-            f"| [{error.variant}/{error.plugin_name}]({error.link}) | {error.error['msg']} |" for error in self.errors
+            (
+                f"| [{error.variant}/{error.plugin_name}]({error.link}) "
+                f"| {error.error['msg']} | {error.error['input']} "
+                f"| {error.error['loc']} |"
+            )
+            for error in self.errors
         ])
         return result
 
