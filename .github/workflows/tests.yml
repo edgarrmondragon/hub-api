@@ -39,7 +39,6 @@ jobs:
       with:
         version: ${{ env.UV_VERSION }}
     - run: uv run python -I build.py --git-ref ${{ github.event.inputs.git-ref || 'main' }} >> _errors.md
-      continue-on-error: true
       id: build
       env:
         ONLY_GROUP: build
