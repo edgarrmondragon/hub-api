@@ -313,10 +313,12 @@ def main() -> int:
     class CLINamespace(argparse.Namespace):
         git_ref: str
         cache: bool
+        exit_zero: bool
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--git-ref", default="main")
     parser.add_argument("--no-cache", action="store_false", dest="cache")
+    parser.add_argument("--exit-zero", action="store_true", dest="exit_zero")
 
     engine = sa.create_engine(f"sqlite:///{database.get_db_path()}")
     SyncSession = sessionmaker(autocommit=False, autoflush=False, bind=engine)  # noqa: N806
@@ -331,7 +333,7 @@ def main() -> int:
     result = load_db(hub_dir / "_data", session)
     print(result.to_markdown())
 
-    return 1 if result.errors else 0
+    return 0 if args.exit_zero else 1 if result.errors else 0
 
 
 if __name__ == "__main__":
