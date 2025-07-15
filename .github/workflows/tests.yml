@@ -38,10 +38,19 @@ jobs:
     - uses: astral-sh/setup-uv@445689ea25e0de0a23313031f5fe577c74ae45a1 # v6.3.0
       with:
         version: ${{ env.UV_VERSION }}
-    - run: uv run python -I build.py --git-ref ${{ github.event.inputs.git-ref || 'main' }} >> $GITHUB_STEP_SUMMARY
+    - run: echo "errors=$(uv run python -I build.py --git-ref ${{ github.event.inputs.git-ref || 'main' }})"
+      continue-on-error: true
+      id: build
       env:
         ONLY_GROUP: build
+    - uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4.0.0
+      if: failure()
+      with:
+        body: |
+          ## Hub Data Errors
+          ${{ steps.build.outputs.errors }}
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      if: always()
       with:
         name: hub-data
         path: plugins.db

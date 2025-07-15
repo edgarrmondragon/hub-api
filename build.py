@@ -4,6 +4,7 @@ import dataclasses
 import gzip
 import logging
 import shutil
+import sys
 import tarfile
 import tempfile
 import typing as t
@@ -304,8 +305,10 @@ def load_db(path: Path, session: SessionBase) -> LoadResult:  # noqa: C901, PLR0
     return result
 
 
-if __name__ == "__main__":
-    import argparse
+def main() -> int:
+    import argparse  # noqa: PLC0415
+
+    from hub_api import database  # noqa: PLC0415
 
     class CLINamespace(argparse.Namespace):
         git_ref: str
@@ -315,10 +318,8 @@ if __name__ == "__main__":
     parser.add_argument("--git-ref", default="main")
     parser.add_argument("--no-cache", action="store_false", dest="cache")
 
-    from hub_api import database
-
     engine = sa.create_engine(f"sqlite:///{database.get_db_path()}")
-    SyncSession = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    SyncSession = sessionmaker(autocommit=False, autoflush=False, bind=engine)  # noqa: N806
     session = SyncSession()
 
     models.EntityBase.metadata.drop_all(engine)
@@ -329,3 +330,9 @@ if __name__ == "__main__":
     hub_dir = download_meltano_hub_archive(ref=args.git_ref, use_cache=args.cache)
     result = load_db(hub_dir / "_data", session)
     print(result.to_markdown())
+
+    return 1 if result.errors else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
