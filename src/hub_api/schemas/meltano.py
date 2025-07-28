@@ -46,7 +46,10 @@ class _BasePluginSetting(BaseModel):
         None,
         description="Whether the setting is sensitive.",
     )
-    value: str | dict[str, t.Any] | list[t.Any] | bool | int | None = Field(None, description="The setting value.")
+    value: str | dict[str, t.Any] | list[t.Any] | bool | int | float | None = Field(
+        None,
+        description="The setting value.",
+    )
 
 
 class StringSetting(_BasePluginSetting):
@@ -59,6 +62,12 @@ class IntegerSetting(_BasePluginSetting):
     """Integer setting model."""
 
     kind: t.Literal["integer"]
+
+
+class DecimalSetting(_BasePluginSetting):
+    """Decimal setting model."""
+
+    kind: t.Literal["decimal"]
 
 
 class BooleanSetting(_BasePluginSetting):
@@ -142,6 +151,7 @@ class PluginSetting(RootModel[_BasePluginSetting]):
     root: t.Annotated[
         t.Annotated[StringSetting, Tag("string")]
         | t.Annotated[IntegerSetting, Tag("integer")]
+        | t.Annotated[DecimalSetting, Tag("decimal")]
         | t.Annotated[BooleanSetting, Tag("boolean")]
         | t.Annotated[DateIso8601Setting, Tag("date_iso8601")]
         | t.Annotated[EmailSetting, Tag("email")]
