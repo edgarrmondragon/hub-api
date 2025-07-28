@@ -7,7 +7,7 @@ ref := "main"
 build: update pre-commit typing coverage
 
 build-db $ONLY_GROUP="build":
-    uv run --python={{py}} python -I build.py --git-ref={{ref}}
+    uv run --python={{py}} python -I build.py --git-ref={{ref}} --exit-zero
 
 [group('update')]
 update: gha-update pre-commit-autoupdate lock
