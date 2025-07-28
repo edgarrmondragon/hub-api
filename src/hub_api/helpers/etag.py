@@ -16,8 +16,7 @@ import typing as t
 import uuid
 from collections.abc import Awaitable, Callable
 
-import fastapi.middleware
-from fastapi import Header, Request, Response
+from fastapi import Header, HTTPException, Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
 
@@ -35,7 +34,7 @@ class ETagMiddleware(BaseHTTPMiddleware):
         self,
         request: Request,
         call_next: Callable[[Request], Awaitable[Response]],
-    ) -> fastapi.Response:
+    ) -> Response:
         """Add ETag header to response."""
         response = await call_next(request)
         response.headers["ETag"] = get_etag()
@@ -62,4 +61,4 @@ def check_etag(
 ) -> None:
     """Get ETag value."""
     if if_none_match == get_etag():
-        raise fastapi.HTTPException(status_code=http.HTTPStatus.NOT_MODIFIED)
+        raise HTTPException(status_code=http.HTTPStatus.NOT_MODIFIED)
