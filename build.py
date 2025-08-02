@@ -62,7 +62,7 @@ def download_meltano_hub_archive(*, ref: str = "main", use_cache: bool = True) -
 
 def get_default_variants(path: Path) -> dict[str, dict[str, str]]:
     """Get default variants of a given plugin."""
-    with path.open() as f:
+    with path.open(encoding="utf-8") as f:
         return yaml.safe_load(f)  # type: ignore[no-any-return]
 
 
