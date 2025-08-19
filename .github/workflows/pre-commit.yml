@@ -13,7 +13,7 @@ on:
 env:
   FORCE_COLOR: "1"
   # renovate: datasource=pypi depName=pre-commit
-  PRE_COMMIT_VERSION: "4.2.0"
+  PRE_COMMIT_VERSION: "4.3.0"
   # renovate: datasource=pypi depName=pre-commit-uv
   PRE_COMMIT_UV_VERSION: "4.1.4"
   # renovate: datasource=pypi depName=uv
