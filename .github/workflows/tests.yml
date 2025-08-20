@@ -16,12 +16,7 @@ on:
 
 env:
   FORCE_COLOR: "1"
-  # renovate: datasource=pypi depName=offat
-  OFFAT_VERSION: "0.19.4"
-  # renovate: datasource=pypi depName=schemathesis
-  SCHEMATHESIS_VERSION: "4.1.0"
-  # renovate: datasource=pypi depName=uv
-  UV_VERSION: "0.8.11"
+  UV_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -36,12 +31,10 @@ jobs:
     - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
     - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
     - uses: astral-sh/setup-uv@d9e0f98d3fc6adb07d1e3d37f3043649ddad06a1 # v6.5.0
-      with:
-        version: ${{ env.UV_VERSION }}
-    - run: uv run python -I build.py --git-ref ${{ github.event.inputs.git-ref || 'main' }} --exit-zero >> _errors.md
+    - run: >
+        uvx --with tox-uv
+        tox -qq -e build -- --git-ref ${{ github.event.inputs.git-ref || 'main' }} --exit-zero >> _errors.md
       id: build
-      env:
-        ONLY_GROUP: build
     - uses: peter-evans/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e # v3.1.0
       if: ${{ github.event_name == 'pull_request' }}
       id: find-comment
@@ -62,27 +55,32 @@ jobs:
         path: plugins.db
 
   tests:
-    name: Test
+    name: Python ${{ matrix.python-version }}
     runs-on: ubuntu-24.04
     continue-on-error: false
     needs: [get-hub-data]
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+        - "3.13"
+        - "3.14"
     steps:
     - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
     - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
-    - uses: astral-sh/setup-uv@d9e0f98d3fc6adb07d1e3d37f3043649ddad06a1 # v6.5.0
       with:
-        version: ${{ env.UV_VERSION }}
+        python-version: ${{ matrix.python-version }}
+        allow-prereleases: true
+    - uses: astral-sh/setup-uv@d9e0f98d3fc6adb07d1e3d37f3043649ddad06a1 # v6.5.0
     - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
       with:
         name: hub-data
-    - run: uv run coverage run -m pytest -v
+    - run: uvx --with tox-uv tox -e ${{ matrix.python-version }}
       continue-on-error: true # Continue on error to combine coverage.
-      env:
-        ONLY_GROUP: tests
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       with:
         include-hidden-files: true
-        name: coverage
+        name: coverage-py${{ matrix.python-version }}
         path: .coverage.*
 
   typing:
@@ -92,11 +90,7 @@ jobs:
     - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
     - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
     - uses: astral-sh/setup-uv@d9e0f98d3fc6adb07d1e3d37f3043649ddad06a1 # v6.5.0
-      with:
-        version: ${{ env.UV_VERSION }}
-    - run: uv run mypy src tests
-      env:
-        ONLY_GROUP: typing
+    - run: uvx --with tox-uv tox -e typing
 
   schemathesis:
     name: Schemathesis Test
@@ -106,12 +100,10 @@ jobs:
     - name: Start containers
       run: docker compose up -d --build
     - uses: astral-sh/setup-uv@d9e0f98d3fc6adb07d1e3d37f3043649ddad06a1 # v6.5.0
-      with:
-        version: ${{ env.UV_VERSION }}
     - run: >
-        uvx --from schemathesis==${{ env.SCHEMATHESIS_VERSION }}
+        uvx --from schemathesis
         st run
-        --header 'User-Agent: schemathesis/${{ env.SCHEMATHESIS_VERSION }}'
+        --header 'User-Agent: schemathesis'
         http://127.0.0.1:8080/openapi.json
     - uses: mikepenz/action-junit-report@3585e9575db828022551b4231f165eb59a0e74e3 # v5.6.2
       if: success() || failure() # always run even if the previous step fails
@@ -132,16 +124,14 @@ jobs:
     - name: Start containers
       run: docker compose up -d --build
     - uses: astral-sh/setup-uv@d9e0f98d3fc6adb07d1e3d37f3043649ddad06a1 # v6.5.0
-      with:
-        version: ${{ env.UV_VERSION }}
     - run: >
-        uvx --with offat==${{ env.OFFAT_VERSION }}
+        uvx --with offat
         offat
         --server http://127.0.0.1:8080
         --file http://127.0.0.1:8080/openapi.json
         --rate-limit 120
         --capture-failed
-        --headers 'User-Agent: offat/${{ env.OFFAT_VERSION }}'
+        --headers 'User-Agent: offat'
         --format json
         --output ./offat-tmp/results.json
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -164,22 +154,21 @@ jobs:
     - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
     - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
       with:
-        name: coverage
+        merge-multiple: true
+        pattern: coverage-*
+    - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
     - uses: astral-sh/setup-uv@d9e0f98d3fc6adb07d1e3d37f3043649ddad06a1 # v6.5.0
-      with:
-        version: ${{ env.UV_VERSION }}
+    - run: uv tool install --with tox-uv tox
     - name: Combine coverage
-      env:
-        ONLY_GROUP: tests
       run: |
-        uv run coverage combine
-        uv run coverage html --skip-covered --skip-empty
+        tox -e coverage -- combine
+        tox -e coverage -- html --skip-covered --skip-empty
 
         # Report and write to summary.
-        uv run coverage report --format=markdown >> $GITHUB_STEP_SUMMARY
+        tox -qq -e coverage -- report --format=markdown >> $GITHUB_STEP_SUMMARY
 
         # Report again and fail if under 100%.
-        uv run coverage report --fail-under=100 --show-missing
+        tox -e coverage
     - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
       if: failure()
       with:
