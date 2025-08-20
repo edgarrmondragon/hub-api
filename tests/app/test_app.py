@@ -79,6 +79,14 @@ async def test_plugin_index_etag_match(api: httpx.AsyncClient) -> None:
 
 
 @pytest.mark.asyncio
+async def test_plugin_type_index_type_not_valid(api: httpx.AsyncClient) -> None:
+    """Test /meltano/api/v1/plugins/<invalid_type>/index."""
+    response = await api.get("/meltano/api/v1/plugins/unknown/index")
+    assert response.status_code == http.HTTPStatus.BAD_REQUEST
+    assert response.json()["detail"] == "'unknown' is not a valid plugin type"
+
+
+@pytest.mark.asyncio
 async def test_invalid_etag(api: httpx.AsyncClient) -> None:
     """Test /meltano/api/v1/plugins/stats."""
     response = await api.get(

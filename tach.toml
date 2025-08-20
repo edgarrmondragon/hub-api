@@ -10,6 +10,7 @@ path = "hub_api.api"
 depends_on = [
     "hub_api.dependencies",
     "hub_api.enums",
+    "hub_api.ids",
     "hub_api.schemas",
 ]
 
@@ -18,6 +19,7 @@ path = "hub_api.client"
 depends_on = [
     "hub_api.enums",
     "hub_api.exceptions",
+    "hub_api.ids",
     "hub_api.models",
     "hub_api.schemas",
 ]
@@ -40,6 +42,13 @@ depends_on = []
 [[modules]]
 path = "hub_api.helpers.etag"
 depends_on = []
+
+[[modules]]
+path = "hub_api.ids"
+depends_on = [
+    "hub_api.enums",
+    "hub_api.exceptions",
+]
 
 [[modules]]
 path = "hub_api.main"

@@ -7,7 +7,7 @@ import typing as t
 import pytest
 import pytest_asyncio
 
-from hub_api import client, database, enums, exceptions
+from hub_api import client, database, enums, ids
 from hub_api.schemas import api as api_schemas
 
 if t.TYPE_CHECKING:
@@ -20,6 +20,34 @@ async def hub() -> AsyncGenerator[client.MeltanoHub]:
     session_maker = database.get_session_maker()
     async with session_maker() as db:
         yield client.MeltanoHub(db=db)
+
+
+def test_plugin_id() -> None:
+    """Test plugin ID."""
+    plugin_id = ids.PluginID.from_params(plugin_type="extractors", plugin_name="tap-github")
+    assert plugin_id.as_db_id() == "extractors.tap-github"
+
+
+def test_plugin_id_invalid_type() -> None:
+    """Test plugin ID."""
+    with pytest.raises(ids.InvalidPluginTypeError):
+        ids.PluginID.from_params(plugin_type="unknown", plugin_name="tap-github")
+
+
+def test_variant_id() -> None:
+    """Test variant ID."""
+    variant_id = ids.VariantID.from_params(
+        plugin_type="extractors",
+        plugin_name="tap-github",
+        plugin_variant="singer-io",
+    )
+    assert variant_id.as_db_id() == "extractors.tap-github.singer-io"
+
+
+def test_variant_id_invalid_type() -> None:
+    """Test variant ID."""
+    with pytest.raises(ids.InvalidPluginTypeError):
+        ids.VariantID.from_params(plugin_type="unknown", plugin_name="tap-github", plugin_variant="singer-io")
 
 
 @pytest.mark.asyncio
@@ -38,6 +66,13 @@ async def test_get_plugin_type_index(hub: client.MeltanoHub, plugin_type: enums.
     """Test get_plugin_type_index."""
     plugin_types = await hub.get_plugin_type_index(plugin_type=plugin_type)
     assert plugin_types
+
+
+@pytest.mark.asyncio
+async def test_get_plugin_type_index_type_not_valid(hub: client.MeltanoHub) -> None:
+    """Test get_plugin_type_index."""
+    with pytest.raises(ids.InvalidPluginTypeError):
+        await hub.get_plugin_type_index(plugin_type="unknown")
 
 
 @pytest.mark.asyncio
@@ -65,7 +100,7 @@ async def test_get_plugin_details(
     variant: str,
 ) -> None:
     """Test get_plugin_details."""
-    variant_id = f"{plugin_type}.{plugin}.{variant}"
+    variant_id = ids.VariantID.from_params(plugin_type=plugin_type, plugin_name=plugin, plugin_variant=variant)
     details = await hub.get_plugin_details(variant_id=variant_id)
     assert details.name == plugin
     assert details.variant == variant
@@ -74,8 +109,14 @@ async def test_get_plugin_details(
 @pytest.mark.asyncio
 async def test_get_plugin_variant_not_found(hub: client.MeltanoHub) -> None:
     """Test get_plugin_details."""
-    with pytest.raises(exceptions.NotFoundError):
-        await hub.get_plugin_details(variant_id="unknown")
+    with pytest.raises(client.PluginVariantNotFoundError):
+        await hub.get_plugin_details(
+            variant_id=ids.VariantID.from_params(
+                plugin_type="extractors",
+                plugin_name="tap-github",
+                plugin_variant="unknown",
+            )
+        )
 
 
 @pytest.mark.asyncio
@@ -116,7 +157,7 @@ async def test_get_maintainer(hub: client.MeltanoHub) -> None:
 @pytest.mark.asyncio
 async def test_get_maintainer_not_found(hub: client.MeltanoHub) -> None:
     """Test get_maintainer."""
-    with pytest.raises(exceptions.NotFoundError):
+    with pytest.raises(client.MaintainerNotFoundError):
         await hub.get_maintainer("unknown")
 
 
@@ -131,8 +172,10 @@ async def test_get_top_maintainers(hub: client.MeltanoHub) -> None:
 @pytest.mark.asyncio
 async def test_get_default_variant_url(hub: client.MeltanoHub) -> None:
     """Test get_variant_url."""
-    url = await hub.get_default_variant_url("extractors.tap-github")
+    good_plugin_id = ids.PluginID.from_params(plugin_type="extractors", plugin_name="tap-github")
+    url = await hub.get_default_variant_url(good_plugin_id)
     assert str(url).endswith("extractors/tap-github--meltanolabs")
 
-    with pytest.raises(exceptions.NotFoundError):
-        await hub.get_default_variant_url("unknown")
+    bad_plugin_id = ids.PluginID.from_params(plugin_type="extractors", plugin_name="unknown")
+    with pytest.raises(client.PluginNotFoundError):
+        await hub.get_default_variant_url(bad_plugin_id)

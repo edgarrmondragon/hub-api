@@ -8,14 +8,15 @@ import fastapi
 import fastapi.responses
 from pydantic import BaseModel, ConfigDict, Field
 
-from hub_api import dependencies, enums
+from hub_api import dependencies, enums, ids
 from hub_api.schemas import api as api_schemas
 
 router = fastapi.APIRouter()
 
 
 PluginTypeParam = t.Annotated[
-    enums.PluginTypeEnum,
+    str,
+    # enums.PluginTypeEnum,  # TODO: Schemathesis doesn't like constraints on path parameters
     fastapi.Path(
         ...,
         description="The plugin type",
@@ -30,7 +31,7 @@ PluginNameParam = t.Annotated[
     fastapi.Path(
         ...,
         description="The plugin name",
-        pattern=r"^[A-Za-z0-9-]+$",
+        # pattern=r"^[A-Za-z0-9-]+$",  # TODO: Schemathesis doesn't like constraints on path parameters
         examples=[
             "tap-github",
         ],
@@ -42,7 +43,7 @@ PluginVariantParam = t.Annotated[
     fastapi.Path(
         ...,
         description="The plugin variant",
-        pattern=r"^[A-Za-z0-9-]+$",
+        # pattern=r"^[A-Za-z0-9-]+$",  # TODO: Schemathesis doesn't like constraints on path parameters
         examples=[
             "meltanolabs",
         ],
@@ -64,11 +65,11 @@ async def get_index(hub: dependencies.Hub) -> api_schemas.PluginIndex:
     "/{plugin_type}/index",
     summary="Get plugin type index",
     response_model_exclude_none=True,
+    responses={
+        400: {"description": "Not a valid plugin type"},
+    },
 )
-async def get_type_index(
-    hub: dependencies.Hub,
-    plugin_type: PluginTypeParam,
-) -> api_schemas.PluginTypeIndex:
+async def get_type_index(hub: dependencies.Hub, plugin_type: PluginTypeParam) -> api_schemas.PluginTypeIndex:
     """Retrieve index of plugins of a given type."""
     return await hub.get_plugin_type_index(plugin_type=plugin_type)
 
@@ -77,6 +78,7 @@ async def get_type_index(
     "/{plugin_type}/{plugin_name}/default",
     summary="Get the default plugin variant",
     responses={
+        400: {"description": "Not a valid plugin type"},
         404: {"description": "Plugin not found"},
     },
 )
@@ -86,8 +88,8 @@ async def get_default_plugin(
     plugin_name: PluginNameParam,
 ) -> fastapi.responses.RedirectResponse:
     """Retrieve details of a plugin variant."""
-    plugin_id = f"{plugin_type.value}.{plugin_name}"
-    return fastapi.responses.RedirectResponse(url=str(await hub.get_default_variant_url(plugin_id)))
+    plugin_id = ids.PluginID.from_params(plugin_type=plugin_type, plugin_name=plugin_name)
+    return fastapi.responses.RedirectResponse(url=await hub.get_default_variant_url(plugin_id))
 
 
 @router.get(
@@ -95,6 +97,7 @@ async def get_default_plugin(
     response_model_exclude_none=True,
     summary="Get plugin variant",
     responses={
+        400: {"description": "Not a valid plugin type"},
         404: {"description": "Plugin variant not found"},
     },
 )
@@ -114,8 +117,11 @@ async def get_plugin_variant(
     | api_schemas.FileResponse
 ):
     """Retrieve details of a plugin variant."""
-    plugin_id = f"{plugin_type.value}.{plugin_name}"
-    variant_id = f"{plugin_id}.{plugin_variant}"
+    variant_id = ids.VariantID.from_params(
+        plugin_type=plugin_type,
+        plugin_name=plugin_name,
+        plugin_variant=plugin_variant,
+    )
     return await hub.get_plugin_details(variant_id)
 
 

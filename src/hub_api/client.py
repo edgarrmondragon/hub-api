@@ -8,7 +8,7 @@ import pydantic
 import sqlalchemy as sa
 from sqlalchemy.orm import aliased
 
-from hub_api import enums, exceptions, models
+from hub_api import enums, exceptions, ids, models
 from hub_api.schemas import api as api_schemas
 from hub_api.schemas import meltano
 
@@ -21,10 +21,25 @@ BASE_API_URL = "http://127.0.0.1:8000"
 BASE_HUB_URL = "https://hub.meltano.com"
 
 
+class PluginNotFoundError(exceptions.NotFoundError):
+    """Plugin not found error."""
+
+    def __init__(self, *, plugin_id: ids.PluginID) -> None:
+        super().__init__(f"Plugin '{plugin_id}' not found")
+
+
 class PluginVariantNotFoundError(exceptions.NotFoundError):
     """Plugin variant not found error."""
 
-    pass
+    def __init__(self, *, plugin_variant: ids.VariantID) -> None:
+        super().__init__(f"Plugin variant '{plugin_variant}' not found")
+
+
+class MaintainerNotFoundError(exceptions.NotFoundError):
+    """Maintainer not found error."""
+
+    def __init__(self, *, maintainer_id: str) -> None:
+        super().__init__(f"Maintainer '{maintainer_id}' not found")
 
 
 def _build_variant_path(
@@ -181,7 +196,7 @@ class MeltanoHub:
                 raise ValueError(f"Unknown plugin type: {variant.plugin.plugin_type}")
 
     async def get_plugin_details(
-        self, variant_id: str
+        self, variant_id: ids.VariantID
     ) -> (
         api_schemas.ExtractorResponse
         | api_schemas.LoaderResponse
@@ -192,14 +207,14 @@ class MeltanoHub:
         | api_schemas.MapperResponse
         | api_schemas.FileResponse
     ):
-        variant = await self.db.get(models.PluginVariant, variant_id)
+        variant = await self.db.get(models.PluginVariant, variant_id.as_db_id())
 
         if not variant:
-            raise PluginVariantNotFoundError("Plugin variant not found")
+            raise PluginVariantNotFoundError(plugin_variant=variant_id)
 
         return await self._variant_details(variant)
 
-    async def get_default_variant_url(self, plugin_id: str) -> str:
+    async def get_default_variant_url(self, plugin_id: ids.PluginID) -> str:
         q = (
             sa.select(
                 models.Plugin,
@@ -209,7 +224,7 @@ class MeltanoHub:
                 models.PluginVariant,
                 models.PluginVariant.id == models.Plugin.default_variant_id,
             )
-            .where(models.PluginVariant.plugin_id == plugin_id)
+            .where(models.PluginVariant.plugin_id == plugin_id.as_db_id())
         )
         if result := (await self.db.execute(q)).first():
             plugin, variant = result
@@ -219,7 +234,7 @@ class MeltanoHub:
                 plugin_variant=variant,
             )
 
-        raise exceptions.NotFoundError("Plugin not found")
+        raise PluginNotFoundError(plugin_id=plugin_id)
 
     async def _get_all_plugins(
         self: MeltanoHub,
@@ -281,7 +296,7 @@ class MeltanoHub:
     async def get_plugin_type_index(
         self: MeltanoHub,
         *,
-        plugin_type: enums.PluginTypeEnum,
+        plugin_type: str,
     ) -> api_schemas.PluginTypeIndex:
         """Get all plugins of a given type.
 
@@ -290,7 +305,15 @@ class MeltanoHub:
 
         Returns:
             Mapping of plugin name to variants.
+
+        Raises:
+            NotFoundError: If the plugin type is not valid.
         """
+        try:
+            plugin_type = enums.PluginTypeEnum(plugin_type)
+        except ValueError:
+            raise ids.InvalidPluginTypeError(plugin_type=plugin_type) from None
+
         plugins: api_schemas.PluginTypeIndex = {}
 
         for row in await self._get_all_plugins(plugin_type=plugin_type):
@@ -387,7 +410,7 @@ class MeltanoHub:
         """
         maintainer = await self.db.get(models.Maintainer, maintainer_id)
         if not maintainer:
-            raise exceptions.NotFoundError(f"Maintainer {maintainer_id} not found")
+            raise MaintainerNotFoundError(maintainer_id=maintainer_id)
 
         variants: list[models.PluginVariant] = await maintainer.awaitable_attrs.plugins
 
