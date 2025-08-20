@@ -42,6 +42,7 @@ tests = [
     "pytest-github-actions-annotate-failures>=0.3.0",
 ]
 typing = [
+    { include-group = "build" },
     { include-group = "tests" },
     "mypy>=1.17.0",
     "ty>=0.0.1a19",
@@ -195,8 +196,8 @@ commands = [
 description = "run type checking"
 dependency_groups = [ "typing" ]
 commands = [
-    [ "mypy", { replace = "posargs", default = [ "src", "tests" ], extend = true } ],
-    [ "ty", "check", { replace = "posargs", default = [ "src", "tests" ], extend = true } ],
+    [ "mypy", { replace = "posargs", default = [ "src", "tests", "build.py" ], extend = true } ],
+    [ "ty", "check", { replace = "posargs", default = [ "src", "tests", "build.py" ], extend = true } ],
 ]
 
 [tool.tox.env.build]

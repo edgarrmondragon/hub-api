@@ -179,8 +179,6 @@ def load_db(path: Path, session: SessionBase) -> LoadResult:  # noqa: C901, PLR0
                             plugin = validation.MapperDefinition.model_validate(definition)
                         case enums.PluginTypeEnum.files:
                             plugin = validation.FileDefinition.model_validate(definition)
-                        case _:
-                            continue
                 except pydantic.ValidationError as exc:
                     logger.error("Error validating plugin %s", plugin_id)
                     for error in exc.errors():
