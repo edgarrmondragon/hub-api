@@ -104,14 +104,14 @@ jobs:
         uvx --from schemathesis
         st run
         --header 'User-Agent: schemathesis'
-        http://127.0.0.1:8080/openapi.json
+        http://127.0.0.1:8000/openapi.json
     - uses: mikepenz/action-junit-report@3585e9575db828022551b4231f165eb59a0e74e3 # v5.6.2
       if: success() || failure() # always run even if the previous step fails
       with:
         comment: true
         detailed_summary: true
         include_passed: true
-        report_paths: junit.xml
+        report_paths: schemathesis-results.xml
     - name: Stop containers
       if: always()
       run: docker compose down
@@ -127,8 +127,8 @@ jobs:
     - run: >
         uvx --with offat
         offat
-        --server http://127.0.0.1:8080
-        --file http://127.0.0.1:8080/openapi.json
+        --server http://127.0.0.1:8000
+        --file http://127.0.0.1:8000/openapi.json
         --rate-limit 120
         --capture-failed
         --headers 'User-Agent: offat'
