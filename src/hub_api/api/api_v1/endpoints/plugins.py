@@ -8,10 +8,46 @@ import fastapi
 import fastapi.responses
 from pydantic import BaseModel, ConfigDict, Field
 
-from hub_api import dependencies, enums  # noqa: TC001
+from hub_api import dependencies, enums
 from hub_api.schemas import api as api_schemas
 
 router = fastapi.APIRouter()
+
+
+PluginTypeParam = t.Annotated[
+    enums.PluginTypeEnum,
+    fastapi.Path(
+        ...,
+        description="The plugin type",
+        examples=[
+            enums.PluginTypeEnum.extractors,
+        ],
+    ),
+]
+
+PluginNameParam = t.Annotated[
+    str,
+    fastapi.Path(
+        ...,
+        description="The plugin name",
+        pattern=r"^[A-Za-z0-9-]+$",
+        examples=[
+            "tap-github",
+        ],
+    ),
+]
+
+PluginVariantParam = t.Annotated[
+    str,
+    fastapi.Path(
+        ...,
+        description="The plugin variant",
+        pattern=r"^[A-Za-z0-9-]+$",
+        examples=[
+            "meltanolabs",
+        ],
+    ),
+]
 
 
 @router.get(
@@ -31,13 +67,7 @@ async def get_index(hub: dependencies.Hub) -> api_schemas.PluginIndex:
 )
 async def get_type_index(
     hub: dependencies.Hub,
-    plugin_type: t.Annotated[
-        enums.PluginTypeEnum,
-        fastapi.Path(
-            ...,
-            description="The plugin type",
-        ),
-    ],
+    plugin_type: PluginTypeParam,
 ) -> api_schemas.PluginTypeIndex:
     """Retrieve index of plugins of a given type."""
     return await hub.get_plugin_type_index(plugin_type=plugin_type)
@@ -45,7 +75,6 @@ async def get_type_index(
 
 @router.get(
     "/{plugin_type}/{plugin_name}/default",
-    status_code=fastapi.status.HTTP_307_TEMPORARY_REDIRECT,
     summary="Get the default plugin variant",
     responses={
         404: {"description": "Plugin not found"},
@@ -53,21 +82,8 @@ async def get_type_index(
 )
 async def get_default_plugin(
     hub: dependencies.Hub,
-    plugin_type: t.Annotated[
-        enums.PluginTypeEnum,
-        fastapi.Path(
-            ...,
-            description="The plugin type",
-        ),
-    ],
-    plugin_name: t.Annotated[
-        str,
-        fastapi.Path(
-            ...,
-            description="The plugin name",
-            pattern=r"^[A-Za-z0-9-]+$",
-        ),
-    ],
+    plugin_type: PluginTypeParam,
+    plugin_name: PluginNameParam,
 ) -> fastapi.responses.RedirectResponse:
     """Retrieve details of a plugin variant."""
     plugin_id = f"{plugin_type.value}.{plugin_name}"
@@ -84,23 +100,9 @@ async def get_default_plugin(
 )
 async def get_plugin_variant(
     hub: dependencies.Hub,
-    plugin_type: enums.PluginTypeEnum,
-    plugin_name: t.Annotated[
-        str,
-        fastapi.Path(
-            ...,
-            description="The plugin name",
-            pattern=r"^[A-Za-z0-9-]+$",
-        ),
-    ],
-    plugin_variant: t.Annotated[
-        str,
-        fastapi.Path(
-            ...,
-            description="The plugin variant",
-            pattern=r"^[A-Za-z0-9-]+$",
-        ),
-    ],
+    plugin_type: PluginTypeParam,
+    plugin_name: PluginNameParam,
+    plugin_variant: PluginVariantParam,
 ) -> (
     api_schemas.ExtractorResponse
     | api_schemas.LoaderResponse
