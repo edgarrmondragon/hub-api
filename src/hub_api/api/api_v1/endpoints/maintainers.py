@@ -59,6 +59,10 @@ async def get_maintainer(
             ...,
             description="The maintainer identifier",
             pattern=r"^[A-Za-z0-9-_]+$",
+            examples=[
+                "meltanolabs",
+                "singer-io",
+            ],
         ),
     ],
 ) -> api_schemas.MaintainerDetails:
