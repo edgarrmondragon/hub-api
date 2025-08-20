@@ -315,7 +315,7 @@ def main() -> int:
         cache: bool
         exit_zero: bool
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(allow_abbrev=False)
     parser.add_argument("--git-ref", default="main")
     parser.add_argument("--no-cache", action="store_false", dest="cache")
     parser.add_argument("--exit-zero", action="store_true", dest="exit_zero")
