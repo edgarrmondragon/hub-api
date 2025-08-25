@@ -2,7 +2,7 @@
 # See `Dockerfile` for details.
 ARG PYTHON_VERSION=3.13
 
-FROM ghcr.io/astral-sh/uv:python${PYTHON_VERSION}-bookworm-slim AS builder
+FROM ghcr.io/astral-sh/uv:python${PYTHON_VERSION}-trixie-slim AS builder
 ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy
 
@@ -16,7 +16,7 @@ ADD . /app
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev
 
-FROM ghcr.io/astral-sh/uv:python${PYTHON_VERSION}-bookworm-slim AS database
+FROM ghcr.io/astral-sh/uv:python${PYTHON_VERSION}-trixie-slim AS database
 ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy
 
@@ -33,7 +33,7 @@ ARG HUB_REF=main
 RUN uv run python -I build.py --git-ref $HUB_REF --exit-zero
 
 # Then, use a final image without uv
-FROM python:${PYTHON_VERSION}-slim-bookworm
+FROM python:${PYTHON_VERSION}-slim-trixie
 # It is important to use the image that matches the builder, as the path to the
 # Python executable must be the same, e.g., using `python:3.11-slim-bookworm`
 # will fail.
