@@ -3,12 +3,15 @@
 from __future__ import annotations
 
 import http
+import unittest.mock
 
 import httpx
 import pytest
+from starlette.datastructures import Headers
+from starlette.requests import Request
 
 from hub_api import enums, main
-from hub_api.helpers import etag
+from hub_api.helpers import compatibility, etag
 
 
 @pytest.fixture(scope="session")
@@ -63,16 +66,59 @@ async def test_plugin_details(
 @pytest.mark.asyncio
 async def test_plugin_index_etag_match(api: httpx.AsyncClient) -> None:
     """Test /meltano/api/v1/plugins/stats."""
-    etag_value = etag.get_etag()
-
     response = await api.get("/meltano/api/v1/plugins/index")
     assert response.status_code == http.HTTPStatus.OK
-    assert response.headers["ETag"] == etag_value
+    assert response.headers["ETag"] == etag.ETAGS[compatibility.Compatibility.LATEST]
     assert "extractors" in response.json()
 
     response = await api.get(
         "/meltano/api/v1/plugins/index",
-        headers={"If-None-Match": etag_value},
+        headers={"If-None-Match": etag.ETAGS[compatibility.Compatibility.LATEST]},
+    )
+    assert response.status_code == http.HTTPStatus.NOT_MODIFIED
+    assert not response.content
+
+    response = await api.get("/meltano/api/v1/plugins/index", headers={"User-Agent": "Meltano/3.2.0"})
+    assert response.status_code == http.HTTPStatus.OK
+    assert response.headers["ETag"] == etag.ETAGS[compatibility.Compatibility.PRE_3_3]
+    assert "extractors" in response.json()
+
+    response = await api.get(
+        "/meltano/api/v1/plugins/index",
+        headers={
+            "User-Agent": "Meltano/3.2.0",
+            "If-None-Match": etag.ETAGS[compatibility.Compatibility.PRE_3_3],
+        },
+    )
+    assert response.status_code == http.HTTPStatus.NOT_MODIFIED
+    assert not response.content
+
+    response = await api.get("/meltano/api/v1/plugins/index", headers={"User-Agent": "Meltano/3.8.0"})
+    assert response.status_code == http.HTTPStatus.OK
+    assert response.headers["ETag"] == etag.ETAGS[compatibility.Compatibility.PRE_3_9]
+    assert "extractors" in response.json()
+
+    response = await api.get(
+        "/meltano/api/v1/plugins/index",
+        headers={
+            "User-Agent": "Meltano/3.8.0",
+            "If-None-Match": etag.ETAGS[compatibility.Compatibility.PRE_3_9],
+        },
+    )
+    assert response.status_code == http.HTTPStatus.NOT_MODIFIED
+    assert not response.content
+
+    response = await api.get("/meltano/api/v1/plugins/index", headers={"User-Agent": "Meltano/3.9.0"})
+    assert response.status_code == http.HTTPStatus.OK
+    assert response.headers["ETag"] == etag.ETAGS[compatibility.Compatibility.LATEST]
+    assert "extractors" in response.json()
+
+    response = await api.get(
+        "/meltano/api/v1/plugins/index",
+        headers={
+            "User-Agent": "Meltano/3.9.0",
+            "If-None-Match": etag.ETAGS[compatibility.Compatibility.LATEST],
+        },
     )
     assert response.status_code == http.HTTPStatus.NOT_MODIFIED
     assert not response.content
@@ -182,3 +228,19 @@ async def test_gzip_encoding(api: httpx.AsyncClient) -> None:
     assert response.status_code == http.HTTPStatus.OK
     assert "Content-Encoding" not in response.headers
     assert response.headers["Content-Type"] == "application/json"
+
+
+@pytest.mark.parametrize(
+    ("ua_value", "version"),
+    [
+        pytest.param("Meltano/1.0.0", (1, 0), id="normal"),
+        pytest.param("Meltano/1.0.0rc1", (1, 0), id="prerelease"),
+        pytest.param("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)", compatibility.LATEST, id="missing"),
+        pytest.param("Meltano/NOT_A_VERSION", compatibility.LATEST, id="invalid"),
+    ],
+)
+def test_get_client_version(ua_value: str, version: tuple[int, int]) -> None:
+    """Test get_client_version."""
+    mock_request = unittest.mock.Mock(spec=Request)
+    mock_request.headers = Headers({"User-Agent": ua_value})
+    assert compatibility.get_version_tuple(mock_request) == version

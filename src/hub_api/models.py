@@ -127,9 +127,9 @@ class Setting(EntityBase):
     setting_aliases: Mapped[list[SettingAlias]] = relationship(back_populates="setting", lazy="joined")
 
     @property
-    def aliases(self) -> list[str]:
+    def aliases(self) -> list[str] | None:
         """The alias names for the setting."""
-        return [alias.name for alias in self.setting_aliases]
+        return [alias.name for alias in self.setting_aliases] or None
 
 
 class SettingAlias(EntityBase):

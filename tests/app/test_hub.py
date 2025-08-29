@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import pytest
 import pytest_asyncio
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from hub_api import client, database, enums, ids
+from hub_api import client, database, enums, ids, models
+from hub_api.helpers import compatibility
 from hub_api.schemas import api as api_schemas
 
 if TYPE_CHECKING:
@@ -179,3 +181,165 @@ async def test_get_default_variant_url(hub: client.MeltanoHub) -> None:
     bad_plugin_id = ids.PluginID.from_params(plugin_type="extractors", plugin_name="unknown")
     with pytest.raises(client.PluginNotFoundError):
         await hub.get_default_variant_url(bad_plugin_id)
+
+
+@pytest_asyncio.fixture
+async def db() -> AsyncGenerator[AsyncSession]:
+    """Get a database session."""
+    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
+    session_maker = async_sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    async with session_maker() as session:
+        conn = await session.connection()
+        await conn.run_sync(models.EntityBase.metadata.create_all)
+        session.add(
+            models.Plugin(
+                id="extractors.tap-mock",
+                plugin_type="extractors",
+                name="tap-mock",
+                default_variant_id="tap-mock.singer",
+            )
+        )
+        session.add(
+            models.PluginVariant(
+                id="extractors.tap-mock.singer",
+                plugin_id="extractors.tap-mock",
+                name="singer",
+                namespace="tap_mock",
+                repo="https://github.com/singer-io/tap-mock",
+            ),
+        )
+        session.add_all([
+            models.Setting(
+                id="extractors.tap-mock.singer.setting_mock_string",
+                variant_id="extractors.tap-mock.singer",
+                name="mock_string",
+                kind="string",
+                sensitive=True,
+            ),
+            models.Setting(
+                id="extractors.tap-mock.singer.setting_mock_integer",
+                variant_id="extractors.tap-mock.singer",
+                name="mock_integer",
+                kind="integer",
+            ),
+            models.Setting(
+                id="extractors.tap-mock.singer.setting_mock_decimal",
+                variant_id="extractors.tap-mock.singer",
+                name="mock_decimal",
+                kind="decimal",
+            ),
+        ])
+        session.add(
+            models.SettingAlias(
+                id="extractors.tap-mock.singer.setting_mock_string.alias_mock_string_alias",
+                setting_id="extractors.tap-mock.singer.setting_mock_string",
+                name="mock_string_alias",
+            ),
+        )
+        await session.commit()
+        yield session
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("meltano_version", "settings_dict"),
+    [
+        pytest.param(
+            compatibility.LATEST,
+            {
+                "mock_string": {
+                    "aliases": ["mock_string_alias"],
+                    "name": "mock_string",
+                    "sensitive": True,
+                    "kind": "string",
+                },
+                "mock_integer": {
+                    "name": "mock_integer",
+                    "kind": "integer",
+                },
+                "mock_decimal": {
+                    "name": "mock_decimal",
+                    "kind": "decimal",
+                },
+            },
+            id="latest",
+        ),
+        pytest.param(
+            (3, 2),
+            {
+                "mock_string": {
+                    "aliases": ["mock_string_alias"],
+                    "name": "mock_string",
+                    "kind": "string",
+                },
+                "mock_integer": {
+                    "name": "mock_integer",
+                    "kind": "integer",
+                },
+                "mock_decimal": {
+                    "name": "mock_decimal",
+                    "kind": "integer",
+                },
+            },
+            id="<3.3",
+        ),
+        pytest.param(
+            (3, 5),
+            {
+                "mock_string": {
+                    "aliases": ["mock_string_alias"],
+                    "name": "mock_string",
+                    "sensitive": True,
+                    "kind": "string",
+                },
+                "mock_integer": {
+                    "name": "mock_integer",
+                    "kind": "integer",
+                },
+                "mock_decimal": {
+                    "name": "mock_decimal",
+                    "kind": "integer",
+                },
+            },
+            id=">=3.3,<3.9",
+        ),
+        pytest.param(
+            (3, 9),
+            {
+                "mock_string": {
+                    "aliases": ["mock_string_alias"],
+                    "name": "mock_string",
+                    "sensitive": True,
+                    "kind": "string",
+                },
+                "mock_integer": {
+                    "name": "mock_integer",
+                    "kind": "integer",
+                },
+                "mock_decimal": {
+                    "name": "mock_decimal",
+                    "kind": "decimal",
+                },
+            },
+            id=">=3.9",
+        ),
+    ],
+)
+async def test_get_plugin_details_meltano_version(
+    db: AsyncSession,
+    meltano_version: tuple[int, int],
+    settings_dict: dict[str, dict[str, Any]],
+) -> None:
+    """Test get_plugin_details."""
+    hub = client.MeltanoHub(db=db)
+    details = await hub.get_plugin_details(
+        variant_id=ids.VariantID.from_params(
+            plugin_type="extractors",
+            plugin_name="tap-mock",
+            plugin_variant="singer",
+        ),
+        meltano_version=meltano_version,
+    )
+    settings = {s.root.name: s.model_dump(exclude_none=True) for s in details.settings}
+    checks = [settings[name] == s for name, s in settings_dict.items()]
+    assert all(checks)

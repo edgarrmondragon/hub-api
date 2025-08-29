@@ -9,6 +9,7 @@ import fastapi.responses
 from pydantic import BaseModel, ConfigDict, Field
 
 from hub_api import dependencies, enums, ids
+from hub_api.helpers import compatibility
 from hub_api.schemas import api as api_schemas
 
 router = fastapi.APIRouter()
@@ -48,6 +49,12 @@ PluginVariantParam = Annotated[
             "meltanolabs",
         ],
     ),
+]
+
+
+MeltanoVersion = Annotated[
+    tuple[int, int],
+    fastapi.Depends(compatibility.get_version_tuple),
 ]
 
 
@@ -106,6 +113,7 @@ async def get_plugin_variant(
     plugin_type: PluginTypeParam,
     plugin_name: PluginNameParam,
     plugin_variant: PluginVariantParam,
+    meltano_version: MeltanoVersion,
 ) -> (
     api_schemas.ExtractorResponse
     | api_schemas.LoaderResponse
@@ -122,7 +130,7 @@ async def get_plugin_variant(
         plugin_name=plugin_name,
         plugin_variant=plugin_variant,
     )
-    return await hub.get_plugin_details(variant_id)
+    return await hub.get_plugin_details(variant_id, meltano_version=meltano_version)
 
 
 class MadeWithSDKParams(BaseModel):

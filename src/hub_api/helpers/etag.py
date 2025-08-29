@@ -8,9 +8,7 @@ Otherwise, the response is returned as normal.
 https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
 """  # noqa: I002
 
-import functools
 import http
-import os
 import textwrap
 import uuid
 from collections.abc import Awaitable, Callable
@@ -19,11 +17,24 @@ from typing import Annotated, override
 from fastapi import Header, HTTPException, Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
+from . import compatibility
 
-@functools.lru_cache
-def get_etag() -> str:
-    """Get ETag value."""
-    return os.environ.get("ETAG", f'"etag-{uuid.uuid4()}"')
+
+def get_new_etag() -> str:
+    """Get a new ETag value."""
+    return f'"etag-{uuid.uuid4()}"'
+
+
+ETAGS: dict[compatibility.Compatibility, str] = {
+    compatibility.Compatibility.PRE_3_3: get_new_etag(),
+    compatibility.Compatibility.PRE_3_9: get_new_etag(),
+    compatibility.Compatibility.LATEST: get_new_etag(),
+}
+
+
+def get_etag(request: Request) -> str:
+    """Get the ETag value for the request."""
+    return ETAGS[compatibility.get_compatibility(request)]
 
 
 class ETagMiddleware(BaseHTTPMiddleware):
@@ -37,11 +48,12 @@ class ETagMiddleware(BaseHTTPMiddleware):
     ) -> Response:
         """Add ETag header to response."""
         response = await call_next(request)
-        response.headers["ETag"] = get_etag()
+        response.headers["ETag"] = get_etag(request)
         return response
 
 
 def check_etag(
+    request: Request,
     if_none_match: Annotated[
         str,  # noqa: RUF013
         Header(
@@ -60,5 +72,5 @@ def check_etag(
     ] = None,  # type: ignore[assignment]
 ) -> None:
     """Get ETag value."""
-    if if_none_match == get_etag():
+    if if_none_match == get_etag(request):
         raise HTTPException(status_code=http.HTTPStatus.NOT_MODIFIED)

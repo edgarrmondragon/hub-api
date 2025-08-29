@@ -8,6 +8,7 @@ import sqlalchemy as sa
 from sqlalchemy.orm import aliased
 
 from hub_api import enums, exceptions, ids, models
+from hub_api.helpers import compatibility
 from hub_api.schemas import api as api_schemas
 from hub_api.schemas import meltano
 
@@ -109,6 +110,19 @@ def build_hub_url(
     return pydantic.HttpUrl(f"{base_url}/{plugin_type.value}/{plugin_name}--{plugin_variant}")
 
 
+def _convert_decimal_to_integer(settings: list[meltano.PluginSetting]) -> list[meltano.PluginSetting]:
+    """Convert decimal settings to integer settings."""
+    new_settings: list[meltano.PluginSetting] = []
+    for setting in settings:
+        if isinstance(setting.root, meltano.DecimalSetting):
+            dump = setting.root.model_dump()
+            dump["kind"] = "integer"
+            new_settings.append(meltano.PluginSetting(root=meltano.IntegerSetting.model_validate(dump)))
+        else:
+            new_settings.append(setting)
+    return new_settings
+
+
 class MeltanoHub:
     def __init__(
         self: MeltanoHub,
@@ -183,7 +197,10 @@ class MeltanoHub:
                 assert_never(variant.plugin.plugin_type)
 
     async def get_plugin_details(
-        self, variant_id: ids.VariantID
+        self,
+        variant_id: ids.VariantID,
+        *,
+        meltano_version: compatibility.VersionTuple = compatibility.LATEST,
     ) -> (
         api_schemas.ExtractorResponse
         | api_schemas.LoaderResponse
@@ -199,7 +216,16 @@ class MeltanoHub:
         if not variant:
             raise PluginVariantNotFoundError(plugin_variant=variant_id)
 
-        return await self._variant_details(variant)
+        details = await self._variant_details(variant)
+
+        if meltano_version < (3, 9):
+            details.settings = _convert_decimal_to_integer(details.settings)
+
+        if meltano_version < (3, 3):
+            for setting in details.settings:
+                setting.root.sensitive = None
+
+        return details
 
     async def get_default_variant_url(self, plugin_id: ids.PluginID) -> str:
         q = (
