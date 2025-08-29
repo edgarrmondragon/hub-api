@@ -146,11 +146,6 @@ warn_redundant_casts = true
 branch = true
 parallel = true
 
-[tool.coverage.report]
-exclude_also = [
-  '''if (t\.)?TYPE_CHECKING:''',
-]
-
 [tool.tox]
 min_version = "4.22"
 requires = [ "tox", "tox-uv" ]

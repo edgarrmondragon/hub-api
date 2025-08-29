@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import typing as t
+from typing import Annotated
 
 import fastapi
 import fastapi.responses
@@ -14,7 +14,7 @@ from hub_api.schemas import api as api_schemas
 router = fastapi.APIRouter()
 
 
-PluginTypeParam = t.Annotated[
+PluginTypeParam = Annotated[
     str,
     # enums.PluginTypeEnum,  # TODO: Schemathesis doesn't like constraints on path parameters
     fastapi.Path(
@@ -26,7 +26,7 @@ PluginTypeParam = t.Annotated[
     ),
 ]
 
-PluginNameParam = t.Annotated[
+PluginNameParam = Annotated[
     str,
     fastapi.Path(
         ...,
@@ -38,7 +38,7 @@ PluginNameParam = t.Annotated[
     ),
 ]
 
-PluginVariantParam = t.Annotated[
+PluginVariantParam = Annotated[
     str,
     fastapi.Path(
         ...,
@@ -144,7 +144,7 @@ class MadeWithSDKParams(BaseModel):
 async def sdk(
     hub: dependencies.Hub,
     *,
-    filter_query: t.Annotated[MadeWithSDKParams, fastapi.Query()],
+    filter_query: Annotated[MadeWithSDKParams, fastapi.Query()],
 ) -> list[dict[str, str]]:
     """Retrieve plugins made with the Singer SDK."""
     return await hub.get_sdk_plugins(limit=filter_query.limit, plugin_type=filter_query.plugin_type)

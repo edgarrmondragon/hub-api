@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import typing as t
+from typing import Annotated
 
 import fastapi
 
@@ -29,7 +29,7 @@ async def get_maintainers(hub: dependencies.Hub) -> api_schemas.MaintainersList:
 )
 async def get_top_maintainers(
     hub: dependencies.Hub,
-    count: t.Annotated[
+    count: Annotated[
         int,
         fastapi.Query(
             ...,
@@ -53,7 +53,7 @@ async def get_top_maintainers(
 )
 async def get_maintainer(
     hub: dependencies.Hub,
-    maintainer: t.Annotated[
+    maintainer: Annotated[
         str,
         fastapi.Path(
             ...,
