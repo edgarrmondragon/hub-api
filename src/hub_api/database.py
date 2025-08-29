@@ -16,7 +16,7 @@ def get_db_path() -> pathlib.Path:
 def get_session_maker() -> async_sessionmaker[AsyncSession]:
     """Get session maker."""
     engine = create_async_engine(
-        f"sqlite+aiosqlite:///{get_db_path()}",
+        f"sqlite+aiosqlite:///file:{get_db_path()}?mode=ro&uri=true",
         connect_args={"check_same_thread": False},
     )
     return async_sessionmaker(autocommit=False, autoflush=False, bind=engine)
