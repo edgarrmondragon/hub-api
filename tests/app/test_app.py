@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 import http
+import unittest.mock
 
 import httpx
 import pytest
+from packaging.version import Version
+from starlette.datastructures import Headers
+from starlette.requests import Request
 
 from hub_api import enums, main
-from hub_api.helpers import etag
+from hub_api.helpers import etag, get_client_version
 
 
 @pytest.fixture(scope="session")
@@ -182,3 +186,19 @@ async def test_gzip_encoding(api: httpx.AsyncClient) -> None:
     assert response.status_code == http.HTTPStatus.OK
     assert "Content-Encoding" not in response.headers
     assert response.headers["Content-Type"] == "application/json"
+
+
+@pytest.mark.parametrize(
+    ("user_agent", "version"),
+    [
+        pytest.param("Meltano/1.0.0", Version("1.0.0"), id="normal"),
+        pytest.param("Meltano/1.0.0rc1", Version("1.0.0rc1"), id="prerelease"),
+        pytest.param("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)", None, id="missing"),
+        pytest.param("Meltano/NOT_A_VERSION", None, id="invalid"),
+    ],
+)
+def test_get_client_version(user_agent: str, version: Version) -> None:
+    """Test get_client_version."""
+    mock_request = unittest.mock.Mock(spec=Request)
+    mock_request.headers = Headers({"User-Agent": user_agent})
+    assert get_client_version(mock_request) == version

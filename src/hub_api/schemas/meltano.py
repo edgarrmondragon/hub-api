@@ -65,7 +65,10 @@ class IntegerSetting(_BasePluginSetting):
 
 
 class DecimalSetting(_BasePluginSetting):
-    """Decimal setting model."""
+    """Decimal setting model.
+
+    Only available in Meltano 3.9 and later.
+    """
 
     kind: Literal["decimal"]
 
@@ -240,7 +243,7 @@ class Plugin(BaseModel):
             "tap-covid-19",
         ],
     )
-    repo: HttpUrl = Field(description="The plugin repository")
+    repo: HttpUrl = Field(description="The plugin repository")  # TODO: Consider making this optional
     ext_repo: HttpUrl | None = Field(
         None,
         description="The URL to the repository where the plugin extension code lives.",

@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any, assert_never
 
 import pydantic
 import sqlalchemy as sa
+from packaging.version import Version
 from sqlalchemy.orm import aliased
 
 from hub_api import enums, exceptions, ids, models
@@ -121,8 +122,11 @@ class MeltanoHub:
         self.base_api_url = base_api_url
         self.base_hub_url = base_hub_url
 
-    async def _variant_details(  # noqa: PLR0911
-        self: MeltanoHub, variant: models.PluginVariant
+    async def _variant_details(  # noqa: C901, PLR0911
+        self: MeltanoHub,
+        variant: models.PluginVariant,
+        *,
+        meltano_version: Version | None = None,
     ) -> (
         api_schemas.ExtractorResponse
         | api_schemas.LoaderResponse
@@ -134,6 +138,11 @@ class MeltanoHub:
         | api_schemas.FileResponse
     ):
         settings: list[models.Setting] = await variant.awaitable_attrs.settings
+
+        if meltano_version is None or meltano_version < Version("3.9"):
+            for setting in settings:
+                if setting.kind == "decimal":
+                    setting.kind = "integer"
 
         result: dict[str, Any] = {
             "commands": variant.commands,
@@ -183,7 +192,10 @@ class MeltanoHub:
                 assert_never(variant.plugin.plugin_type)
 
     async def get_plugin_details(
-        self, variant_id: ids.VariantID
+        self,
+        variant_id: ids.VariantID,
+        *,
+        meltano_version: Version | None = None,
     ) -> (
         api_schemas.ExtractorResponse
         | api_schemas.LoaderResponse
@@ -199,7 +211,7 @@ class MeltanoHub:
         if not variant:
             raise PluginVariantNotFoundError(plugin_variant=variant_id)
 
-        return await self._variant_details(variant)
+        return await self._variant_details(variant, meltano_version=meltano_version)
 
     async def get_default_variant_url(self, plugin_id: ids.PluginID) -> str:
         q = (
