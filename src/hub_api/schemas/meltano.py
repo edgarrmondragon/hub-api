@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import typing as t
+from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel as PydanticBaseModel
 from pydantic import ConfigDict, Discriminator, Field, HttpUrl, RootModel, Tag
@@ -46,7 +46,7 @@ class _BasePluginSetting(BaseModel):
         None,
         description="Whether the setting is sensitive.",
     )
-    value: str | dict[str, t.Any] | list[t.Any] | bool | int | float | None = Field(
+    value: str | dict[str, Any] | list[Any] | bool | int | float | None = Field(
         None,
         description="The setting value.",
     )
@@ -55,62 +55,62 @@ class _BasePluginSetting(BaseModel):
 class StringSetting(_BasePluginSetting):
     """String setting model."""
 
-    kind: t.Literal["string"] | None = None
+    kind: Literal["string"] | None = None
 
 
 class IntegerSetting(_BasePluginSetting):
     """Integer setting model."""
 
-    kind: t.Literal["integer"]
+    kind: Literal["integer"]
 
 
 class DecimalSetting(_BasePluginSetting):
     """Decimal setting model."""
 
-    kind: t.Literal["decimal"]
+    kind: Literal["decimal"]
 
 
 class BooleanSetting(_BasePluginSetting):
     """Boolean setting model."""
 
-    kind: t.Literal["boolean"]
+    kind: Literal["boolean"]
 
 
 class DateIso8601Setting(_BasePluginSetting):
     """Date ISO8601 setting model."""
 
-    kind: t.Literal["date_iso8601"]
+    kind: Literal["date_iso8601"]
 
 
 class EmailSetting(_BasePluginSetting):
     """Email setting model."""
 
-    kind: t.Literal["email"]
+    kind: Literal["email"]
 
 
 class PasswordSetting(_BasePluginSetting):
     """Password setting model."""
 
-    kind: t.Literal["password"]
+    kind: Literal["password"]
 
 
 class OAuthSetting(_BasePluginSetting):
     """OAuth setting model."""
 
-    kind: t.Literal["oauth"]
+    kind: Literal["oauth"]
 
 
 class Option(BaseModel):
     """Option model."""
 
     label: str | None = Field(None, description="The option label")
-    value: t.Any = Field(description="The option value")
+    value: Any = Field(description="The option value")
 
 
 class OptionsSetting(_BasePluginSetting):
     """Options setting model."""
 
-    kind: t.Literal["options"]
+    kind: Literal["options"]
     options: list[Option] = Field(
         description="The setting options",
         default_factory=list,
@@ -120,48 +120,48 @@ class OptionsSetting(_BasePluginSetting):
 class FileSetting(_BasePluginSetting):
     """File setting model."""
 
-    kind: t.Literal["file"]
+    kind: Literal["file"]
 
 
 class ArraySetting(_BasePluginSetting):
     """Array setting model."""
 
-    kind: t.Literal["array"]
+    kind: Literal["array"]
 
 
 class ObjectSetting(_BasePluginSetting):
     """Object setting model."""
 
-    kind: t.Literal["object"]
+    kind: Literal["object"]
 
 
 class HiddenSetting(_BasePluginSetting):
     """Hidden setting model."""
 
-    kind: t.Literal["hidden"]
+    kind: Literal["hidden"]
 
 
-def _kind_discriminator(setting: dict[str, t.Any] | _BasePluginSetting) -> str:
+def _kind_discriminator(setting: dict[str, Any] | _BasePluginSetting) -> str:
     if isinstance(setting, dict):
         return setting.get("kind") or "string"  # pragma: no cover
     return getattr(setting, "kind", None) or "string"
 
 
 class PluginSetting(RootModel[_BasePluginSetting]):
-    root: t.Annotated[
-        t.Annotated[StringSetting, Tag("string")]
-        | t.Annotated[IntegerSetting, Tag("integer")]
-        | t.Annotated[DecimalSetting, Tag("decimal")]
-        | t.Annotated[BooleanSetting, Tag("boolean")]
-        | t.Annotated[DateIso8601Setting, Tag("date_iso8601")]
-        | t.Annotated[EmailSetting, Tag("email")]
-        | t.Annotated[PasswordSetting, Tag("password")]
-        | t.Annotated[OAuthSetting, Tag("oauth")]
-        | t.Annotated[OptionsSetting, Tag("options")]
-        | t.Annotated[FileSetting, Tag("file")]
-        | t.Annotated[ArraySetting, Tag("array")]
-        | t.Annotated[ObjectSetting, Tag("object")]
-        | t.Annotated[HiddenSetting, Tag("hidden")],
+    root: Annotated[
+        Annotated[StringSetting, Tag("string")]
+        | Annotated[IntegerSetting, Tag("integer")]
+        | Annotated[DecimalSetting, Tag("decimal")]
+        | Annotated[BooleanSetting, Tag("boolean")]
+        | Annotated[DateIso8601Setting, Tag("date_iso8601")]
+        | Annotated[EmailSetting, Tag("email")]
+        | Annotated[PasswordSetting, Tag("password")]
+        | Annotated[OAuthSetting, Tag("oauth")]
+        | Annotated[OptionsSetting, Tag("options")]
+        | Annotated[FileSetting, Tag("file")]
+        | Annotated[ArraySetting, Tag("array")]
+        | Annotated[ObjectSetting, Tag("object")]
+        | Annotated[HiddenSetting, Tag("hidden")],
         Discriminator(_kind_discriminator),
     ]
 
@@ -180,7 +180,7 @@ class Command(BaseModel):
     )
 
     # TODO: Fill the container_spec field
-    container_spec: dict[str, t.Any] | None = Field(
+    container_spec: dict[str, Any] | None = Field(
         None,
         description="Container specification for this command",
     )
@@ -287,8 +287,8 @@ class Extractor(Plugin, extra="forbid"):
     """Extractor details model."""
 
     capabilities: list[enums.ExtractorCapabilityEnum]
-    metadata: dict[str, t.Any] | None = Field(None)
-    extractor_schema: dict[str, t.Any] | None = Field(None, alias="schema")
+    metadata: dict[str, Any] | None = Field(None)
+    extractor_schema: dict[str, Any] | None = Field(None, alias="schema")
     select: list[str] | None = Field(None)
 
 
@@ -322,7 +322,7 @@ class Orchestrator(Plugin, extra="forbid"):
 class Transform(Plugin, extra="forbid"):
     """Transform details model."""
 
-    vars: dict[str, t.Any] = Field(default_factory=dict)
+    vars: dict[str, Any] = Field(default_factory=dict)
 
 
 class Transformer(Plugin, extra="forbid"):

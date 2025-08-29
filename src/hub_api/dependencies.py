@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-import typing as t
+from typing import TYPE_CHECKING, Annotated
 
 import fastapi
 
 from hub_api import client, database
 
-if t.TYPE_CHECKING:
+if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
 
 
@@ -19,4 +19,4 @@ async def get_hub() -> AsyncGenerator[client.MeltanoHub]:
         yield client.MeltanoHub(db=db)
 
 
-Hub = t.Annotated[client.MeltanoHub, fastapi.Depends(get_hub)]
+Hub = Annotated[client.MeltanoHub, fastapi.Depends(get_hub)]

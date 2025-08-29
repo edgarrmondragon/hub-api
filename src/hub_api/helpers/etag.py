@@ -12,9 +12,9 @@ import functools
 import http
 import os
 import textwrap
-import typing as t
 import uuid
 from collections.abc import Awaitable, Callable
+from typing import Annotated, override
 
 from fastapi import Header, HTTPException, Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -29,7 +29,7 @@ def get_etag() -> str:
 class ETagMiddleware(BaseHTTPMiddleware):
     """ETag middleware."""
 
-    @t.override
+    @override
     async def dispatch(
         self,
         request: Request,
@@ -42,7 +42,7 @@ class ETagMiddleware(BaseHTTPMiddleware):
 
 
 def check_etag(
-    if_none_match: t.Annotated[
+    if_none_match: Annotated[
         str,  # noqa: RUF013
         Header(
             description=textwrap.dedent("""\

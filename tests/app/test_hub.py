@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import typing as t
+from typing import TYPE_CHECKING
 
 import pytest
 import pytest_asyncio
@@ -10,7 +10,7 @@ import pytest_asyncio
 from hub_api import client, database, enums, ids
 from hub_api.schemas import api as api_schemas
 
-if t.TYPE_CHECKING:
+if TYPE_CHECKING:
     from collections.abc import AsyncGenerator
 
 

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import typing as t
+from typing import Annotated
 
 from pydantic import BaseModel, Field, HttpUrl, StringConstraints
 
@@ -65,7 +65,7 @@ class HubPluginMetadata(BaseModel):
 
 
 class HubPluginDefinition(meltano.Plugin, HubPluginMetadata):
-    logo_url: t.Annotated[str | None, StringConstraints(pattern=r"^(\/[^\/]+)+$")] = None
+    logo_url: Annotated[str | None, StringConstraints(pattern=r"^(\/[^\/]+)+$")] = None
 
 
 class ExtractorDefinition(HubPluginDefinition, meltano.Extractor):
