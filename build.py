@@ -7,8 +7,8 @@ import shutil
 import sys
 import tarfile
 import tempfile
-import typing as t
 from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
 import platformdirs
 import pydantic
@@ -21,7 +21,7 @@ from sqlalchemy.orm import sessionmaker
 from hub_api import enums, models
 from hub_api.schemas import meltano, validation
 
-if t.TYPE_CHECKING:
+if TYPE_CHECKING:
     from collections.abc import Generator
 
     import pydantic_core
@@ -66,7 +66,7 @@ def get_default_variants(path: Path) -> dict[str, dict[str, str]]:
         return yaml.safe_load(f)  # type: ignore[no-any-return]
 
 
-def get_plugin_variants(plugin_path: Path) -> Generator[tuple[str, dict[str, t.Any]]]:
+def get_plugin_variants(plugin_path: Path) -> Generator[tuple[str, dict[str, Any]]]:
     """Get plugin variants of a given type."""
     for plugin_file in plugin_path.glob("*.yml"):
         with plugin_file.open() as f:
@@ -76,7 +76,7 @@ def get_plugin_variants(plugin_path: Path) -> Generator[tuple[str, dict[str, t.A
 def get_plugins_of_type(
     base_path: Path,
     plugin_type: enums.PluginTypeEnum,
-) -> Generator[tuple[str, dict[str, t.Any]]]:
+) -> Generator[tuple[str, dict[str, Any]]]:
     """Get plugins of a given type."""
     for plugin_path in base_path.joinpath(plugin_type).glob("*"):
         yield from get_plugin_variants(plugin_path)
@@ -84,6 +84,7 @@ def get_plugins_of_type(
 
 def _build_setting(variant_id: str, setting: meltano.PluginSetting) -> models.Setting:
     """Build setting object."""
+    setting_id = f"{variant_id}.setting_{setting.root.name}"
     instance = models.Setting(
         id=f"{variant_id}.setting_{setting.root.name}",
         variant_id=variant_id,
@@ -103,6 +104,12 @@ def _build_setting(variant_id: str, setting: meltano.PluginSetting) -> models.Se
             instance.options = [opt.model_dump() for opt in setting.root.options]
         case _:
             pass
+
+    if setting.root.aliases:
+        for alias in setting.root.aliases:
+            alias_id = f"{setting_id}.alias_{alias}"
+            alias_object = models.SettingAlias(id=alias_id, setting_id=setting_id, name=alias)
+            instance.setting_aliases.append(alias_object)
 
     return instance
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-import typing as t
+import collections
+from typing import Any
 
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncAttrs
@@ -61,18 +62,45 @@ class PluginVariant(EntityBase):
 
     plugin: Mapped[Plugin] = relationship(back_populates="variants", lazy="joined")
     settings: Mapped[list[Setting]] = relationship(back_populates="variant")
-    capabilities: Mapped[list[Capability]] = relationship(back_populates="variant")
-    keywords: Mapped[list[Keyword]] = relationship(back_populates="variant")
-    commands: Mapped[list[Command]] = relationship(back_populates="variant")
-    required_settings: Mapped[list[RequiredSetting]] = relationship(
-        back_populates="variant",
-    )
+
+    plugin_capabilities: Mapped[list[Capability]] = relationship(back_populates="variant", lazy="joined")
+    plugin_commands: Mapped[list[Command]] = relationship(back_populates="variant", lazy="joined")
+    plugin_keywords: Mapped[list[Keyword]] = relationship(back_populates="variant", lazy="joined")
+    required_settings: Mapped[list[RequiredSetting]] = relationship(back_populates="variant", lazy="joined")
 
     # Extractor-specific
-    select: Mapped[list[Select]] = relationship(back_populates="variant")
-    extractor_metadata: Mapped[list[Metadata]] = relationship(back_populates="variant")
+    select_expressions: Mapped[list[Select]] = relationship(back_populates="variant", lazy="joined")
+    metadata_overrides: Mapped[list[Metadata]] = relationship(back_populates="variant", lazy="joined")
 
     maintainer: Mapped[Maintainer] = relationship(back_populates="plugins")
+
+    @property
+    def capabilities(self) -> list[str]:
+        """The capabilities for the variant."""
+        return [c.name for c in self.plugin_capabilities]
+
+    @property
+    def commands(self) -> dict[str, Command]:
+        """The commands for the variant."""
+        return {cmd.name: cmd for cmd in self.plugin_commands}
+
+    @property
+    def select(self) -> list[str]:
+        """The select expressions for the variant."""
+        return [s.expression for s in self.select_expressions]
+
+    @property
+    def extractor_metadata(self) -> dict[str, dict[str, Any]]:
+        """The metadata for the variant."""
+        return {m.key: m.value for m in self.metadata_overrides}
+
+    @property
+    def settings_group_validation(self) -> list[list[str]]:
+        """The settings group validation for the variant."""
+        settings_groups: dict[int, list[str]] = collections.defaultdict(list)
+        for required in self.required_settings:
+            settings_groups[required.group_id].append(required.setting_name)
+        return list(settings_groups.values())
 
 
 class Setting(EntityBase):
@@ -91,12 +119,17 @@ class Setting(EntityBase):
     placeholder: Mapped[str | None]
     env: Mapped[str | None]
     kind: Mapped[str | None]
-    value: Mapped[t.Any | None] = mapped_column(sa.JSON)
-    options: Mapped[list[dict[str, t.Any]] | None] = mapped_column(sa.JSON)
+    value: Mapped[Any | None] = mapped_column(sa.JSON)
+    options: Mapped[list[dict[str, Any]] | None] = mapped_column(sa.JSON)
     sensitive: Mapped[bool | None]
 
     variant: Mapped[PluginVariant] = relationship(back_populates="settings")
-    aliases: Mapped[list[SettingAlias]] = relationship(back_populates="setting", lazy="joined")
+    setting_aliases: Mapped[list[SettingAlias]] = relationship(back_populates="setting", lazy="joined")
+
+    @property
+    def aliases(self) -> list[str]:
+        """The alias names for the setting."""
+        return [alias.name for alias in self.setting_aliases]
 
 
 class SettingAlias(EntityBase):
@@ -109,7 +142,7 @@ class SettingAlias(EntityBase):
     )
 
     name: Mapped[str]
-    setting: Mapped[Setting] = relationship(back_populates="aliases")
+    setting: Mapped[Setting] = relationship(back_populates="setting_aliases")
 
 
 class RequiredSetting(EntityBase):
@@ -149,7 +182,7 @@ class Capability(EntityBase):
     id: Mapped[str] = mapped_column(primary_key=True)
     name: Mapped[str]
 
-    variant: Mapped[PluginVariant] = relationship(back_populates="capabilities")
+    variant: Mapped[PluginVariant] = relationship(back_populates="plugin_capabilities")
 
 
 class Keyword(EntityBase):
@@ -163,7 +196,7 @@ class Keyword(EntityBase):
 
     name: Mapped[str]
 
-    variant: Mapped[PluginVariant] = relationship(back_populates="keywords")
+    variant: Mapped[PluginVariant] = relationship(back_populates="plugin_keywords")
 
 
 class Command(EntityBase):
@@ -180,7 +213,7 @@ class Command(EntityBase):
     description: Mapped[str | None]
     executable: Mapped[str | None]
 
-    variant: Mapped[PluginVariant] = relationship(back_populates="commands")
+    variant: Mapped[PluginVariant] = relationship(back_populates="plugin_commands")
 
 
 class PluginRequires(EntityBase):
@@ -207,7 +240,7 @@ class Select(EntityBase):
 
     expression: Mapped[str]
 
-    variant: Mapped[PluginVariant] = relationship(back_populates="select")
+    variant: Mapped[PluginVariant] = relationship(back_populates="select_expressions")
 
 
 class Metadata(EntityBase):
@@ -220,9 +253,9 @@ class Metadata(EntityBase):
     )
 
     key: Mapped[str]
-    value: Mapped[dict[str, t.Any]] = mapped_column(sa.JSON)
+    value: Mapped[dict[str, Any]] = mapped_column(sa.JSON)
 
-    variant: Mapped[PluginVariant] = relationship(back_populates="extractor_metadata")
+    variant: Mapped[PluginVariant] = relationship(back_populates="metadata_overrides")
 
 
 class Maintainer(EntityBase):

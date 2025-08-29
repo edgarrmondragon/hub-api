@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-import collections
-import typing as t
 import urllib.parse
+from typing import TYPE_CHECKING, Any, assert_never
 
 import pydantic
 import sqlalchemy as sa
@@ -12,7 +11,7 @@ from hub_api import enums, exceptions, ids, models
 from hub_api.schemas import api as api_schemas
 from hub_api.schemas import meltano
 
-if t.TYPE_CHECKING:
+if TYPE_CHECKING:
     from collections.abc import Sequence
 
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -122,7 +121,7 @@ class MeltanoHub:
         self.base_api_url = base_api_url
         self.base_hub_url = base_hub_url
 
-    async def _variant_details(  # noqa: C901, PLR0911, PLR0912
+    async def _variant_details(  # noqa: PLR0911
         self: MeltanoHub, variant: models.PluginVariant
     ) -> (
         api_schemas.ExtractorResponse
@@ -135,16 +134,9 @@ class MeltanoHub:
         | api_schemas.FileResponse
     ):
         settings: list[models.Setting] = await variant.awaitable_attrs.settings
-        capabilities: list[models.Capability] = await variant.awaitable_attrs.capabilities
-        commands: list[models.Command] = await variant.awaitable_attrs.commands
 
-        settings_groups = collections.defaultdict(list)
-        required_settings: list[models.RequiredSetting] = await variant.awaitable_attrs.required_settings
-
-        for required in required_settings:
-            settings_groups[required.group_id].append(required.setting_name)
-
-        result: dict[str, t.Any] = {
+        result: dict[str, Any] = {
+            "commands": variant.commands,
             "description": variant.description,
             "executable": variant.executable,
             "docs": build_hub_url(
@@ -162,23 +154,18 @@ class MeltanoHub:
             "repo": variant.repo,
             "ext_repo": variant.ext_repo,
             "settings": [meltano.PluginSetting.model_validate(s) for s in settings],
-            "settings_group_validation": list(settings_groups.values()),
+            "settings_group_validation": variant.settings_group_validation,
             "variant": variant.name,
         }
 
-        if commands:
-            result["commands"] = {cmd.name: meltano.Command.model_validate(cmd) for cmd in commands}
-
         match variant.plugin.plugin_type:
             case enums.PluginTypeEnum.extractors:
-                result["capabilities"] = [c.name for c in capabilities]
-                if select := await variant.awaitable_attrs.select:
-                    result["select"] = [s.expression for s in select]
-                if metadata := await variant.awaitable_attrs.extractor_metadata:
-                    result["metadata"] = {m.key: m.value for m in metadata}
+                result["capabilities"] = variant.capabilities
+                result["select"] = variant.select
+                result["metadata"] = variant.extractor_metadata
                 return api_schemas.ExtractorResponse.model_validate(result)
             case enums.PluginTypeEnum.loaders:
-                result["capabilities"] = [c.name for c in capabilities]
+                result["capabilities"] = variant.capabilities
                 return api_schemas.LoaderResponse.model_validate(result)
             case enums.PluginTypeEnum.utilities:
                 return api_schemas.UtilityResponse.model_validate(result)
@@ -193,7 +180,7 @@ class MeltanoHub:
             case enums.PluginTypeEnum.files:
                 return api_schemas.FileResponse.model_validate(result)
             case _:  # pragma: no cover
-                raise ValueError(f"Unknown plugin type: {variant.plugin.plugin_type}")
+                assert_never(variant.plugin.plugin_type)
 
     async def get_plugin_details(
         self, variant_id: ids.VariantID
