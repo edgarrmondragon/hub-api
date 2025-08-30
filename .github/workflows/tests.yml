@@ -17,7 +17,7 @@ on:
 env:
   FORCE_COLOR: "1"
   UV_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
-  UV_PYTHON: "3.13"
+  UV_PYTHON: "3.14"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -65,7 +65,6 @@ jobs:
       fail-fast: false
       matrix:
         python-version:
-        - "3.13"
         - "3.14"
     steps:
     - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
