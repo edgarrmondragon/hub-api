@@ -63,62 +63,26 @@ async def test_plugin_details(
     assert details["name"] == plugin
 
 
+@pytest.mark.parametrize(
+    ("headers", "etag"),
+    [
+        ({}, etag.ETAGS[compatibility.Compatibility.LATEST]),
+        ({"User-Agent": "Meltano/3.2.0"}, etag.ETAGS[compatibility.Compatibility.PRE_3_3]),
+        ({"User-Agent": "Meltano/3.8.0"}, etag.ETAGS[compatibility.Compatibility.PRE_3_9]),
+        ({"User-Agent": "Meltano/3.9.0"}, etag.ETAGS[compatibility.Compatibility.LATEST]),
+    ],
+)
 @pytest.mark.asyncio
-async def test_plugin_index_etag_match(api: httpx.AsyncClient) -> None:
+async def test_plugin_index_etag_match(api: httpx.AsyncClient, headers: dict[str, str], etag: str) -> None:
     """Test /meltano/api/v1/plugins/stats."""
-    response = await api.get("/meltano/api/v1/plugins/index")
+    response = await api.get("/meltano/api/v1/plugins/index", headers=headers)
     assert response.status_code == http.HTTPStatus.OK
-    assert response.headers["ETag"] == etag.ETAGS[compatibility.Compatibility.LATEST]
+    assert response.headers["ETag"] == etag
     assert "extractors" in response.json()
 
     response = await api.get(
         "/meltano/api/v1/plugins/index",
-        headers={"If-None-Match": etag.ETAGS[compatibility.Compatibility.LATEST]},
-    )
-    assert response.status_code == http.HTTPStatus.NOT_MODIFIED
-    assert not response.content
-
-    response = await api.get("/meltano/api/v1/plugins/index", headers={"User-Agent": "Meltano/3.2.0"})
-    assert response.status_code == http.HTTPStatus.OK
-    assert response.headers["ETag"] == etag.ETAGS[compatibility.Compatibility.PRE_3_3]
-    assert "extractors" in response.json()
-
-    response = await api.get(
-        "/meltano/api/v1/plugins/index",
-        headers={
-            "User-Agent": "Meltano/3.2.0",
-            "If-None-Match": etag.ETAGS[compatibility.Compatibility.PRE_3_3],
-        },
-    )
-    assert response.status_code == http.HTTPStatus.NOT_MODIFIED
-    assert not response.content
-
-    response = await api.get("/meltano/api/v1/plugins/index", headers={"User-Agent": "Meltano/3.8.0"})
-    assert response.status_code == http.HTTPStatus.OK
-    assert response.headers["ETag"] == etag.ETAGS[compatibility.Compatibility.PRE_3_9]
-    assert "extractors" in response.json()
-
-    response = await api.get(
-        "/meltano/api/v1/plugins/index",
-        headers={
-            "User-Agent": "Meltano/3.8.0",
-            "If-None-Match": etag.ETAGS[compatibility.Compatibility.PRE_3_9],
-        },
-    )
-    assert response.status_code == http.HTTPStatus.NOT_MODIFIED
-    assert not response.content
-
-    response = await api.get("/meltano/api/v1/plugins/index", headers={"User-Agent": "Meltano/3.9.0"})
-    assert response.status_code == http.HTTPStatus.OK
-    assert response.headers["ETag"] == etag.ETAGS[compatibility.Compatibility.LATEST]
-    assert "extractors" in response.json()
-
-    response = await api.get(
-        "/meltano/api/v1/plugins/index",
-        headers={
-            "User-Agent": "Meltano/3.9.0",
-            "If-None-Match": etag.ETAGS[compatibility.Compatibility.LATEST],
-        },
+        headers={"If-None-Match": etag, **headers},
     )
     assert response.status_code == http.HTTPStatus.NOT_MODIFIED
     assert not response.content
