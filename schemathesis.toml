@@ -1,6 +1,9 @@
 base-url = "http://127.0.0.1:8000"
 rate-limit = "10/s"
 
+[checks]
+unsupported_method.enabled = false
+
 [phases.fuzzing]
 enabled = false
 
@@ -11,6 +14,10 @@ path = "schemathesis-results.xml"
 [[operations]]
 include-name = "GET /meltano/api/v1/plugins/{plugin_type}/{plugin_name}--{plugin_variant}"
 parameters = { plugin_type = "extractors", plugin_name = "tap-github", plugin_variant = "meltanolabs" }
+
+[[operations]]
+include-name = "GET /meltano/api/v1/plugins/{plugin_type}/{plugin_name}/{variant}"
+parameters = { plugin_type = "extractors", plugin_name = "tap-github", variant = "meltanolabs" }
 
 [[operations]]
 include-name = "GET /meltano/api/v1/plugins/{plugin_type}/{plugin_name}/default"

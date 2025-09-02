@@ -51,7 +51,7 @@ class MaintainerDetails(_BaseMaintainerSchema):
 
 
 class PluginTypeOrAnyEnum(enum.StrEnum):
-    """Plugin type or any enum."""
+    """One or any plugin type enum."""
 
     extractors = enum.auto()
     loaders = enum.auto()
@@ -64,12 +64,12 @@ class PluginTypeOrAnyEnum(enum.StrEnum):
     any = enum.auto()
 
 
-class VariantReference(BaseModel):
+class VariantReference(BaseModel, extra="forbid"):
     """Variant reference model."""
 
-    ref: HttpUrl = Field(
+    ref: str = Field(
         description="API URL for the variant",
-        examples=["https://hub.meltano.com/meltano/api/v1/plugins/extractors/tap-github--singer-io"],
+        examples=["/meltano/api/v1/plugins/extractors/tap-github--singer-io"],
     )
 
 
@@ -102,6 +102,8 @@ class LoaderResponse(PluginResponse, meltano.Loader):
 
 class UtilityResponse(PluginResponse, meltano.Utility):
     """Utility response model."""
+
+    model_config = ConfigDict(extra="forbid")
 
 
 class OrchestratorResponse(PluginResponse, meltano.Orchestrator):
