@@ -11,6 +11,7 @@ dependencies = [
     "aiosqlite>=0.19.0",
     "fastapi>=0.109.2",
     "granian[reload]>=1.6.0",
+    "litestar[standard]>=2.17.0",
     "packaging>=25.0",
     "pydantic>=2.12.0a1",
     "python-json-logger>=4.0.0.dev0",
@@ -51,6 +52,9 @@ source = "vcs"
 [tool.uv]
 preview = true
 required-version = ">=0.8.0"
+
+# [tool.uv.sources]
+# litestar = { path = "../../Contrib/litestar-org/litestar", editable = true }
 
 [tool.ruff]
 line-length = 120
@@ -110,6 +114,7 @@ addopts = ["--durations=5", "-ra", "--strict-config", "--strict-markers"]
 asyncio_default_fixture_loop_scope = "session"
 filterwarnings = [
     "error",
+    "ignore:'asyncio.iscoroutinefunction' is deprecated:DeprecationWarning", # https://github.com/fastapi/fastapi/pull/13890
 ]
 log_cli_level = "INFO"
 minversion = "8"
