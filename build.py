@@ -304,7 +304,7 @@ def load_db(path: Path, session: SessionBase) -> LoadResult:  # noqa: C901, PLR0
             session.add(plugin_object)
             plugin_count += 1
 
-        logger.info("Processed %d %s variants for %d plugins", variant_count, plugin_type.value, plugin_count)
+        logger.info("Processed %d variants for %d unique %s", variant_count, plugin_count, plugin_type.value)
 
     session.commit()
     return result
