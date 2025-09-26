@@ -17,7 +17,6 @@ if TYPE_CHECKING:
 
     from sqlalchemy.ext.asyncio import AsyncSession
 
-BASE_API_URL = "http://127.0.0.1:8000"
 BASE_HUB_URL = "https://hub.meltano.com"
 
 
@@ -102,11 +101,9 @@ class MeltanoHub:
         self: MeltanoHub,
         *,
         db: AsyncSession,
-        base_api_url: str = BASE_API_URL,
         base_hub_url: str = BASE_HUB_URL,
     ) -> None:
         self.db = db
-        self.base_api_url = base_api_url
         self.base_hub_url = base_hub_url
 
     async def _variant_details(  # noqa: PLR0911
