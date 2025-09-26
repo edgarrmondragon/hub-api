@@ -19,22 +19,14 @@ dependencies = [
 ]
 
 [dependency-groups]
-build = [
-    "platformdirs>=4.3.6",
-    "PyYAML>=6.0.1",
-    "requests>=2.32.3",
-]
-coverage = [
-    "coverage>=7.6.1",
-]
+build = ["platformdirs>=4.3.6", "PyYAML>=6.0.1", "requests>=2.32.3"]
+coverage = ["coverage>=7.6.1"]
 dev = [
     { include-group = "build" },
     { include-group = "tests" },
     { include-group = "typing" },
 ]
-lint = [
-    "ruff>=0.12.9",
-]
+lint = ["ruff>=0.12.9"]
 tests = [
     { include-group = "coverage" },
     "httpx>=0.27.2",
@@ -88,7 +80,7 @@ select = [
     "RET",   # flake8-return
     "SLF",   # flake8-self
     "SIM",   # flake8-simplify
-    "TC" ,   # flake8-type-checking
+    "TC",    # flake8-type-checking
     "ARG",   # flake8-unused-arguments
     "PTH",   # flake8-use-pathlib
     "PGH",   # pygrep-hooks
@@ -113,16 +105,11 @@ banned-from = ["sqlalchemy"]
 "tests/*" = ["S101"]
 
 [tool.pytest.ini_options]
-addopts = [
-    "--durations=5",
-    "-ra",
-    "--strict-config",
-    "--strict-markers",
-]
+addopts = ["--durations=5", "-ra", "--strict-config", "--strict-markers"]
 asyncio_default_fixture_loop_scope = "session"
 filterwarnings = [
     "error",
-    "ignore:'asyncio.iscoroutinefunction' is deprecated:DeprecationWarning",  # https://github.com/fastapi/fastapi/pull/13890
+    "ignore:'asyncio.iscoroutinefunction' is deprecated:DeprecationWarning", # https://github.com/fastapi/fastapi/pull/13890
 ]
 log_cli_level = "INFO"
 minversion = "8"
@@ -135,7 +122,7 @@ enable_error_code = [
     "ignore-without-code",
     "redundant-expr",
     "truthy-bool",
-    "exhaustive-match",  # https://mypy.readthedocs.io/en/stable/error_code_list2.html#check-that-match-statements-match-exhaustively-exhaustive-match
+    "exhaustive-match",    # https://mypy.readthedocs.io/en/stable/error_code_list2.html#check-that-match-statements-match-exhaustively-exhaustive-match
 ]
 strict = true
 warn_unused_configs = true
@@ -149,96 +136,138 @@ parallel = true
 
 [tool.tox]
 min_version = "4.22"
-requires = [ "tox", "tox-uv" ]
+requires = ["tox", "tox-uv"]
 env_list = [
-  "format",
-  "build",
-  "py313",
-  "py314",
-  "combine",
-  "coverage",
-  "lint",
-  "typing",
+    "format",
+    "build",
+    "py313",
+    "py314",
+    "combine",
+    "coverage",
+    "lint",
+    "typing",
 ]
 
 [tool.tox.env_run_base]
 description = "run unit tests"
 runner = "uv-venv-lock-runner"
-dependency_groups = [ "tests" ]
+dependency_groups = ["tests"]
 commands = [
-    [ "coverage", "run", "-m", "pytest", { replace = "posargs", default = [ "-v" ], extend = true } ],
+    [
+        "coverage",
+        "run",
+        "-m",
+        "pytest",
+        { replace = "posargs", default = [
+            "-v",
+        ], extend = true },
+    ],
 ]
 
 [tool.tox.env.format]
 description = "format code"
-dependency_groups = [ "lint" ]
+dependency_groups = ["lint"]
 commands = [
-    [ "ruff", "check", "--fix", { replace = "posargs", default = [], extend = true } ],
-    [ "ruff", "format", { replace = "posargs", default = [], extend = true } ],
+    [
+        "ruff",
+        "check",
+        "--fix",
+        { replace = "posargs", default = [
+        ], extend = true },
+    ],
+    [
+        "ruff",
+        "format",
+        { replace = "posargs", default = [
+        ], extend = true },
+    ],
 ]
 
 [tool.tox.env.lint]
 description = "lint code"
-dependency_groups = [ "lint" ]
-depends = [
-  "format",
-]
+dependency_groups = ["lint"]
+depends = ["format"]
 commands = [
-    [ "ruff", "check", { replace = "posargs", default = [], extend = true } ],
-    [ "ruff", "format", "--diff", { replace = "posargs", default = [], extend = true } ],
+    [
+        "ruff",
+        "check",
+        { replace = "posargs", default = [
+        ], extend = true },
+    ],
+    [
+        "ruff",
+        "format",
+        "--diff",
+        { replace = "posargs", default = [
+        ], extend = true },
+    ],
 ]
 
 [tool.tox.env.typing]
 description = "run type checking"
-dependency_groups = [ "typing" ]
+dependency_groups = ["typing"]
 commands = [
-    [ "mypy", { replace = "posargs", default = [ "src", "tests", "build.py" ], extend = true } ],
-    [ "ty", "check", { replace = "posargs", default = [ "src", "tests", "build.py" ], extend = true } ],
+    [
+        "mypy",
+        { replace = "posargs", default = [
+            "src",
+            "tests",
+            "build.py",
+        ], extend = true },
+    ],
+    [
+        "ty",
+        "check",
+        { replace = "posargs", default = [
+            "src",
+            "tests",
+            "build.py",
+        ], extend = true },
+    ],
 ]
 
 [tool.tox.env.build]
 description = "build the plugin database"
-dependency_groups = [ "build" ]
+dependency_groups = ["build"]
 commands = [
-    [ "python", "-I", "build.py", { replace = "posargs", default = [], extend = true } ],
+    [
+        "python",
+        "-I",
+        "build.py",
+        { replace = "posargs", default = [
+        ], extend = true },
+    ],
 ]
 
 [tool.tox.env.py313]
-depends = [
-  "build",
-]
+depends = ["build"]
 
 [tool.tox.env.py314]
-depends = [
-  "build",
-]
+depends = ["build"]
 
 [tool.tox.env.combine]
 description = "combine coverage reports"
 skip_install = true
-dependency_groups = [ "coverage" ]
-depends = [
-  "py313",
-  "py314",
-]
-commands = [
-    [ "coverage", "combine" ],
-]
+dependency_groups = ["coverage"]
+depends = ["py313", "py314"]
+commands = [["coverage", "combine"]]
 
 [tool.tox.env.coverage]
 description = "generate coverage report"
 skip_install = true
-dependency_groups = [ "coverage" ]
-depends = [
-  "combine",
-]
+dependency_groups = ["coverage"]
+depends = ["combine"]
 commands = [
-  [ "coverage", { replace = "posargs", default = [ "report", "--fail-under=100", "--show-missing" ], extend = true } ],
+    [
+        "coverage",
+        { replace = "posargs", default = [
+            "report",
+            "--fail-under=100",
+            "--show-missing",
+        ], extend = true },
+    ],
 ]
 
 [build-system]
-requires = [
-    "hatchling==1.27.0",
-    "hatch-vcs==0.5.0",
-]
+requires = ["hatchling==1.27.0", "hatch-vcs==0.5.0"]
 build-backend = "hatchling.build"
