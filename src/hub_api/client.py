@@ -25,14 +25,14 @@ class PluginNotFoundError(exceptions.NotFoundError):
     """Plugin not found error."""
 
     def __init__(self, *, plugin_id: ids.PluginID) -> None:
-        super().__init__(f"Plugin '{plugin_id}' not found")
+        super().__init__(f"Plugin '{plugin_id.plugin_name}' not found")
 
 
 class PluginVariantNotFoundError(exceptions.NotFoundError):
     """Plugin variant not found error."""
 
-    def __init__(self, *, plugin_variant: ids.VariantID) -> None:
-        super().__init__(f"Plugin variant '{plugin_variant}' not found")
+    def __init__(self, *, variant_id: ids.VariantID) -> None:
+        super().__init__(f"Variant '{variant_id.plugin_variant}' of '{variant_id.plugin_name}' not found")
 
 
 class MaintainerNotFoundError(exceptions.NotFoundError):
@@ -61,32 +61,6 @@ def _build_variant_path(
     """
     prefix = "/meltano/api/v1/plugins"
     return f"{prefix}/{plugin_type.value}/{plugin_name}--{plugin_variant}"
-
-
-def build_variant_url(
-    *,
-    base_url: str,
-    plugin_type: enums.PluginTypeEnum,
-    plugin_name: str,
-    plugin_variant: str,
-) -> pydantic.HttpUrl:
-    """Build variant URL.
-
-    Args:
-        base_url: Base API URL.
-        plugin_type: Plugin type.
-        plugin_name: Plugin name.
-        plugin_variant: Plugin variant.
-
-    Returns:
-        Variant URL.
-    """
-    path = _build_variant_path(
-        plugin_type=plugin_type,
-        plugin_name=plugin_name,
-        plugin_variant=plugin_variant,
-    )
-    return pydantic.HttpUrl(f"{base_url}{path}")
 
 
 def build_hub_url(
@@ -214,7 +188,7 @@ class MeltanoHub:
         variant = await self.db.get(models.PluginVariant, variant_id.as_db_id())
 
         if not variant:
-            raise PluginVariantNotFoundError(plugin_variant=variant_id)
+            raise PluginVariantNotFoundError(variant_id=variant_id)
 
         details = await self._variant_details(variant)
 
@@ -288,7 +262,7 @@ class MeltanoHub:
 
         for row in await self._get_all_plugins(plugin_type=None):
             plugin_name, plugin_type, variant_name, logo_url, default_variant = row._tuple()  # noqa: SLF001
-            logo_http_url = pydantic.HttpUrl(f"{self.base_hub_url}/assets{logo_url}") if logo_url else None
+            logo_http_url = pydantic.HttpUrl(f"{self.base_hub_url}{logo_url}") if logo_url else None
             if plugin_name not in plugins[plugin_type]:
                 plugins[plugin_type][plugin_name] = api_schemas.PluginRef(
                     default_variant=default_variant,
@@ -296,8 +270,7 @@ class MeltanoHub:
                 )
 
             plugins[plugin_type][plugin_name].variants[variant_name] = api_schemas.VariantReference(
-                ref=build_variant_url(
-                    base_url=self.base_api_url,
+                ref=_build_variant_path(
                     plugin_type=plugin_type,
                     plugin_name=plugin_name,
                     plugin_variant=variant_name,
@@ -339,8 +312,7 @@ class MeltanoHub:
                 )
 
             plugins[plugin_name].variants[variant_name] = api_schemas.VariantReference(
-                ref=build_variant_url(
-                    base_url=self.base_api_url,
+                ref=_build_variant_path(
                     plugin_type=plugin_type,
                     plugin_name=plugin_name,
                     plugin_variant=variant_name,
