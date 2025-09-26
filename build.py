@@ -2,32 +2,36 @@ from __future__ import annotations
 
 import dataclasses
 import gzip
+import json
 import logging
 import shutil
+import sqlite3
 import sys
 import tarfile
 import tempfile
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, assert_never
 
 import platformdirs
 import pydantic
 import requests
-import sqlalchemy as sa
 import yaml
-from sqlalchemy.orm import Session as SessionBase
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.dialects import sqlite
+from sqlalchemy.schema import CreateTable
 
 from hub_api import enums, models
 from hub_api.schemas import meltano, validation
 
 if TYPE_CHECKING:
-    from collections.abc import Generator
+    from collections.abc import Generator, Sequence
 
     import pydantic_core
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
+
+sqlite3.register_adapter(list, json.dumps)
+sqlite3.register_adapter(dict, json.dumps)
 
 
 def download_meltano_hub_archive(*, ref: str = "main", use_cache: bool = True) -> Path:
@@ -66,7 +70,9 @@ def get_default_variants(path: Path) -> dict[str, dict[str, str]]:
         return yaml.safe_load(f)  # type: ignore[no-any-return]
 
 
-def get_plugin_variants(plugin_path: Path) -> Generator[tuple[str, dict[str, Any]]]:
+def get_plugin_variants(
+    plugin_path: Path,
+) -> Generator[tuple[str, dict[str, Any]]]:
     """Get plugin variants of a given type."""
     for plugin_file in plugin_path.glob("*.yml"):
         with plugin_file.open() as f:
@@ -82,36 +88,45 @@ def get_plugins_of_type(
         yield from get_plugin_variants(plugin_path)
 
 
-def _build_setting(variant_id: str, setting: meltano.PluginSetting) -> models.Setting:
+def _build_setting(
+    variant_id: str,
+    setting: meltano.PluginSetting,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     """Build setting object."""
     setting_id = f"{variant_id}.setting_{setting.root.name}"
-    instance = models.Setting(
-        id=f"{variant_id}.setting_{setting.root.name}",
-        variant_id=variant_id,
-        name=setting.root.name,
-        label=setting.root.label,
-        documentation=setting.root.documentation,
-        description=setting.root.description,
-        placeholder=setting.root.placeholder,
-        env=setting.root.env,
-        kind=setting.root.kind,
-        value=setting.root.value,
-        sensitive=setting.root.sensitive,
-    )
+    setting_data: dict[str, Any] = {
+        "id": setting_id,
+        "variant_id": variant_id,
+        "name": setting.root.name,
+        "label": setting.root.label,
+        "documentation": setting.root.documentation,
+        "description": setting.root.description,
+        "placeholder": setting.root.placeholder,
+        "env": setting.root.env,
+        "kind": setting.root.kind,
+        "value": None if setting.root.value is None else json.dumps(setting.root.value),
+        "sensitive": setting.root.sensitive,
+        "options": None,
+    }
 
     match setting.root:
         case meltano.OptionsSetting():
-            instance.options = [opt.model_dump() for opt in setting.root.options]
+            setting_data["options"] = [opt.model_dump() for opt in setting.root.options]
         case _:
             pass
 
+    aliases_data: list[dict[str, Any]] = []
     if setting.root.aliases:
-        for alias in setting.root.aliases:
-            alias_id = f"{setting_id}.alias_{alias}"
-            alias_object = models.SettingAlias(id=alias_id, setting_id=setting_id, name=alias)
-            instance.setting_aliases.append(alias_object)
+        aliases_data.extend(
+            {
+                "id": f"{setting_id}.alias_{alias}",
+                "setting_id": setting_id,
+                "name": alias,
+            }
+            for alias in setting.root.aliases
+        )
 
-    return instance
+    return setting_data, aliases_data
 
 
 @dataclasses.dataclass
@@ -141,21 +156,44 @@ class LoadResult:
         return result
 
 
-def load_db(path: Path, session: SessionBase) -> LoadResult:  # noqa: C901, PLR0912, PLR0914, PLR0915
-    """Load database."""
+def _insert_row(connection: sqlite3.Connection, table: str, row: dict[str, Any]) -> None:
+    """Insert a row into the specified table."""
+    column_names = row.keys()
+    columns = ", ".join(column_names)
+    placeholders = ", ".join(f":{col}" for col in column_names)
+    query = f"INSERT INTO {table} ({columns}) VALUES ({placeholders})"  # noqa: S608
+    connection.execute(query, row)
 
+
+def _insert_rows(connection: sqlite3.Connection, table: str, rows: Sequence[dict[str, Any]]) -> None:
+    """Insert multiple rows into the specified table."""
+    column_names = rows[0].keys()
+    columns = ", ".join(column_names)
+    placeholders = ", ".join(f":{col}" for col in column_names)
+    query = f"INSERT INTO {table} ({columns}) VALUES ({placeholders})"  # noqa: S608
+    connection.executemany(query, rows)
+
+
+def load_db(  # noqa: C901, PLR0912, PLR0914, PLR0915
+    path: Path,
+    connection: sqlite3.Connection,
+) -> LoadResult:
+    """Load database."""
     result = LoadResult(errors=[])
     default_variants = get_default_variants(path.joinpath("default_variants.yml"))
     maintainers = get_default_variants(path.joinpath("maintainers.yml"))
 
     for maintainer_id, maintainer_data in maintainers.items():
-        maintainer_object = models.Maintainer(
-            id=maintainer_id,
-            name=maintainer_data.get("name"),
-            label=maintainer_data.get("label"),
-            url=maintainer_data.get("url"),
+        _insert_row(
+            connection,
+            "maintainers",
+            {
+                "id": maintainer_id,
+                "name": maintainer_data.get("name"),
+                "label": maintainer_data.get("label"),
+                "url": maintainer_data.get("url"),
+            },
         )
-        session.add(maintainer_object)
 
     for plugin_type in enums.PluginTypeEnum:
         variant_count = 0  # Counter for processed plugin variants
@@ -186,6 +224,8 @@ def load_db(path: Path, session: SessionBase) -> LoadResult:  # noqa: C901, PLR0
                             plugin = validation.MapperDefinition.model_validate(definition)
                         case enums.PluginTypeEnum.files:
                             plugin = validation.FileDefinition.model_validate(definition)
+                        case _:
+                            assert_never(plugin_type)
                 except pydantic.ValidationError as exc:
                     logger.error("Error validating plugin %s", plugin_id)
                     for error in exc.errors():
@@ -195,118 +235,149 @@ def load_db(path: Path, session: SessionBase) -> LoadResult:  # noqa: C901, PLR0
                                 variant=variant,
                                 link=f"https://github.com/meltano/hub/blob/main/_data/meltano/{plugin_type}/{plugin_name}/{variant}.yml",
                                 error=error,
-                            )
+                            ),
                         )
                     continue
 
                 variant_id = f"{plugin_id}.{variant}"
-                variant_object = models.PluginVariant(
-                    plugin_id=plugin_id,
-                    id=variant_id,
-                    description=plugin.description,
-                    executable=plugin.executable,
-                    docs=str(plugin.docs) if plugin.docs else None,
-                    name=variant,
-                    label=plugin.label,
-                    logo_url=plugin.logo_url,
-                    pip_url=plugin.pip_url,
-                    repo=str(plugin.repo),
-                    ext_repo=str(plugin.ext_repo) if plugin.ext_repo else None,
-                    namespace=plugin.namespace,
-                    hidden=plugin.hidden,
-                    maintenance_status=plugin.maintenance_status,
-                    quality=plugin.quality,
-                    domain_url=str(plugin.domain_url) if plugin.domain_url else None,
-                    definition=plugin.definition,
-                    next_steps=plugin.next_steps,
-                    settings_preamble=plugin.settings_preamble,
-                    usage=plugin.usage,
-                    prereq=plugin.prereq,
+                _insert_row(
+                    connection,
+                    "plugin_variants",
+                    {
+                        "plugin_id": plugin_id,
+                        "id": variant_id,
+                        "description": plugin.description,
+                        "executable": plugin.executable,
+                        "docs": str(plugin.docs) if plugin.docs else None,
+                        "name": variant,
+                        "label": plugin.label,
+                        "logo_url": plugin.logo_url,
+                        "pip_url": plugin.pip_url,
+                        "repo": str(plugin.repo),
+                        "ext_repo": str(plugin.ext_repo) if plugin.ext_repo else None,
+                        "namespace": plugin.namespace,
+                        "hidden": plugin.hidden,
+                        "maintenance_status": plugin.maintenance_status.value if plugin.maintenance_status else None,
+                        "quality": plugin.quality.value if plugin.quality else None,
+                        "domain_url": str(plugin.domain_url) if plugin.domain_url else None,
+                        "definition": plugin.definition,
+                        "next_steps": plugin.next_steps,
+                        "settings_preamble": plugin.settings_preamble,
+                        "usage": plugin.usage,
+                        "prereq": plugin.prereq,
+                    },
                 )
-                session.add(variant_object)
                 variant_count += 1
 
                 for setting in plugin.settings:
-                    session.add(_build_setting(variant_id, setting))
+                    setting_data, aliases_data = _build_setting(variant_id, setting)
+                    _insert_row(connection, "settings", setting_data)
+                    if aliases_data:
+                        _insert_rows(connection, "setting_aliases", aliases_data)
 
                 for group_idx, setting_group in enumerate(
                     definition.get("settings_group_validation", []),
                 ):
                     for setting_name in setting_group:
                         setting_id = f"{variant_id}.setting_{setting_name}"
-                        setting_group_object = models.RequiredSetting(
-                            variant_id=variant_object.id,
-                            setting_id=setting_id,
-                            setting_name=setting_name,
-                            group_id=group_idx,
+                        _insert_row(
+                            connection,
+                            "setting_groups",
+                            {
+                                "variant_id": variant_id,
+                                "setting_id": setting_id,
+                                "setting_name": setting_name,
+                                "group_id": group_idx,
+                            },
                         )
-                        session.add(setting_group_object)
 
                 for capability in definition.get("capabilities", []):
-                    capability_object = models.Capability(
-                        id=f"{variant_id}.capability_{capability}",
-                        variant_id=variant_object.id,
-                        name=capability,
+                    _insert_row(
+                        connection,
+                        "capabilities",
+                        {
+                            "id": f"{variant_id}.capability_{capability}",
+                            "variant_id": variant_id,
+                            "name": capability,
+                        },
                     )
-                    session.add(capability_object)
 
                 for keyword in definition.get("keywords", []):
-                    keyword_object = models.Keyword(
-                        id=f"{variant_id}.keyword_{keyword}",
-                        variant_id=variant_object.id,
-                        name=keyword,
+                    _insert_row(
+                        connection,
+                        "keywords",
+                        {
+                            "id": f"{variant_id}.keyword_{keyword}",
+                            "variant_id": variant_id,
+                            "name": keyword,
+                        },
                     )
-                    session.add(keyword_object)
 
                 for i, select in enumerate(definition.get("select", [])):
-                    select_object = models.Select(
-                        id=f"{variant_id}.select_{i}",
-                        variant_id=variant_object.id,
-                        expression=select,
+                    _insert_row(
+                        connection,
+                        "selects",
+                        {
+                            "id": f"{variant_id}.select_{i}",
+                            "variant_id": variant_id,
+                            "expression": select,
+                        },
                     )
-                    session.add(select_object)
 
-                for i, (key, metadata) in enumerate(definition.get("metadata", {}).items()):
-                    metadata_object = models.Metadata(
-                        id=f"{variant_id}.metadata_{i}",
-                        variant_id=variant_object.id,
-                        key=key,
-                        value=metadata,
+                for i, (key, metadata) in enumerate(
+                    definition.get("metadata", {}).items(),
+                ):
+                    _insert_row(
+                        connection,
+                        "metadata",
+                        {
+                            "id": f"{variant_id}.metadata_{i}",
+                            "variant_id": variant_id,
+                            "key": key,
+                            "value": metadata,
+                        },
                     )
-                    session.add(metadata_object)
 
                 for command_name, command in definition.get("commands", {}).items():
                     command_id = f"{variant_id}.command_{command_name}"
                     if isinstance(command, str):
-                        command_object = models.Command(
-                            id=command_id,
-                            variant_id=variant_object.id,
-                            name=command_name,
-                            args=command,
-                        )
+                        command_details = {
+                            "id": command_id,
+                            "variant_id": variant_id,
+                            "name": command_name,
+                            "args": command,
+                        }
                     else:
-                        command_object = models.Command(
-                            id=command_id,
-                            variant_id=variant_object.id,
-                            name=command_name,
-                            args=command.get("args"),
-                            description=command.get("description"),
-                            executable=command.get("executable"),
-                        )
-                    session.add(command_object)
+                        command_details = {
+                            "id": command_id,
+                            "variant_id": variant_id,
+                            "name": command_name,
+                            "args": command.get("args"),
+                            "description": command.get("description"),
+                            "executable": command.get("executable"),
+                        }
+                    _insert_row(connection, "commands", command_details)
 
-            plugin_object = models.Plugin(
-                id=plugin_id,
-                default_variant_id=default_variant_id,
-                plugin_type=plugin_type.value,
-                name=plugin_name,
+            _insert_row(
+                connection,
+                "plugins",
+                {
+                    "id": plugin_id,
+                    "default_variant_id": default_variant_id,
+                    "plugin_type": plugin_type.value,
+                    "name": plugin_name,
+                },
             )
-            session.add(plugin_object)
             plugin_count += 1
 
-        logger.info("Processed %d variants for %d unique %s", variant_count, plugin_count, plugin_type.value)
+        logger.info(
+            "Processed %d variants for %d unique %s",
+            variant_count,
+            plugin_count,
+            plugin_type.value,
+        )
 
-    session.commit()
+    connection.commit()
     return result
 
 
@@ -325,18 +396,18 @@ def main() -> int:
     parser.add_argument("--no-cache", action="store_false", dest="cache")
     parser.add_argument("--exit-zero", action="store_true", dest="exit_zero")
 
-    engine = sa.create_engine(f"sqlite:///{database.get_db_path()}")
-    SyncSession = sessionmaker(autocommit=False, autoflush=False, bind=engine)  # noqa: N806
-    session = SyncSession()
+    db_path = database.get_db_path()
+    db_path.unlink(missing_ok=True)
 
-    models.EntityBase.metadata.drop_all(engine)
-    models.EntityBase.metadata.create_all(engine)
+    with sqlite3.connect(db_path) as connection:
+        for table in models.EntityBase.metadata.sorted_tables:
+            connection.execute(str(CreateTable(table).compile(dialect=sqlite.dialect())))  # type: ignore[no-untyped-call]
 
-    args = parser.parse_args(namespace=CLINamespace())
+        args = parser.parse_args(namespace=CLINamespace())
 
-    hub_dir = download_meltano_hub_archive(ref=args.git_ref, use_cache=args.cache)
-    result = load_db(hub_dir / "_data", session)
-    print(result.to_markdown())
+        hub_dir = download_meltano_hub_archive(ref=args.git_ref, use_cache=args.cache)
+        result = load_db(hub_dir / "_data", connection)
+        print(result.to_markdown())
 
     return 0 if args.exit_zero else 1 if result.errors else 0
 
