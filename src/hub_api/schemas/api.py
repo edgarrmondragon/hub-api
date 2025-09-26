@@ -51,7 +51,7 @@ class MaintainerDetails(_BaseMaintainerSchema):
 
 
 class PluginTypeOrAnyEnum(enum.StrEnum):
-    """Plugin type or any enum."""
+    """One or any plugin type enum."""
 
     extractors = enum.auto()
     loaders = enum.auto()
@@ -64,7 +64,7 @@ class PluginTypeOrAnyEnum(enum.StrEnum):
     any = enum.auto()
 
 
-class VariantReference(BaseModel):
+class VariantReference(BaseModel, extra="forbid"):
     """Variant reference model."""
 
     ref: str = Field(
