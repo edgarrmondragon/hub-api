@@ -67,9 +67,9 @@ class PluginTypeOrAnyEnum(enum.StrEnum):
 class VariantReference(BaseModel):
     """Variant reference model."""
 
-    ref: HttpUrl = Field(
+    ref: str = Field(
         description="API URL for the variant",
-        examples=["https://hub.meltano.com/meltano/api/v1/plugins/extractors/tap-github--singer-io"],
+        examples=["/meltano/api/v1/plugins/extractors/tap-github--singer-io"],
     )
 
 
