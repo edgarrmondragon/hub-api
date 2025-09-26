@@ -301,7 +301,7 @@ class MeltanoHub:
 
         for row in await self._get_all_plugins(plugin_type=plugin_type):
             plugin_name, _, variant_name, logo_url, default_variant = row._tuple()  # noqa: SLF001
-            logo_http_url = pydantic.HttpUrl(f"{self.base_hub_url}/assets{logo_url}") if logo_url else None
+            logo_http_url = pydantic.HttpUrl(f"{self.base_hub_url}{logo_url}") if logo_url else None
             if plugin_name not in plugins:
                 plugins[plugin_name] = api_schemas.PluginRef(
                     default_variant=default_variant,
