@@ -25,6 +25,7 @@ dev = [
     { include-group = "build" },
     { include-group = "tests" },
     { include-group = "typing" },
+    "python-dotenv>=1.1.1",
 ]
 lint = ["ruff>=0.12.9"]
 tests = [
@@ -264,6 +265,23 @@ commands = [
             "report",
             "--fail-under=100",
             "--show-missing",
+        ], extend = true },
+    ],
+]
+
+[tool.tox.env.serve]
+description = "serve the application"
+dependency_groups = ["dev"]
+commands = [
+    [
+        "dotenv",
+        "-f",
+        ".env",
+        "run",
+        "granian",
+        "hub_api.main:app",
+        { replace = "posargs", default = [
+            "--port=8000",
         ], extend = true },
     ],
 ]

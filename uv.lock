@@ -316,6 +316,7 @@ dev = [
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "pytest-github-actions-annotate-failures" },
+    { name = "python-dotenv" },
     { name = "pyyaml" },
     { name = "requests" },
     { name = "ty" },
@@ -374,6 +375,7 @@ dev = [
     { name = "pytest", specifier = ">=8.3.2" },
     { name = "pytest-asyncio", specifier = ">=1.1.0a1" },
     { name = "pytest-github-actions-annotate-failures", specifier = ">=0.3.0" },
+    { name = "python-dotenv", specifier = ">=1.1.1" },
     { name = "pyyaml", specifier = ">=6.0.1" },
     { name = "requests", specifier = ">=2.32.3" },
     { name = "ty", specifier = ">=0.0.1a19" },
@@ -599,6 +601,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/39/d4/c54ee6a871eee4a7468e3a8c0dead28e634c0bc2110c694309dcb7563a66/pytest_github_actions_annotate_failures-0.3.0.tar.gz", hash = "sha256:d4c3177c98046c3900a7f8ddebb22ea54b9f6822201b5d3ab8fcdea51e010db7", size = 11248, upload-time = "2025-01-17T22:39:32.722Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/6d/73/7b0b15cb8605ee967b34aa1d949737ab664f94e6b0f1534e8339d9e64ab2/pytest_github_actions_annotate_failures-0.3.0-py3-none-any.whl", hash = "sha256:41ea558ba10c332c0bfc053daeee0c85187507b2034e990f21e4f7e5fef044cf", size = 6030, upload-time = "2025-01-17T22:39:31.701Z" },
+]
+
+[[package]]
+name = "python-dotenv"
+version = "1.1.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/f6/b0/4bc07ccd3572a2f9df7e6782f52b0c6c90dcbb803ac4a167702d7d0dfe1e/python_dotenv-1.1.1.tar.gz", hash = "sha256:a8a6399716257f45be6a007360200409fce5cda2661e3dec71d23dc15f6189ab", size = 41978, upload-time = "2025-06-24T04:21:07.341Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5f/ed/539768cf28c661b5b068d66d96a2f155c4971a5d55684a514c1a0e0dec2f/python_dotenv-1.1.1-py3-none-any.whl", hash = "sha256:31f23644fe2602f88ff55e1f5c79ba497e01224ee7737937930c448e4d0e24dc", size = 20556, upload-time = "2025-06-24T04:21:06.073Z" },
 ]
 
 [[package]]
