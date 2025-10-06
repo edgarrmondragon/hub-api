@@ -59,6 +59,7 @@ class ExtractorCapabilityEnum(_HyphenatedEnum):
     batch = enum.auto()
     test = enum.auto()
     log_based = enum.auto()
+    structured_logging = enum.auto()
 
 
 class LoaderCapabilityEnum(_HyphenatedEnum):
@@ -72,9 +73,11 @@ class LoaderCapabilityEnum(_HyphenatedEnum):
     soft_delete = enum.auto()
     stream_maps = enum.auto()
     validate_records = enum.auto()
+    structured_logging = enum.auto()
 
 
 class MapperCapabilityEnum(_HyphenatedEnum):
     """Mapper capabilities."""
 
     stream_maps = enum.auto()
+    structured_logging = enum.auto()
