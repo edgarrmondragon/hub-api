@@ -6,7 +6,7 @@ authors = [
     { name = "Edgar Ramírez Mondragón", email = "edgarrm358@gmail.com" },
 ]
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.14"
 dependencies = [
     "aiosqlite>=0.19.0",
     "fastapi>=0.109.2",
@@ -140,7 +140,6 @@ requires = ["tox", "tox-uv"]
 env_list = [
     "format",
     "build",
-    "py313",
     "py314",
     "combine",
     "coverage",
@@ -239,18 +238,15 @@ commands = [
     ],
 ]
 
-[tool.tox.env.py313]
-depends = ["build"]
-
 [tool.tox.env.py314]
 depends = ["build"]
 
 [tool.tox.env.combine]
 description = "combine coverage reports"
 skip_install = true
-dependency_groups = ["coverage"]
-depends = ["py313", "py314"]
-commands = [["coverage", "combine"]]
+dependency_groups = [ "coverage" ]
+depends = ["py314"]
+commands = [[ "coverage", "combine" ]]
 
 [tool.tox.env.coverage]
 description = "generate coverage report"
