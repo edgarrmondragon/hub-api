@@ -401,7 +401,7 @@ def main() -> int:
 
     with sqlite3.connect(db_path) as connection:
         for table in models.EntityBase.metadata.sorted_tables:
-            connection.execute(str(CreateTable(table).compile(dialect=sqlite.dialect())))  # type: ignore[no-untyped-call]
+            connection.execute(str(CreateTable(table).compile(dialect=sqlite.dialect())))
 
         args = parser.parse_args(namespace=CLINamespace())
 
