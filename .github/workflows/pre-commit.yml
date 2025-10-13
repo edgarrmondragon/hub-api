@@ -12,7 +12,7 @@ on:
 
 env:
   FORCE_COLOR: "1"
-  UV_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
+  UV_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/requirements.txt
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

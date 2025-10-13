@@ -16,7 +16,7 @@ on:
 
 env:
   FORCE_COLOR: "1"
-  UV_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/constraints.txt
+  UV_CONSTRAINT: ${{ github.workspace }}/.github/workflows/resources/requirements.txt
   UV_PYTHON: "3.14"
 
 concurrency:
