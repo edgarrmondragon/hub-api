@@ -103,8 +103,8 @@ class MeltanoHub:
         db: AsyncSession,
         base_hub_url: str = BASE_HUB_URL,
     ) -> None:
-        self.db = db
-        self.base_hub_url = base_hub_url
+        self.db: AsyncSession = db
+        self.base_hub_url: str = base_hub_url
 
     async def _variant_details(  # noqa: PLR0911
         self: MeltanoHub, variant: models.PluginVariant
@@ -323,15 +323,15 @@ class MeltanoHub:
         *,
         limit: int,
         plugin_type: api_schemas.PluginTypeOrAnyEnum,
-    ) -> list[dict[str, str]]:
+    ) -> list[api_schemas.PluginListElement]:
         """Get all plugins with the sdk keyword.
 
         Returns:
             List of plugins.
         """
         q = sa.select(
-            models.Plugin.id.label("plugin_id"),
-            models.PluginVariant.id.label("variant_id"),
+            models.Plugin.name.label("plugin"),
+            models.Plugin.plugin_type.label("plugin_type"),
             models.PluginVariant.name.label("variant"),
         )
 
@@ -354,7 +354,19 @@ class MeltanoHub:
         )
 
         result = await self.db.execute(q)
-        return [dict(row) for row in result.mappings().all()]
+        return [
+            api_schemas.PluginListElement(
+                plugin=pname,
+                variant=vname,
+                plugin_type=ptype,
+                ref=_build_variant_path(
+                    plugin_type=ptype,
+                    plugin_name=pname,
+                    plugin_variant=vname,
+                ),
+            )
+            for pname, ptype, vname in result.all()
+        ]
 
     async def get_plugin_stats(self: MeltanoHub) -> dict[enums.PluginTypeEnum, int]:
         """Get plugin statistics.

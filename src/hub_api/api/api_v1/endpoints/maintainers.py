@@ -13,7 +13,7 @@ router = fastapi.APIRouter()
 
 
 @router.get(
-    "/",
+    "",
     summary="Get maintainers list",
     response_model_exclude_none=True,
 )

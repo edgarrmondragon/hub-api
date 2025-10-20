@@ -122,3 +122,11 @@ class MapperResponse(PluginResponse, meltano.Mapper):
 
 class FileResponse(PluginResponse, meltano.File):
     """File response model."""
+
+
+class PluginListElement(VariantReference):
+    """Plugin list element model."""
+
+    plugin: str = Field(description="The plugin name", examples=["tap-github"])
+    variant: str = Field(description="The plugin variant", examples=["meltanolabs"])
+    plugin_type: enums.PluginTypeEnum = Field(description="The plugin type", examples=[enums.PluginTypeEnum.extractors])

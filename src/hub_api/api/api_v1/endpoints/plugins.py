@@ -141,10 +141,20 @@ class MadeWithSDKParams(BaseModel):
         ge=1,
         le=100,
         description="The number of plugins to return",
+        examples=[
+            10,
+            25,
+            100,
+        ],
     )
     plugin_type: api_schemas.PluginTypeOrAnyEnum = Field(
         api_schemas.PluginTypeOrAnyEnum.any,
         description="The plugin type",
+        examples=[
+            api_schemas.PluginTypeOrAnyEnum.any,
+            api_schemas.PluginTypeOrAnyEnum.extractors,
+            api_schemas.PluginTypeOrAnyEnum.loaders,
+        ],
     )
 
 
@@ -153,7 +163,7 @@ async def sdk(
     hub: dependencies.Hub,
     *,
     filter_query: Annotated[MadeWithSDKParams, fastapi.Query()],
-) -> list[dict[str, str]]:
+) -> list[api_schemas.PluginListElement]:
     """Retrieve plugins made with the Singer SDK."""
     return await hub.get_sdk_plugins(limit=filter_query.limit, plugin_type=filter_query.plugin_type)
 
