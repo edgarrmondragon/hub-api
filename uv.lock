@@ -270,6 +270,7 @@ dev = [
     { name = "python-dotenv" },
     { name = "pyyaml" },
     { name = "requests" },
+    { name = "syrupy" },
     { name = "ty" },
     { name = "types-pyyaml" },
     { name = "types-requests" },
@@ -283,6 +284,7 @@ tests = [
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "pytest-github-actions-annotate-failures" },
+    { name = "syrupy" },
 ]
 typing = [
     { name = "coverage" },
@@ -294,6 +296,7 @@ typing = [
     { name = "pytest-github-actions-annotate-failures" },
     { name = "pyyaml" },
     { name = "requests" },
+    { name = "syrupy" },
     { name = "ty" },
     { name = "types-pyyaml" },
     { name = "types-requests" },
@@ -329,6 +332,7 @@ dev = [
     { name = "python-dotenv", specifier = ">=1.1.1" },
     { name = "pyyaml", specifier = ">=6.0.1" },
     { name = "requests", specifier = ">=2.32.3" },
+    { name = "syrupy", specifier = ">=5.0.0" },
     { name = "ty", specifier = ">=0.0.1a19" },
     { name = "types-pyyaml", specifier = ">=6.0.12.20240808" },
     { name = "types-requests", specifier = ">=2.32.0" },
@@ -340,6 +344,7 @@ tests = [
     { name = "pytest", specifier = ">=8.3.2" },
     { name = "pytest-asyncio", specifier = ">=1.1.0a1" },
     { name = "pytest-github-actions-annotate-failures", specifier = ">=0.3.0" },
+    { name = "syrupy", specifier = ">=5.0.0" },
 ]
 typing = [
     { name = "coverage", specifier = ">=7.6.1" },
@@ -351,6 +356,7 @@ typing = [
     { name = "pytest-github-actions-annotate-failures", specifier = ">=0.3.0" },
     { name = "pyyaml", specifier = ">=6.0.1" },
     { name = "requests", specifier = ">=2.32.3" },
+    { name = "syrupy", specifier = ">=5.0.0" },
     { name = "ty", specifier = ">=0.0.1a19" },
     { name = "types-pyyaml", specifier = ">=6.0.12.20240808" },
     { name = "types-requests", specifier = ">=2.32.0" },
@@ -655,6 +661,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/a7/a5/d6f429d43394057b67a6b5bbe6eae2f77a6bf7459d961fdb224bf206eee6/starlette-0.48.0.tar.gz", hash = "sha256:7e8cee469a8ab2352911528110ce9088fdc6a37d9876926e73da7ce4aa4c7a46", size = 2652949, upload-time = "2025-09-13T08:41:05.699Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/be/72/2db2f49247d0a18b4f1bb9a5a39a0162869acf235f3a96418363947b3d46/starlette-0.48.0-py3-none-any.whl", hash = "sha256:0764ca97b097582558ecb498132ed0c7d942f233f365b86ba37770e026510659", size = 73736, upload-time = "2025-09-13T08:41:03.869Z" },
+]
+
+[[package]]
+name = "syrupy"
+version = "5.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pytest" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c1/90/1a442d21527009d4b40f37fe50b606ebb68a6407142c2b5cc508c34b696b/syrupy-5.0.0.tar.gz", hash = "sha256:3282fe963fa5d4d3e47231b16d1d4d0f4523705e8199eeb99a22a1bc9f5942f2", size = 48881, upload-time = "2025-09-28T21:15:12.783Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/9d/9a/6c68aad2ccfce6e2eeebbf5bb709d0240592eb51ff142ec4c8fbf3c2460a/syrupy-5.0.0-py3-none-any.whl", hash = "sha256:c848e1a980ca52a28715cd2d2b4d434db424699c05653bd1158fb31cf56e9546", size = 49087, upload-time = "2025-09-28T21:15:11.639Z" },
 ]
 
 [[package]]

@@ -4,14 +4,19 @@ from __future__ import annotations
 
 import http
 import unittest.mock
+from typing import TYPE_CHECKING
 
 import httpx
 import pytest
 from starlette.datastructures import Headers
 from starlette.requests import Request
+from syrupy.extensions.json import JSONSnapshotExtension
 
 from hub_api import enums, main
 from hub_api.helpers import compatibility, etag
+
+if TYPE_CHECKING:
+    from syrupy.assertion import SnapshotAssertion
 
 
 @pytest.fixture(scope="session")
@@ -53,6 +58,7 @@ async def test_plugin_details(
     plugin: str,
     plugin_type: enums.PluginTypeEnum,
     variant: str,
+    snapshot: SnapshotAssertion,
 ) -> None:
     """Test /meltano/api/v1/plugins/extractors/<plugin>--<variant>."""
     path = f"/meltano/api/v1/plugins/{plugin_type}/{plugin}--{variant}"
@@ -61,6 +67,9 @@ async def test_plugin_details(
 
     details = response.json()
     assert details["name"] == plugin
+
+    snapshot_json = snapshot.with_defaults(extension_class=JSONSnapshotExtension)
+    assert snapshot_json(name=plugin) == details
 
 
 @pytest.mark.parametrize(
