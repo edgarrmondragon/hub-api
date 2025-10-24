@@ -24,7 +24,7 @@ from hub_api.schemas import meltano, validation
 if TYPE_CHECKING:
     from collections.abc import Generator, Sequence
 
-    import pydantic_core
+    from pydantic_core import ErrorDetails
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
@@ -35,7 +35,7 @@ sqlite3.register_adapter(dict, json.dumps)
 
 def download_meltano_hub_archive(*, ref: str = "main", use_cache: bool = True) -> Path:
     """Download Meltano Hub archive."""
-    cached_tree = Path(platformdirs.user_cache_dir()) / "hub-api"
+    cached_tree = platformdirs.user_cache_path("hub-api")
     if use_cache and cached_tree.exists():
         logger.info("Using cached directory %s", cached_tree)
 
@@ -69,28 +69,20 @@ def load_yaml(path: Path) -> dict[str, dict[str, str]]:
         return yaml.safe_load(f)  # type: ignore[no-any-return]
 
 
-def get_plugin_variants(
-    plugin_path: Path,
-) -> Generator[tuple[str, dict[str, Any]]]:
+def get_plugin_variants(plugin_path: Path) -> Generator[tuple[str, dict[str, Any]]]:
     """Get plugin variants of a given type."""
     for plugin_file in plugin_path.glob("*.yml"):
         with plugin_file.open() as f:
             yield plugin_file.stem, yaml.safe_load(f)
 
 
-def get_plugins_of_type(
-    base_path: Path,
-    plugin_type: enums.PluginTypeEnum,
-) -> Generator[tuple[str, dict[str, Any]]]:
+def get_plugins_of_type(base_path: Path, plugin_type: enums.PluginTypeEnum) -> Generator[tuple[str, dict[str, Any]]]:
     """Get plugins of a given type."""
     for plugin_path in base_path.joinpath(plugin_type).glob("*"):
         yield from get_plugin_variants(plugin_path)
 
 
-def _build_setting(
-    variant_id: str,
-    setting: meltano.PluginSetting,
-) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+def _build_setting(variant_id: str, setting: meltano.PluginSetting) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     """Build setting object."""
     setting_id = f"{variant_id}.setting_{setting.root.name}"
     setting_data: dict[str, Any] = {
@@ -133,7 +125,7 @@ class LoadError:
     plugin_name: str
     variant: str
     link: str
-    error: pydantic_core.ErrorDetails
+    error: ErrorDetails
 
 
 @dataclasses.dataclass
@@ -344,10 +336,7 @@ def _insert_variant(  # noqa: C901, PLR0912, PLR0913
         _insert_row(connection, "commands", command_details)
 
 
-def load_db(
-    path: Path,
-    connection: sqlite3.Connection,
-) -> LoadResult:
+def load_db(path: Path, connection: sqlite3.Connection) -> LoadResult:
     """Load database."""
     result = LoadResult(errors=[])
     default_variants = load_yaml(path.joinpath("default_variants.yml"))
