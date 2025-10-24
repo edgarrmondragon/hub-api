@@ -34,6 +34,7 @@ tests = [
     "pytest>=8.3.2",
     "pytest-asyncio>=1.1.0a1",
     "pytest-github-actions-annotate-failures>=0.3.0",
+    "syrupy>=5.0.0",
 ]
 typing = [
     { include-group = "build" },
