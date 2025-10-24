@@ -39,6 +39,7 @@ repos:
     rev: v1.39.0
     hooks:
     -   id: typos
+        exclude: ^tests/app/__snapshots__/.*$
 
 -   repo: https://github.com/python-jsonschema/check-jsonschema
     rev: 0.34.1
