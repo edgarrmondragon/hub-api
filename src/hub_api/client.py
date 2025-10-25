@@ -164,6 +164,30 @@ class MeltanoHub:
             case _:  # pragma: no cover
                 assert_never(variant.plugin.plugin_type)
 
+    async def find_plugin(
+        self,
+        *,
+        plugin_name: str,
+        plugin_type: enums.PluginTypeEnum | None = None,
+        variant_name: str | None = None,
+    ) -> api_schemas.PluginDetails:
+        conditions: list[sa.ColumnElement[bool]] = [models.Plugin.name == plugin_name]
+        if plugin_type is not None:
+            conditions.append(models.Plugin.plugin_type == plugin_type)
+        if variant_name is not None:
+            conditions.append(models.PluginVariant.name == variant_name)
+        else:
+            conditions.append(models.PluginVariant.id == models.Plugin.default_variant_id)
+
+        q = sa.select(models.PluginVariant).join(models.Plugin, sa.and_(*conditions))
+
+        # TODO: Handle ambiguity:
+        # - Plugins of different type with the same name
+        if variant := (await self.db.execute(q)).scalar():
+            return await self._variant_details(variant)
+
+        raise PluginNotFoundError(plugin_name=plugin_name, plugin_type=plugin_type, variant_name=variant_name)
+
     async def get_plugin_details(
         self,
         variant_id: ids.VariantID,
@@ -203,7 +227,7 @@ class MeltanoHub:
             .where(models.PluginVariant.plugin_id == plugin_id.as_db_id())
         )
         if result := (await self.db.execute(q)).first():
-            plugin, variant = result
+            plugin, variant = result._tuple()  # noqa: SLF001
             return _build_variant_path(
                 plugin_type=plugin.plugin_type,
                 plugin_name=plugin.name,

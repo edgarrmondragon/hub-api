@@ -83,6 +83,41 @@ async def get_type_index(hub: dependencies.Hub, plugin_type: PluginTypeParam) ->
     return await hub.get_plugin_type_index(plugin_type=plugin_type)
 
 
+class FindParams(BaseModel):
+    name: str = Field(
+        description="The plugin name",
+        examples=["tap-github"],
+    )
+
+    type: enums.PluginTypeEnum = Field(  # type: ignore[assignment]
+        None,
+        description="The plugin type",
+        examples=[enums.PluginTypeEnum.extractors],
+    )
+
+    variant: str = Field(  # type: ignore[assignment]
+        None,
+        description="The optional variant name",
+        examples=["meltanolabs"],
+    )
+
+
+@router.get(
+    "/search",
+    summary="Find a plugin",
+    responses={
+        400: {"description": "Not a valid plugin type"},
+        404: {"description": "Plugin not found"},
+    },
+    operation_id="get_plugin",
+)
+async def find_plugin(
+    hub: dependencies.Hub,
+    params: Annotated[FindParams, fastapi.Query()],
+) -> api_schemas.PluginDetails:
+    return await hub.find_plugin(plugin_name=params.name, plugin_type=params.type, variant_name=params.variant)
+
+
 @router.get(
     "/{plugin_type}/{plugin_name}/default",
     summary="Get the default plugin variant",
