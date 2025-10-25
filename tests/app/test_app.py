@@ -65,6 +65,55 @@ async def test_plugin_type_index(base_url: str, api: httpx.AsyncClient) -> None:
 
 
 @pytest.mark.asyncio
+async def test_plugin_search(api: httpx.AsyncClient) -> None:
+    """Test /meltano/api/v1/plugins/search."""
+    response = await api.get("/meltano/api/v1/plugins/search")
+    assert response.status_code == http.HTTPStatus.UNPROCESSABLE_ENTITY
+    assert response.json() == {
+        "detail": [
+            {
+                "type": "missing",
+                "loc": ["query", "name"],
+                "msg": "Field required",
+                "input": {},
+            },
+        ]
+    }
+
+    response = await api.get(
+        "/meltano/api/v1/plugins/search",
+        params={"name": "tap-github"},
+        follow_redirects=True,
+    )
+    assert response.status_code == http.HTTPStatus.OK
+    assert response.json()["name"] == "tap-github"
+
+    response = await api.get(
+        "/meltano/api/v1/plugins/search",
+        params={"name": "tap-unknown"},
+        follow_redirects=True,
+    )
+    assert response.status_code == http.HTTPStatus.NOT_FOUND
+    assert response.json() == {"detail": "Plugin 'tap-unknown' was not found"}
+
+    response = await api.get(
+        "/meltano/api/v1/plugins/search",
+        params={"name": "tap-github", "variant": "unknown"},
+        follow_redirects=True,
+    )
+    assert response.status_code == http.HTTPStatus.NOT_FOUND
+    assert response.json() == {"detail": "Variant 'unknown' of 'tap-github' was not found"}
+
+    response = await api.get(
+        "/meltano/api/v1/plugins/search",
+        params={"name": "tap-github", "type": "loaders"},
+        follow_redirects=True,
+    )
+    assert response.status_code == http.HTTPStatus.NOT_FOUND
+    assert response.json() == {"detail": "Plugin 'tap-github' was not found in loaders"}
+
+
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
     ("plugin", "plugin_type", "variant"),
     [

@@ -4939,6 +4939,98 @@
         ]
       }
     },
+    "/meltano/api/v1/plugins/search": {
+      "get": {
+        "operationId": "get_plugin",
+        "parameters": [
+          {
+            "description": "The plugin name",
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "The plugin name",
+              "examples": [
+                "tap-github"
+              ],
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The plugin type",
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PluginTypeEnum",
+              "description": "The plugin type",
+              "examples": [
+                "extractors"
+              ]
+            }
+          },
+          {
+            "description": "The optional variant name",
+            "in": "query",
+            "name": "variant",
+            "required": false,
+            "schema": {
+              "description": "The optional variant name",
+              "examples": [
+                "meltanolabs"
+              ],
+              "title": "Variant",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The `If-None-Match` HTTP request header makes the request conditional.\nFor `GET` and `HEAD` methods, the server will return the requested resource, with a `200` status, only if it doesn't have an `ETag` matching the given ones.\nFor other methods, the request will be processed only if the eventually existing resource's `ETag` doesn't match any of the values listed.\n\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match\n",
+            "in": "header",
+            "name": "if-none-match",
+            "required": false,
+            "schema": {
+              "description": "The `If-None-Match` HTTP request header makes the request conditional.\nFor `GET` and `HEAD` methods, the server will return the requested resource, with a `200` status, only if it doesn't have an `ETag` matching the given ones.\nFor other methods, the request will be processed only if the eventually existing resource's `ETag` doesn't match any of the values listed.\n\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match\n",
+              "pattern": "^\"etag-[A-Za-z0-9-]+\"$",
+              "title": "If-None-Match",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PluginDetails"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "description": "Not a valid plugin type"
+          },
+          "404": {
+            "description": "Plugin not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Find a plugin",
+        "tags": [
+          "plugins"
+        ]
+      }
+    },
     "/meltano/api/v1/plugins/stats": {
       "get": {
         "description": "Retrieve Hub plugin statistics.",

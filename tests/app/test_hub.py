@@ -55,6 +55,48 @@ def test_variant_id_invalid_type() -> None:
 
 
 @pytest.mark.asyncio
+async def test_find_plugin(hub: client.MeltanoHub) -> None:
+    response = await hub.find_plugin(plugin_name="tap-github")
+    assert isinstance(response, api_schemas.ExtractorResponse)
+
+
+@pytest.mark.asyncio
+async def test_find_plugin_name_not_found(hub: client.MeltanoHub) -> None:
+    with pytest.raises(client.PluginNotFoundError, match=r"Plugin 'tap-unknown' was not found"):
+        await hub.find_plugin(plugin_name="tap-unknown")
+
+
+@pytest.mark.asyncio
+async def test_find_plugin_of_type_not_found(hub: client.MeltanoHub) -> None:
+    with pytest.raises(client.PluginNotFoundError, match=r"Plugin 'tap-github' was not found in loaders"):
+        await hub.find_plugin(plugin_name="tap-github", plugin_type=enums.PluginTypeEnum.loaders)
+
+
+@pytest.mark.asyncio
+async def test_find_plugin_variant_not_found(hub: client.MeltanoHub) -> None:
+    with pytest.raises(client.PluginNotFoundError, match=r"Variant 'acme' of 'tap-github' was not found"):
+        await hub.find_plugin(plugin_name="tap-github", variant_name="acme")
+
+
+@pytest.mark.asyncio
+async def test_find_plugin_of_multiple_types(hub: client.MeltanoHub) -> None:
+    airflow_utility = await hub.find_plugin(plugin_name="airflow", plugin_type=enums.PluginTypeEnum.utilities)
+    assert isinstance(airflow_utility, api_schemas.UtilityResponse)
+
+    airflow_orchestrator = await hub.find_plugin(plugin_name="airflow", plugin_type=enums.PluginTypeEnum.orchestrators)
+    assert isinstance(airflow_orchestrator, api_schemas.OrchestratorResponse)
+
+
+@pytest.mark.asyncio
+async def test_find_plugin_ambiguous(hub: client.MeltanoHub) -> None:
+    with pytest.raises(
+        client.PluginAmbiguityError,
+        match=r"More than one plugin found for the given criteria: airflow \(utilities\), airflow \(orchestrators\)",
+    ):
+        await hub.find_plugin(plugin_name="airflow")
+
+
+@pytest.mark.asyncio
 async def test_get_plugin_index(hub: client.MeltanoHub) -> None:
     """Test get_plugin_index."""
     plugins = await hub.get_plugin_index()

@@ -47,14 +47,27 @@ class PluginNotFoundError(exceptions.NotFoundError):
         self,
         *,
         plugin_name: str,
-        plugin_type: enums.PluginTypeEnum,
+        plugin_type: enums.PluginTypeEnum | None = None,
         variant_name: str | None = None,
     ) -> None:
-        if variant_name is not None:
-            msg = f"Variant '{variant_name}' of '{plugin_name}' not found in {plugin_type}"
+        if variant_name is not None and plugin_type is not None:
+            msg = f"Variant '{variant_name}' of '{plugin_name}' was not found in {plugin_type}"
+        elif variant_name is not None:
+            msg = f"Variant '{variant_name}' of '{plugin_name}' was not found"
+        elif plugin_type is not None:
+            msg = f"Plugin '{plugin_name}' was not found in {plugin_type}"
         else:
-            msg = f"No plugin '{plugin_name}' found in {plugin_type}"
+            msg = f"Plugin '{plugin_name}' was not found"
         super().__init__(msg)
+
+
+class PluginAmbiguityError(exceptions.BadParameterError):
+    """Plugin ambiguity error."""
+
+    def __init__(self, *, plugins: list[dict[str, Any]]) -> None:
+        self.plugins = plugins
+        plugin_names = [f"{p['name']} ({p['plugin_type']})" for p in plugins]
+        super().__init__(f"More than one plugin found for the given criteria: {', '.join(plugin_names)}")
 
 
 class MaintainerNotFoundError(exceptions.NotFoundError):
@@ -238,6 +251,56 @@ class MeltanoHub:
                 return api_schemas.FileResponse.model_validate(result)
             case _:  # pragma: no cover
                 assert_never(plugin_type)
+
+    async def find_plugin(
+        self,
+        *,
+        plugin_name: str,
+        plugin_type: enums.PluginTypeEnum | None = None,
+        variant_name: str | None = None,
+    ) -> api_schemas.PluginDetails:
+        """Find a plugin by name with optional type and variant filters.
+
+        Args:
+            plugin_name: Plugin name to search for.
+            plugin_type: Optional plugin type filter.
+            variant_name: Optional variant name filter. If not provided, uses default variant.
+
+        Returns:
+            Plugin details.
+
+        Raises:
+            PluginNotFoundError: If plugin not found.
+        """
+        sql = """
+            SELECT
+                pv.id,
+                p.plugin_type,
+                p.name
+            FROM plugin_variants pv
+            JOIN plugins p ON p.id = pv.plugin_id
+            WHERE p.name = :plugin_name
+        """
+        params: dict[str, Any] = {"plugin_name": plugin_name}
+
+        if plugin_type is not None:
+            sql += " AND p.plugin_type = :plugin_type"
+            params["plugin_type"] = plugin_type.value
+
+        if variant_name is not None:
+            sql += " AND pv.name = :variant_name"
+            params["variant_name"] = variant_name
+        else:
+            sql += " AND pv.id = p.default_variant_id"
+
+        results = await fetch_all_dicts(self.db, sql, params)
+        if len(results) == 1:
+            return await self._variant_details(results[0]["id"])
+
+        if len(results) > 1:
+            raise PluginAmbiguityError(plugins=results)
+
+        raise PluginNotFoundError(plugin_name=plugin_name, plugin_type=plugin_type, variant_name=variant_name)
 
     async def get_plugin_details(
         self,
