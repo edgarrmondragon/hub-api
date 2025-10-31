@@ -23,15 +23,20 @@ BASE_HUB_URL = "https://hub.meltano.com"
 class PluginNotFoundError(exceptions.NotFoundError):
     """Plugin not found error."""
 
-    def __init__(self, *, plugin_id: ids.PluginID) -> None:
-        super().__init__(f"Plugin '{plugin_id.plugin_name}' not found")
-
-
-class PluginVariantNotFoundError(exceptions.NotFoundError):
-    """Plugin variant not found error."""
-
-    def __init__(self, *, variant_id: ids.VariantID) -> None:
-        super().__init__(f"Variant '{variant_id.plugin_variant}' of '{variant_id.plugin_name}' not found")
+    def __init__(
+        self,
+        *,
+        plugin_name: str,
+        plugin_type: enums.PluginTypeEnum | None = None,
+        variant_name: str | None = None,
+    ) -> None:
+        if variant_name is not None:
+            msg = f"Variant '{variant_name}' of '{plugin_name}' not found"
+        elif plugin_type is not None:
+            msg = f"No plugin '{plugin_name}' found in {plugin_type}"
+        else:
+            msg = f"Plugin '{plugin_name}' not found"
+        super().__init__(msg)
 
 
 class MaintainerNotFoundError(exceptions.NotFoundError):
@@ -167,7 +172,11 @@ class MeltanoHub:
         variant = await self.db.get(models.PluginVariant, variant_id.as_db_id())
 
         if not variant:
-            raise PluginVariantNotFoundError(variant_id=variant_id)
+            raise PluginNotFoundError(
+                plugin_name=variant_id.plugin_name,
+                plugin_type=variant_id.plugin_type,
+                variant_name=variant_id.plugin_variant,
+            )
 
         details = await self._variant_details(variant)
 
@@ -200,7 +209,7 @@ class MeltanoHub:
                 plugin_variant=variant,
             )
 
-        raise PluginNotFoundError(plugin_id=plugin_id)
+        raise PluginNotFoundError(plugin_name=plugin_id.plugin_name, plugin_type=plugin_id.plugin_type)
 
     async def _get_all_plugins(
         self: MeltanoHub,

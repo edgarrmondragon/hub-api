@@ -111,7 +111,7 @@ async def test_get_plugin_details(
 @pytest.mark.asyncio
 async def test_get_plugin_variant_not_found(hub: client.MeltanoHub) -> None:
     """Test get_plugin_details."""
-    with pytest.raises(client.PluginVariantNotFoundError):
+    with pytest.raises(client.PluginNotFoundError):
         await hub.get_plugin_details(
             variant_id=ids.VariantID.from_params(
                 plugin_type="extractors",
