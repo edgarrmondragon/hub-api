@@ -33,7 +33,7 @@ Built with:
 4. Run Meltano as usual.
 
     ```bash
-    meltano add extractor tap-github
+    meltano add tap-github
     meltano lock --update
     ```
 
