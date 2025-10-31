@@ -114,16 +114,7 @@ async def get_plugin_variant(
     plugin_name: PluginNameParam,
     plugin_variant: PluginVariantParam,
     meltano_version: MeltanoVersion,
-) -> (
-    api_schemas.ExtractorResponse
-    | api_schemas.LoaderResponse
-    | api_schemas.UtilityResponse
-    | api_schemas.OrchestratorResponse
-    | api_schemas.TransformResponse
-    | api_schemas.TransformerResponse
-    | api_schemas.MapperResponse
-    | api_schemas.FileResponse
-):
+) -> api_schemas.PluginDetails:
     """Retrieve details of a plugin variant."""
     variant_id = ids.VariantID.from_params(
         plugin_type=plugin_type,
