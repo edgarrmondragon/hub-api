@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, assert_never
 import pydantic
 import sqlalchemy as sa
 from sqlalchemy.orm import aliased
+from starlette.datastructures import URL
 
 from hub_api import enums, exceptions, ids, models
 from hub_api.helpers import compatibility
@@ -51,6 +52,7 @@ def _build_variant_path(
     plugin_type: enums.PluginTypeEnum,
     plugin_name: str,
     plugin_variant: str,
+    base_url: URL,
 ) -> str:
     """Build variant URL.
 
@@ -63,7 +65,7 @@ def _build_variant_path(
     Returns:
         Variant URL.
     """
-    prefix = "/meltano/api/v1/plugins"
+    prefix = f"{base_url}meltano/api/v1/plugins"
     return f"{prefix}/{plugin_type.value}/{plugin_name}--{plugin_variant}"
 
 
@@ -106,9 +108,11 @@ class MeltanoHub:
         self: MeltanoHub,
         *,
         db: AsyncSession,
+        base_url: URL | None = None,
         base_hub_url: str = BASE_HUB_URL,
     ) -> None:
         self.db: AsyncSession = db
+        self.base_url = base_url or URL("http://localhost:8000")
         self.base_hub_url: str = base_hub_url
 
     async def _variant_details(  # noqa: PLR0911
@@ -208,6 +212,7 @@ class MeltanoHub:
                 plugin_type=plugin.plugin_type,
                 plugin_name=plugin.name,
                 plugin_variant=variant,
+                base_url=self.base_url,
             )
 
         raise PluginNotFoundError(plugin_name=plugin_id.plugin_name, plugin_type=plugin_id.plugin_type)
@@ -263,6 +268,7 @@ class MeltanoHub:
                     plugin_type=plugin_type,
                     plugin_name=plugin_name,
                     plugin_variant=variant_name,
+                    base_url=self.base_url,
                 ),
             )
 
@@ -305,6 +311,7 @@ class MeltanoHub:
                     plugin_type=plugin_type,
                     plugin_name=plugin_name,
                     plugin_variant=variant_name,
+                    base_url=self.base_url,
                 ),
             )
 
@@ -355,6 +362,7 @@ class MeltanoHub:
                     plugin_type=ptype,
                     plugin_name=pname,
                     plugin_variant=vname,
+                    base_url=self.base_url,
                 ),
             )
             for pname, ptype, vname in result.all()
@@ -409,6 +417,7 @@ class MeltanoHub:
                     plugin_type=v.plugin.plugin_type,
                     plugin_name=v.plugin.name,
                     plugin_variant=v.name,
+                    base_url=self.base_url,
                 )
                 for v in variants
             },

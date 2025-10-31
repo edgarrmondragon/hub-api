@@ -4630,7 +4630,7 @@
   "info": {
     "description": "The Meltano Hub API provides access to Meltano's plugin registry. It allows you to search for plugins, view their details, and download the necessary files to install them.\n\n- The API is versioned, with the current version being v1.\n- The API is read-only, and no authentication is required.\n",
     "title": "Meltano Hub API",
-    "version": "0.0.0.dev429+g849367e60.d20251031"
+    "version": "0.1.0"
   },
   "openapi": "3.1.0",
   "paths": {

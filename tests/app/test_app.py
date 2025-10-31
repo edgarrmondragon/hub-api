@@ -4,11 +4,12 @@ from __future__ import annotations
 
 import http
 import unittest.mock
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import fastapi
 import httpx
 import pytest
+from faker import Faker
 from starlette.datastructures import Headers
 from starlette.requests import Request
 from syrupy.extensions.json import JSONSnapshotExtension
@@ -21,25 +22,46 @@ if TYPE_CHECKING:
 
 
 @pytest.fixture(scope="session")
-def api() -> httpx.AsyncClient:
+def base_url() -> str:
+    """The base URL for the test server."""
+    faker = Faker()
+    return f"http://{faker.hostname()}"
+
+
+@pytest.fixture(scope="session")
+def api(base_url: str) -> httpx.AsyncClient:
     """Create app."""
-    return httpx.AsyncClient(base_url="http://test", transport=httpx.ASGITransport(app=main.app))
+    return httpx.AsyncClient(base_url=base_url, transport=httpx.ASGITransport(app=main.app))
 
 
 @pytest.mark.asyncio
-async def test_plugin_index(api: httpx.AsyncClient) -> None:
+async def test_plugin_index(base_url: str, api: httpx.AsyncClient) -> None:
     """Test /meltano/api/v1/plugins/extractors/index."""
     response = await api.get("/meltano/api/v1/plugins/index")
     assert response.status_code == http.HTTPStatus.OK
     assert response.json()
 
+    data: dict[str, Any] = response.json()
+    plugin_type_info = next(iter(data.values()))
+    plugin_info = next(iter(plugin_type_info.values()))
+
+    default_variant_name = plugin_info["default_variant"]
+    default_variant = plugin_info["variants"][default_variant_name]
+    assert default_variant["ref"].startswith(base_url)
+
 
 @pytest.mark.asyncio
-async def test_plugin_type_index(api: httpx.AsyncClient) -> None:
+async def test_plugin_type_index(base_url: str, api: httpx.AsyncClient) -> None:
     """Test /meltano/api/v1/plugins/extractors/index."""
     response = await api.get("/meltano/api/v1/plugins/extractors/index")
     assert response.status_code == http.HTTPStatus.OK
-    assert response.json()
+
+    data: dict[str, Any] = response.json()
+    plugin_info = next(iter(data.values()))
+
+    default_variant_name = plugin_info["default_variant"]
+    default_variant = plugin_info["variants"][default_variant_name]
+    assert default_variant["ref"].startswith(base_url)
 
 
 @pytest.mark.asyncio
