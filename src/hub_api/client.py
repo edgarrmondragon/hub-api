@@ -108,16 +108,7 @@ class MeltanoHub:
 
     async def _variant_details(  # noqa: PLR0911
         self: MeltanoHub, variant: models.PluginVariant
-    ) -> (
-        api_schemas.ExtractorResponse
-        | api_schemas.LoaderResponse
-        | api_schemas.UtilityResponse
-        | api_schemas.OrchestratorResponse
-        | api_schemas.TransformResponse
-        | api_schemas.TransformerResponse
-        | api_schemas.MapperResponse
-        | api_schemas.FileResponse
-    ):
+    ) -> api_schemas.PluginDetails:
         settings: list[models.Setting] = await variant.awaitable_attrs.settings
 
         result: dict[str, Any] = {
@@ -172,16 +163,7 @@ class MeltanoHub:
         variant_id: ids.VariantID,
         *,
         meltano_version: compatibility.VersionTuple = compatibility.LATEST,
-    ) -> (
-        api_schemas.ExtractorResponse
-        | api_schemas.LoaderResponse
-        | api_schemas.UtilityResponse
-        | api_schemas.OrchestratorResponse
-        | api_schemas.TransformResponse
-        | api_schemas.TransformerResponse
-        | api_schemas.MapperResponse
-        | api_schemas.FileResponse
-    ):
+    ) -> api_schemas.PluginDetails:
         variant = await self.db.get(models.PluginVariant, variant_id.as_db_id())
 
         if not variant:

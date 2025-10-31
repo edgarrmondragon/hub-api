@@ -124,6 +124,18 @@ class FileResponse(PluginResponse, meltano.File):
     """File response model."""
 
 
+type PluginDetails = (
+    ExtractorResponse
+    | LoaderResponse
+    | UtilityResponse
+    | OrchestratorResponse
+    | TransformResponse
+    | TransformerResponse
+    | MapperResponse
+    | FileResponse
+)
+
+
 class PluginListElement(VariantReference):
     """Plugin list element model."""
 
