@@ -1,0 +1,5329 @@
+{
+  "components": {
+    "schemas": {
+      "ArraySetting": {
+        "description": "Array setting model.",
+        "properties": {
+          "aliases": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aliases"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting description.",
+            "examples": [
+              "The API token."
+            ],
+            "title": "Description"
+          },
+          "documentation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A URL to the documentation for this setting.",
+            "examples": [
+              "https://example.com/docs"
+            ],
+            "title": "Documentation"
+          },
+          "env": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The environment variable name.",
+            "title": "Env"
+          },
+          "kind": {
+            "const": "array",
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting label.",
+            "examples": [
+              "API Token"
+            ],
+            "title": "Label"
+          },
+          "name": {
+            "description": "The setting name.",
+            "example": "token",
+            "title": "Name",
+            "type": "string"
+          },
+          "placeholder": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting placeholder.",
+            "examples": [
+              "my-api-token"
+            ],
+            "title": "Placeholder"
+          },
+          "sensitive": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the setting is sensitive.",
+            "title": "Sensitive"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting value.",
+            "title": "Value"
+          }
+        },
+        "required": [
+          "name",
+          "kind"
+        ],
+        "title": "ArraySetting",
+        "type": "object"
+      },
+      "BooleanSetting": {
+        "description": "Boolean setting model.",
+        "properties": {
+          "aliases": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aliases"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting description.",
+            "examples": [
+              "The API token."
+            ],
+            "title": "Description"
+          },
+          "documentation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A URL to the documentation for this setting.",
+            "examples": [
+              "https://example.com/docs"
+            ],
+            "title": "Documentation"
+          },
+          "env": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The environment variable name.",
+            "title": "Env"
+          },
+          "kind": {
+            "const": "boolean",
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting label.",
+            "examples": [
+              "API Token"
+            ],
+            "title": "Label"
+          },
+          "name": {
+            "description": "The setting name.",
+            "example": "token",
+            "title": "Name",
+            "type": "string"
+          },
+          "placeholder": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting placeholder.",
+            "examples": [
+              "my-api-token"
+            ],
+            "title": "Placeholder"
+          },
+          "sensitive": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the setting is sensitive.",
+            "title": "Sensitive"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting value.",
+            "title": "Value"
+          }
+        },
+        "required": [
+          "name",
+          "kind"
+        ],
+        "title": "BooleanSetting",
+        "type": "object"
+      },
+      "Command": {
+        "description": "Command model.",
+        "properties": {
+          "args": {
+            "description": "Command arguments",
+            "title": "Args",
+            "type": "string"
+          },
+          "container_spec": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Container specification for this command",
+            "title": "Container Spec"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Documentation displayed when listing commands",
+            "title": "Description"
+          },
+          "executable": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Override the plugin's executable for this command",
+            "title": "Executable"
+          }
+        },
+        "required": [
+          "args"
+        ],
+        "title": "Command",
+        "type": "object"
+      },
+      "DateIso8601Setting": {
+        "description": "Date ISO8601 setting model.",
+        "properties": {
+          "aliases": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aliases"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting description.",
+            "examples": [
+              "The API token."
+            ],
+            "title": "Description"
+          },
+          "documentation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A URL to the documentation for this setting.",
+            "examples": [
+              "https://example.com/docs"
+            ],
+            "title": "Documentation"
+          },
+          "env": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The environment variable name.",
+            "title": "Env"
+          },
+          "kind": {
+            "const": "date_iso8601",
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting label.",
+            "examples": [
+              "API Token"
+            ],
+            "title": "Label"
+          },
+          "name": {
+            "description": "The setting name.",
+            "example": "token",
+            "title": "Name",
+            "type": "string"
+          },
+          "placeholder": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting placeholder.",
+            "examples": [
+              "my-api-token"
+            ],
+            "title": "Placeholder"
+          },
+          "sensitive": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the setting is sensitive.",
+            "title": "Sensitive"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting value.",
+            "title": "Value"
+          }
+        },
+        "required": [
+          "name",
+          "kind"
+        ],
+        "title": "DateIso8601Setting",
+        "type": "object"
+      },
+      "DecimalSetting": {
+        "description": "Decimal setting model.\n\nOnly available in Meltano 3.9 and later.",
+        "properties": {
+          "aliases": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aliases"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting description.",
+            "examples": [
+              "The API token."
+            ],
+            "title": "Description"
+          },
+          "documentation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A URL to the documentation for this setting.",
+            "examples": [
+              "https://example.com/docs"
+            ],
+            "title": "Documentation"
+          },
+          "env": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The environment variable name.",
+            "title": "Env"
+          },
+          "kind": {
+            "const": "decimal",
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting label.",
+            "examples": [
+              "API Token"
+            ],
+            "title": "Label"
+          },
+          "name": {
+            "description": "The setting name.",
+            "example": "token",
+            "title": "Name",
+            "type": "string"
+          },
+          "placeholder": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting placeholder.",
+            "examples": [
+              "my-api-token"
+            ],
+            "title": "Placeholder"
+          },
+          "sensitive": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the setting is sensitive.",
+            "title": "Sensitive"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting value.",
+            "title": "Value"
+          }
+        },
+        "required": [
+          "name",
+          "kind"
+        ],
+        "title": "DecimalSetting",
+        "type": "object"
+      },
+      "EmailSetting": {
+        "description": "Email setting model.",
+        "properties": {
+          "aliases": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aliases"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting description.",
+            "examples": [
+              "The API token."
+            ],
+            "title": "Description"
+          },
+          "documentation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A URL to the documentation for this setting.",
+            "examples": [
+              "https://example.com/docs"
+            ],
+            "title": "Documentation"
+          },
+          "env": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The environment variable name.",
+            "title": "Env"
+          },
+          "kind": {
+            "const": "email",
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting label.",
+            "examples": [
+              "API Token"
+            ],
+            "title": "Label"
+          },
+          "name": {
+            "description": "The setting name.",
+            "example": "token",
+            "title": "Name",
+            "type": "string"
+          },
+          "placeholder": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting placeholder.",
+            "examples": [
+              "my-api-token"
+            ],
+            "title": "Placeholder"
+          },
+          "sensitive": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the setting is sensitive.",
+            "title": "Sensitive"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting value.",
+            "title": "Value"
+          }
+        },
+        "required": [
+          "name",
+          "kind"
+        ],
+        "title": "EmailSetting",
+        "type": "object"
+      },
+      "ExtractorCapabilityEnum": {
+        "description": "Extractor capabilities.",
+        "enum": [
+          "properties",
+          "catalog",
+          "discover",
+          "state",
+          "about",
+          "stream-maps",
+          "schema-flattening",
+          "activate-version",
+          "batch",
+          "test",
+          "log-based",
+          "structured-logging"
+        ],
+        "title": "ExtractorCapabilityEnum",
+        "type": "string"
+      },
+      "ExtractorResponse": {
+        "additionalProperties": false,
+        "description": "Extractor response model.",
+        "properties": {
+          "capabilities": {
+            "items": {
+              "$ref": "#/components/schemas/ExtractorCapabilityEnum"
+            },
+            "title": "Capabilities",
+            "type": "array"
+          },
+          "commands": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/components/schemas/Command"
+                }
+              ]
+            },
+            "description": "An object containing commands to be run by the plugin, the keys are the name of the command and the values are the arguments to be passed to the plugin executable.",
+            "title": "Commands",
+            "type": "object"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The plugin description",
+            "examples": [
+              "A Singer tap for CSV files."
+            ],
+            "title": "Description"
+          },
+          "docs": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A URL to the documentation for this plugin",
+            "title": "Docs"
+          },
+          "documentation": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "URL to the plugin's documentation",
+            "title": "Documentation"
+          },
+          "executable": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The plugin's executable name, as defined in setup.py (if a Python based plugin)",
+            "examples": [
+              "tap-stripe",
+              "tap-covid-19"
+            ],
+            "title": "Executable"
+          },
+          "ext_repo": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The URL to the repository where the plugin extension code lives.",
+            "title": "Ext Repo"
+          },
+          "hidden": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the plugin should be shown when listing or not.",
+            "title": "Hidden"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The plugin label",
+            "examples": [
+              "CSV Tap"
+            ],
+            "title": "Label"
+          },
+          "logo_url": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "URL to the plugin's logo",
+            "title": "Logo Url"
+          },
+          "metadata": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metadata"
+          },
+          "name": {
+            "description": "The plugin name",
+            "examples": [
+              "tap-csv"
+            ],
+            "maxLength": 63,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9-_]+$",
+            "title": "Name",
+            "type": "string"
+          },
+          "namespace": {
+            "title": "Namespace",
+            "type": "string"
+          },
+          "pip_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A string containing the command line arguments to pass to `pip install`. See https://pip.pypa.io/en/stable/cli/pip_install/#usage for more information.",
+            "examples": [
+              "git+https://github.com/singer-io/tap-github.git",
+              "pipelinewise-tap-mysql",
+              "-e path/to/local/tap"
+            ],
+            "title": "Pip URL"
+          },
+          "python": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The python version to use for this plugin, specified as a path, or as the name of an executable to find within a directory in $PATH. If not specified, the top-level `python` setting will be used, or if it is not set, the python executable that was used to run Meltano will be used (within a separate virtual environment).",
+            "examples": [
+              "/usr/bin/python3.10",
+              "python",
+              "python3.11"
+            ],
+            "title": "Python"
+          },
+          "repo": {
+            "description": "The plugin repository",
+            "format": "uri",
+            "maxLength": 2083,
+            "minLength": 1,
+            "title": "Repo",
+            "type": "string"
+          },
+          "requires": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/PluginRequires"
+              },
+              "type": "array"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/PluginTypeEnum"
+            },
+            "title": "Requires",
+            "type": "object"
+          },
+          "schema": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schema"
+          },
+          "select": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Select"
+          },
+          "settings": {
+            "items": {
+              "$ref": "#/components/schemas/PluginSetting"
+            },
+            "title": "Settings",
+            "type": "array"
+          },
+          "settings_group_validation": {
+            "description": "A list of lists of setting names that must be set together.",
+            "items": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Settings Group Validation",
+            "type": "array"
+          },
+          "variant": {
+            "description": "The plugin variant",
+            "examples": [
+              "meltanolabs"
+            ],
+            "title": "Variant",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "namespace",
+          "variant",
+          "repo",
+          "capabilities"
+        ],
+        "title": "ExtractorResponse",
+        "type": "object"
+      },
+      "FileResponse": {
+        "additionalProperties": false,
+        "description": "File response model.",
+        "properties": {
+          "commands": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/components/schemas/Command"
+                }
+              ]
+            },
+            "description": "An object containing commands to be run by the plugin, the keys are the name of the command and the values are the arguments to be passed to the plugin executable.",
+            "title": "Commands",
+            "type": "object"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The plugin description",
+            "examples": [
+              "A Singer tap for CSV files."
+            ],
+            "title": "Description"
+          },
+          "docs": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A URL to the documentation for this plugin",
+            "title": "Docs"
+          },
+          "documentation": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "URL to the plugin's documentation",
+            "title": "Documentation"
+          },
+          "executable": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The plugin's executable name, as defined in setup.py (if a Python based plugin)",
+            "examples": [
+              "tap-stripe",
+              "tap-covid-19"
+            ],
+            "title": "Executable"
+          },
+          "ext_repo": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The URL to the repository where the plugin extension code lives.",
+            "title": "Ext Repo"
+          },
+          "hidden": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the plugin should be shown when listing or not.",
+            "title": "Hidden"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The plugin label",
+            "examples": [
+              "CSV Tap"
+            ],
+            "title": "Label"
+          },
+          "logo_url": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "URL to the plugin's logo",
+            "title": "Logo Url"
+          },
+          "name": {
+            "description": "The plugin name",
+            "examples": [
+              "tap-csv"
+            ],
+            "maxLength": 63,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9-_]+$",
+            "title": "Name",
+            "type": "string"
+          },
+          "namespace": {
+            "title": "Namespace",
+            "type": "string"
+          },
+          "pip_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A string containing the command line arguments to pass to `pip install`. See https://pip.pypa.io/en/stable/cli/pip_install/#usage for more information.",
+            "examples": [
+              "git+https://github.com/singer-io/tap-github.git",
+              "pipelinewise-tap-mysql",
+              "-e path/to/local/tap"
+            ],
+            "title": "Pip URL"
+          },
+          "python": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The python version to use for this plugin, specified as a path, or as the name of an executable to find within a directory in $PATH. If not specified, the top-level `python` setting will be used, or if it is not set, the python executable that was used to run Meltano will be used (within a separate virtual environment).",
+            "examples": [
+              "/usr/bin/python3.10",
+              "python",
+              "python3.11"
+            ],
+            "title": "Python"
+          },
+          "repo": {
+            "description": "The plugin repository",
+            "format": "uri",
+            "maxLength": 2083,
+            "minLength": 1,
+            "title": "Repo",
+            "type": "string"
+          },
+          "requires": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/PluginRequires"
+              },
+              "type": "array"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/PluginTypeEnum"
+            },
+            "title": "Requires",
+            "type": "object"
+          },
+          "settings": {
+            "items": {
+              "$ref": "#/components/schemas/PluginSetting"
+            },
+            "title": "Settings",
+            "type": "array"
+          },
+          "settings_group_validation": {
+            "description": "A list of lists of setting names that must be set together.",
+            "items": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Settings Group Validation",
+            "type": "array"
+          },
+          "update": {
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "title": "Update",
+            "type": "object"
+          },
+          "variant": {
+            "description": "The plugin variant",
+            "examples": [
+              "meltanolabs"
+            ],
+            "title": "Variant",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "namespace",
+          "variant",
+          "repo"
+        ],
+        "title": "FileResponse",
+        "type": "object"
+      },
+      "FileSetting": {
+        "description": "File setting model.",
+        "properties": {
+          "aliases": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aliases"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting description.",
+            "examples": [
+              "The API token."
+            ],
+            "title": "Description"
+          },
+          "documentation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A URL to the documentation for this setting.",
+            "examples": [
+              "https://example.com/docs"
+            ],
+            "title": "Documentation"
+          },
+          "env": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The environment variable name.",
+            "title": "Env"
+          },
+          "kind": {
+            "const": "file",
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting label.",
+            "examples": [
+              "API Token"
+            ],
+            "title": "Label"
+          },
+          "name": {
+            "description": "The setting name.",
+            "example": "token",
+            "title": "Name",
+            "type": "string"
+          },
+          "placeholder": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting placeholder.",
+            "examples": [
+              "my-api-token"
+            ],
+            "title": "Placeholder"
+          },
+          "sensitive": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the setting is sensitive.",
+            "title": "Sensitive"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting value.",
+            "title": "Value"
+          }
+        },
+        "required": [
+          "name",
+          "kind"
+        ],
+        "title": "FileSetting",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HiddenSetting": {
+        "description": "Hidden setting model.",
+        "properties": {
+          "aliases": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aliases"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting description.",
+            "examples": [
+              "The API token."
+            ],
+            "title": "Description"
+          },
+          "documentation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A URL to the documentation for this setting.",
+            "examples": [
+              "https://example.com/docs"
+            ],
+            "title": "Documentation"
+          },
+          "env": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The environment variable name.",
+            "title": "Env"
+          },
+          "kind": {
+            "const": "hidden",
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting label.",
+            "examples": [
+              "API Token"
+            ],
+            "title": "Label"
+          },
+          "name": {
+            "description": "The setting name.",
+            "example": "token",
+            "title": "Name",
+            "type": "string"
+          },
+          "placeholder": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting placeholder.",
+            "examples": [
+              "my-api-token"
+            ],
+            "title": "Placeholder"
+          },
+          "sensitive": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the setting is sensitive.",
+            "title": "Sensitive"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting value.",
+            "title": "Value"
+          }
+        },
+        "required": [
+          "name",
+          "kind"
+        ],
+        "title": "HiddenSetting",
+        "type": "object"
+      },
+      "IntegerSetting": {
+        "description": "Integer setting model.",
+        "properties": {
+          "aliases": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aliases"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting description.",
+            "examples": [
+              "The API token."
+            ],
+            "title": "Description"
+          },
+          "documentation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A URL to the documentation for this setting.",
+            "examples": [
+              "https://example.com/docs"
+            ],
+            "title": "Documentation"
+          },
+          "env": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The environment variable name.",
+            "title": "Env"
+          },
+          "kind": {
+            "const": "integer",
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting label.",
+            "examples": [
+              "API Token"
+            ],
+            "title": "Label"
+          },
+          "name": {
+            "description": "The setting name.",
+            "example": "token",
+            "title": "Name",
+            "type": "string"
+          },
+          "placeholder": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting placeholder.",
+            "examples": [
+              "my-api-token"
+            ],
+            "title": "Placeholder"
+          },
+          "sensitive": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the setting is sensitive.",
+            "title": "Sensitive"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting value.",
+            "title": "Value"
+          }
+        },
+        "required": [
+          "name",
+          "kind"
+        ],
+        "title": "IntegerSetting",
+        "type": "object"
+      },
+      "Links": {
+        "description": "Maintainer links.",
+        "properties": {
+          "details": {
+            "description": "Links to maintainer details",
+            "title": "Details",
+            "type": "string"
+          }
+        },
+        "required": [
+          "details"
+        ],
+        "title": "Links",
+        "type": "object"
+      },
+      "LoaderCapabilityEnum": {
+        "description": "Loader capabilities.",
+        "enum": [
+          "about",
+          "activate-version",
+          "datatype-failsafe",
+          "hard-delete",
+          "schema-flattening",
+          "soft-delete",
+          "stream-maps",
+          "validate-records",
+          "structured-logging"
+        ],
+        "title": "LoaderCapabilityEnum",
+        "type": "string"
+      },
+      "LoaderResponse": {
+        "additionalProperties": false,
+        "description": "Loader response model.",
+        "properties": {
+          "capabilities": {
+            "items": {
+              "$ref": "#/components/schemas/LoaderCapabilityEnum"
+            },
+            "title": "Capabilities",
+            "type": "array"
+          },
+          "commands": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/components/schemas/Command"
+                }
+              ]
+            },
+            "description": "An object containing commands to be run by the plugin, the keys are the name of the command and the values are the arguments to be passed to the plugin executable.",
+            "title": "Commands",
+            "type": "object"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The plugin description",
+            "examples": [
+              "A Singer tap for CSV files."
+            ],
+            "title": "Description"
+          },
+          "dialect": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The dialect for the loader",
+            "examples": [
+              "postgres"
+            ],
+            "title": "Dialect"
+          },
+          "docs": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A URL to the documentation for this plugin",
+            "title": "Docs"
+          },
+          "documentation": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "URL to the plugin's documentation",
+            "title": "Documentation"
+          },
+          "executable": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The plugin's executable name, as defined in setup.py (if a Python based plugin)",
+            "examples": [
+              "tap-stripe",
+              "tap-covid-19"
+            ],
+            "title": "Executable"
+          },
+          "ext_repo": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The URL to the repository where the plugin extension code lives.",
+            "title": "Ext Repo"
+          },
+          "hidden": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the plugin should be shown when listing or not.",
+            "title": "Hidden"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The plugin label",
+            "examples": [
+              "CSV Tap"
+            ],
+            "title": "Label"
+          },
+          "logo_url": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "URL to the plugin's logo",
+            "title": "Logo Url"
+          },
+          "name": {
+            "description": "The plugin name",
+            "examples": [
+              "tap-csv"
+            ],
+            "maxLength": 63,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9-_]+$",
+            "title": "Name",
+            "type": "string"
+          },
+          "namespace": {
+            "title": "Namespace",
+            "type": "string"
+          },
+          "pip_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A string containing the command line arguments to pass to `pip install`. See https://pip.pypa.io/en/stable/cli/pip_install/#usage for more information.",
+            "examples": [
+              "git+https://github.com/singer-io/tap-github.git",
+              "pipelinewise-tap-mysql",
+              "-e path/to/local/tap"
+            ],
+            "title": "Pip URL"
+          },
+          "python": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The python version to use for this plugin, specified as a path, or as the name of an executable to find within a directory in $PATH. If not specified, the top-level `python` setting will be used, or if it is not set, the python executable that was used to run Meltano will be used (within a separate virtual environment).",
+            "examples": [
+              "/usr/bin/python3.10",
+              "python",
+              "python3.11"
+            ],
+            "title": "Python"
+          },
+          "repo": {
+            "description": "The plugin repository",
+            "format": "uri",
+            "maxLength": 2083,
+            "minLength": 1,
+            "title": "Repo",
+            "type": "string"
+          },
+          "requires": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/PluginRequires"
+              },
+              "type": "array"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/PluginTypeEnum"
+            },
+            "title": "Requires",
+            "type": "object"
+          },
+          "settings": {
+            "items": {
+              "$ref": "#/components/schemas/PluginSetting"
+            },
+            "title": "Settings",
+            "type": "array"
+          },
+          "settings_group_validation": {
+            "description": "A list of lists of setting names that must be set together.",
+            "items": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Settings Group Validation",
+            "type": "array"
+          },
+          "target_schema": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The target schema for the loader",
+            "title": "Target Schema"
+          },
+          "variant": {
+            "description": "The plugin variant",
+            "examples": [
+              "meltanolabs"
+            ],
+            "title": "Variant",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "namespace",
+          "variant",
+          "repo"
+        ],
+        "title": "LoaderResponse",
+        "type": "object"
+      },
+      "Maintainer": {
+        "description": "Maintainer model.",
+        "properties": {
+          "id": {
+            "description": "The maintainer identifier",
+            "examples": [
+              "meltano"
+            ],
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The maintainer label",
+            "examples": [
+              "Meltano"
+            ],
+            "title": "Label"
+          },
+          "links": {
+            "$ref": "#/components/schemas/Links"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The maintainer URL",
+            "examples": [
+              "https://meltano.com"
+            ],
+            "title": "Url"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "url",
+          "links"
+        ],
+        "title": "Maintainer",
+        "type": "object"
+      },
+      "MaintainerDetails": {
+        "description": "Maintainer details model.",
+        "properties": {
+          "id": {
+            "description": "The maintainer identifier",
+            "examples": [
+              "meltano"
+            ],
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The maintainer label",
+            "examples": [
+              "Meltano"
+            ],
+            "title": "Label"
+          },
+          "links": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Links to the maintainer's plugins",
+            "title": "Links",
+            "type": "object"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The maintainer URL",
+            "examples": [
+              "https://meltano.com"
+            ],
+            "title": "Url"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "url"
+        ],
+        "title": "MaintainerDetails",
+        "type": "object"
+      },
+      "MaintainerPluginCount": {
+        "description": "Maintainer model.",
+        "properties": {
+          "id": {
+            "description": "The maintainer identifier",
+            "examples": [
+              "meltano"
+            ],
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The maintainer label",
+            "examples": [
+              "Meltano"
+            ],
+            "title": "Label"
+          },
+          "plugin_count": {
+            "description": "The number of plugins the maintainer maintains",
+            "examples": [
+              10
+            ],
+            "title": "Plugin Count",
+            "type": "integer"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The maintainer URL",
+            "examples": [
+              "https://meltano.com"
+            ],
+            "title": "Url"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "url",
+          "plugin_count"
+        ],
+        "title": "MaintainerPluginCount",
+        "type": "object"
+      },
+      "MaintainersList": {
+        "properties": {
+          "maintainers": {
+            "items": {
+              "$ref": "#/components/schemas/Maintainer"
+            },
+            "title": "Maintainers",
+            "type": "array"
+          }
+        },
+        "required": [
+          "maintainers"
+        ],
+        "title": "MaintainersList",
+        "type": "object"
+      },
+      "MapperCapabilityEnum": {
+        "description": "Mapper capabilities.",
+        "enum": [
+          "stream-maps",
+          "structured-logging"
+        ],
+        "title": "MapperCapabilityEnum",
+        "type": "string"
+      },
+      "MapperResponse": {
+        "additionalProperties": false,
+        "description": "Mapper response model.",
+        "properties": {
+          "capabilities": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/MapperCapabilityEnum"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capabilities"
+          },
+          "commands": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/components/schemas/Command"
+                }
+              ]
+            },
+            "description": "An object containing commands to be run by the plugin, the keys are the name of the command and the values are the arguments to be passed to the plugin executable.",
+            "title": "Commands",
+            "type": "object"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The plugin description",
+            "examples": [
+              "A Singer tap for CSV files."
+            ],
+            "title": "Description"
+          },
+          "docs": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A URL to the documentation for this plugin",
+            "title": "Docs"
+          },
+          "documentation": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "URL to the plugin's documentation",
+            "title": "Documentation"
+          },
+          "executable": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The plugin's executable name, as defined in setup.py (if a Python based plugin)",
+            "examples": [
+              "tap-stripe",
+              "tap-covid-19"
+            ],
+            "title": "Executable"
+          },
+          "ext_repo": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The URL to the repository where the plugin extension code lives.",
+            "title": "Ext Repo"
+          },
+          "hidden": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the plugin should be shown when listing or not.",
+            "title": "Hidden"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The plugin label",
+            "examples": [
+              "CSV Tap"
+            ],
+            "title": "Label"
+          },
+          "logo_url": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "URL to the plugin's logo",
+            "title": "Logo Url"
+          },
+          "name": {
+            "description": "The plugin name",
+            "examples": [
+              "tap-csv"
+            ],
+            "maxLength": 63,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9-_]+$",
+            "title": "Name",
+            "type": "string"
+          },
+          "namespace": {
+            "title": "Namespace",
+            "type": "string"
+          },
+          "pip_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A string containing the command line arguments to pass to `pip install`. See https://pip.pypa.io/en/stable/cli/pip_install/#usage for more information.",
+            "examples": [
+              "git+https://github.com/singer-io/tap-github.git",
+              "pipelinewise-tap-mysql",
+              "-e path/to/local/tap"
+            ],
+            "title": "Pip URL"
+          },
+          "python": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The python version to use for this plugin, specified as a path, or as the name of an executable to find within a directory in $PATH. If not specified, the top-level `python` setting will be used, or if it is not set, the python executable that was used to run Meltano will be used (within a separate virtual environment).",
+            "examples": [
+              "/usr/bin/python3.10",
+              "python",
+              "python3.11"
+            ],
+            "title": "Python"
+          },
+          "repo": {
+            "description": "The plugin repository",
+            "format": "uri",
+            "maxLength": 2083,
+            "minLength": 1,
+            "title": "Repo",
+            "type": "string"
+          },
+          "requires": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/PluginRequires"
+              },
+              "type": "array"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/PluginTypeEnum"
+            },
+            "title": "Requires",
+            "type": "object"
+          },
+          "settings": {
+            "items": {
+              "$ref": "#/components/schemas/PluginSetting"
+            },
+            "title": "Settings",
+            "type": "array"
+          },
+          "settings_group_validation": {
+            "description": "A list of lists of setting names that must be set together.",
+            "items": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Settings Group Validation",
+            "type": "array"
+          },
+          "variant": {
+            "description": "The plugin variant",
+            "examples": [
+              "meltanolabs"
+            ],
+            "title": "Variant",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "namespace",
+          "variant",
+          "repo"
+        ],
+        "title": "MapperResponse",
+        "type": "object"
+      },
+      "OAuthSetting": {
+        "description": "OAuth setting model.",
+        "properties": {
+          "aliases": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aliases"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting description.",
+            "examples": [
+              "The API token."
+            ],
+            "title": "Description"
+          },
+          "documentation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A URL to the documentation for this setting.",
+            "examples": [
+              "https://example.com/docs"
+            ],
+            "title": "Documentation"
+          },
+          "env": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The environment variable name.",
+            "title": "Env"
+          },
+          "kind": {
+            "const": "oauth",
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting label.",
+            "examples": [
+              "API Token"
+            ],
+            "title": "Label"
+          },
+          "name": {
+            "description": "The setting name.",
+            "example": "token",
+            "title": "Name",
+            "type": "string"
+          },
+          "placeholder": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting placeholder.",
+            "examples": [
+              "my-api-token"
+            ],
+            "title": "Placeholder"
+          },
+          "sensitive": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the setting is sensitive.",
+            "title": "Sensitive"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting value.",
+            "title": "Value"
+          }
+        },
+        "required": [
+          "name",
+          "kind"
+        ],
+        "title": "OAuthSetting",
+        "type": "object"
+      },
+      "ObjectSetting": {
+        "description": "Object setting model.",
+        "properties": {
+          "aliases": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aliases"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting description.",
+            "examples": [
+              "The API token."
+            ],
+            "title": "Description"
+          },
+          "documentation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A URL to the documentation for this setting.",
+            "examples": [
+              "https://example.com/docs"
+            ],
+            "title": "Documentation"
+          },
+          "env": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The environment variable name.",
+            "title": "Env"
+          },
+          "kind": {
+            "const": "object",
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting label.",
+            "examples": [
+              "API Token"
+            ],
+            "title": "Label"
+          },
+          "name": {
+            "description": "The setting name.",
+            "example": "token",
+            "title": "Name",
+            "type": "string"
+          },
+          "placeholder": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting placeholder.",
+            "examples": [
+              "my-api-token"
+            ],
+            "title": "Placeholder"
+          },
+          "sensitive": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the setting is sensitive.",
+            "title": "Sensitive"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting value.",
+            "title": "Value"
+          }
+        },
+        "required": [
+          "name",
+          "kind"
+        ],
+        "title": "ObjectSetting",
+        "type": "object"
+      },
+      "Option": {
+        "description": "Option model.",
+        "properties": {
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The option label",
+            "title": "Label"
+          },
+          "value": {
+            "description": "The option value",
+            "title": "Value"
+          }
+        },
+        "required": [
+          "value"
+        ],
+        "title": "Option",
+        "type": "object"
+      },
+      "OptionsSetting": {
+        "description": "Options setting model.",
+        "properties": {
+          "aliases": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aliases"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting description.",
+            "examples": [
+              "The API token."
+            ],
+            "title": "Description"
+          },
+          "documentation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A URL to the documentation for this setting.",
+            "examples": [
+              "https://example.com/docs"
+            ],
+            "title": "Documentation"
+          },
+          "env": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The environment variable name.",
+            "title": "Env"
+          },
+          "kind": {
+            "const": "options",
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting label.",
+            "examples": [
+              "API Token"
+            ],
+            "title": "Label"
+          },
+          "name": {
+            "description": "The setting name.",
+            "example": "token",
+            "title": "Name",
+            "type": "string"
+          },
+          "options": {
+            "description": "The setting options",
+            "items": {
+              "$ref": "#/components/schemas/Option"
+            },
+            "title": "Options",
+            "type": "array"
+          },
+          "placeholder": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting placeholder.",
+            "examples": [
+              "my-api-token"
+            ],
+            "title": "Placeholder"
+          },
+          "sensitive": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the setting is sensitive.",
+            "title": "Sensitive"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting value.",
+            "title": "Value"
+          }
+        },
+        "required": [
+          "name",
+          "kind"
+        ],
+        "title": "OptionsSetting",
+        "type": "object"
+      },
+      "OrchestratorResponse": {
+        "additionalProperties": false,
+        "description": "Orchestrator response model.",
+        "properties": {
+          "commands": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/components/schemas/Command"
+                }
+              ]
+            },
+            "description": "An object containing commands to be run by the plugin, the keys are the name of the command and the values are the arguments to be passed to the plugin executable.",
+            "title": "Commands",
+            "type": "object"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The plugin description",
+            "examples": [
+              "A Singer tap for CSV files."
+            ],
+            "title": "Description"
+          },
+          "docs": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A URL to the documentation for this plugin",
+            "title": "Docs"
+          },
+          "documentation": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "URL to the plugin's documentation",
+            "title": "Documentation"
+          },
+          "executable": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The plugin's executable name, as defined in setup.py (if a Python based plugin)",
+            "examples": [
+              "tap-stripe",
+              "tap-covid-19"
+            ],
+            "title": "Executable"
+          },
+          "ext_repo": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The URL to the repository where the plugin extension code lives.",
+            "title": "Ext Repo"
+          },
+          "hidden": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the plugin should be shown when listing or not.",
+            "title": "Hidden"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The plugin label",
+            "examples": [
+              "CSV Tap"
+            ],
+            "title": "Label"
+          },
+          "logo_url": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "URL to the plugin's logo",
+            "title": "Logo Url"
+          },
+          "name": {
+            "description": "The plugin name",
+            "examples": [
+              "tap-csv"
+            ],
+            "maxLength": 63,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9-_]+$",
+            "title": "Name",
+            "type": "string"
+          },
+          "namespace": {
+            "title": "Namespace",
+            "type": "string"
+          },
+          "pip_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A string containing the command line arguments to pass to `pip install`. See https://pip.pypa.io/en/stable/cli/pip_install/#usage for more information.",
+            "examples": [
+              "git+https://github.com/singer-io/tap-github.git",
+              "pipelinewise-tap-mysql",
+              "-e path/to/local/tap"
+            ],
+            "title": "Pip URL"
+          },
+          "python": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The python version to use for this plugin, specified as a path, or as the name of an executable to find within a directory in $PATH. If not specified, the top-level `python` setting will be used, or if it is not set, the python executable that was used to run Meltano will be used (within a separate virtual environment).",
+            "examples": [
+              "/usr/bin/python3.10",
+              "python",
+              "python3.11"
+            ],
+            "title": "Python"
+          },
+          "repo": {
+            "description": "The plugin repository",
+            "format": "uri",
+            "maxLength": 2083,
+            "minLength": 1,
+            "title": "Repo",
+            "type": "string"
+          },
+          "requires": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/PluginRequires"
+              },
+              "type": "array"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/PluginTypeEnum"
+            },
+            "title": "Requires",
+            "type": "object"
+          },
+          "settings": {
+            "items": {
+              "$ref": "#/components/schemas/PluginSetting"
+            },
+            "title": "Settings",
+            "type": "array"
+          },
+          "settings_group_validation": {
+            "description": "A list of lists of setting names that must be set together.",
+            "items": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Settings Group Validation",
+            "type": "array"
+          },
+          "variant": {
+            "description": "The plugin variant",
+            "examples": [
+              "meltanolabs"
+            ],
+            "title": "Variant",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "namespace",
+          "variant",
+          "repo"
+        ],
+        "title": "OrchestratorResponse",
+        "type": "object"
+      },
+      "PasswordSetting": {
+        "description": "Password setting model.",
+        "properties": {
+          "aliases": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aliases"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting description.",
+            "examples": [
+              "The API token."
+            ],
+            "title": "Description"
+          },
+          "documentation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A URL to the documentation for this setting.",
+            "examples": [
+              "https://example.com/docs"
+            ],
+            "title": "Documentation"
+          },
+          "env": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The environment variable name.",
+            "title": "Env"
+          },
+          "kind": {
+            "const": "password",
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting label.",
+            "examples": [
+              "API Token"
+            ],
+            "title": "Label"
+          },
+          "name": {
+            "description": "The setting name.",
+            "example": "token",
+            "title": "Name",
+            "type": "string"
+          },
+          "placeholder": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting placeholder.",
+            "examples": [
+              "my-api-token"
+            ],
+            "title": "Placeholder"
+          },
+          "sensitive": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the setting is sensitive.",
+            "title": "Sensitive"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting value.",
+            "title": "Value"
+          }
+        },
+        "required": [
+          "name",
+          "kind"
+        ],
+        "title": "PasswordSetting",
+        "type": "object"
+      },
+      "PluginDetails": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/ExtractorResponse"
+          },
+          {
+            "$ref": "#/components/schemas/LoaderResponse"
+          },
+          {
+            "$ref": "#/components/schemas/UtilityResponse"
+          },
+          {
+            "$ref": "#/components/schemas/OrchestratorResponse"
+          },
+          {
+            "$ref": "#/components/schemas/TransformResponse"
+          },
+          {
+            "$ref": "#/components/schemas/TransformerResponse"
+          },
+          {
+            "$ref": "#/components/schemas/MapperResponse"
+          },
+          {
+            "$ref": "#/components/schemas/FileResponse"
+          }
+        ]
+      },
+      "PluginIndex": {
+        "additionalProperties": {
+          "$ref": "#/components/schemas/PluginTypeIndex"
+        },
+        "propertyNames": {
+          "$ref": "#/components/schemas/PluginTypeEnum"
+        },
+        "type": "object"
+      },
+      "PluginListElement": {
+        "additionalProperties": false,
+        "description": "Plugin list element model.",
+        "properties": {
+          "plugin": {
+            "description": "The plugin name",
+            "examples": [
+              "tap-github"
+            ],
+            "title": "Plugin",
+            "type": "string"
+          },
+          "plugin_type": {
+            "$ref": "#/components/schemas/PluginTypeEnum",
+            "description": "The plugin type",
+            "examples": [
+              "extractors"
+            ]
+          },
+          "ref": {
+            "description": "API URL for the variant",
+            "examples": [
+              "/meltano/api/v1/plugins/extractors/tap-github--singer-io"
+            ],
+            "title": "Ref",
+            "type": "string"
+          },
+          "variant": {
+            "description": "The plugin variant",
+            "examples": [
+              "meltanolabs"
+            ],
+            "title": "Variant",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ref",
+          "plugin",
+          "variant",
+          "plugin_type"
+        ],
+        "title": "PluginListElement",
+        "type": "object"
+      },
+      "PluginRef": {
+        "description": "Plugin entry.",
+        "properties": {
+          "default_variant": {
+            "description": "The default variant of the plugin",
+            "examples": [
+              "singer-io"
+            ],
+            "title": "Default Variant",
+            "type": "string"
+          },
+          "logo_url": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "URL to the plugin's logo",
+            "title": "Logo Url"
+          },
+          "variants": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/VariantReference"
+            },
+            "description": "The variants of the plugin",
+            "title": "Variants",
+            "type": "object"
+          }
+        },
+        "required": [
+          "default_variant"
+        ],
+        "title": "PluginRef",
+        "type": "object"
+      },
+      "PluginRequires": {
+        "description": "Plugin requires model.",
+        "properties": {
+          "name": {
+            "description": "The required plugin name",
+            "title": "Name",
+            "type": "string"
+          },
+          "variant": {
+            "description": "The required plugin variant",
+            "title": "Variant",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "variant"
+        ],
+        "title": "PluginRequires",
+        "type": "object"
+      },
+      "PluginSetting": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/StringSetting"
+          },
+          {
+            "$ref": "#/components/schemas/IntegerSetting"
+          },
+          {
+            "$ref": "#/components/schemas/DecimalSetting"
+          },
+          {
+            "$ref": "#/components/schemas/BooleanSetting"
+          },
+          {
+            "$ref": "#/components/schemas/DateIso8601Setting"
+          },
+          {
+            "$ref": "#/components/schemas/EmailSetting"
+          },
+          {
+            "$ref": "#/components/schemas/PasswordSetting"
+          },
+          {
+            "$ref": "#/components/schemas/OAuthSetting"
+          },
+          {
+            "$ref": "#/components/schemas/OptionsSetting"
+          },
+          {
+            "$ref": "#/components/schemas/FileSetting"
+          },
+          {
+            "$ref": "#/components/schemas/ArraySetting"
+          },
+          {
+            "$ref": "#/components/schemas/ObjectSetting"
+          },
+          {
+            "$ref": "#/components/schemas/HiddenSetting"
+          }
+        ],
+        "title": "PluginSetting"
+      },
+      "PluginTypeEnum": {
+        "description": "Plugin types.",
+        "enum": [
+          "extractors",
+          "loaders",
+          "transformers",
+          "utilities",
+          "transforms",
+          "orchestrators",
+          "mappers",
+          "files"
+        ],
+        "title": "PluginTypeEnum",
+        "type": "string"
+      },
+      "PluginTypeIndex": {
+        "additionalProperties": {
+          "$ref": "#/components/schemas/PluginRef"
+        },
+        "type": "object"
+      },
+      "PluginTypeOrAnyEnum": {
+        "description": "One or any plugin type enum.",
+        "enum": [
+          "extractors",
+          "loaders",
+          "transformers",
+          "utilities",
+          "transforms",
+          "orchestrators",
+          "mappers",
+          "files",
+          "any"
+        ],
+        "title": "PluginTypeOrAnyEnum",
+        "type": "string"
+      },
+      "StringSetting": {
+        "description": "String setting model.",
+        "properties": {
+          "aliases": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aliases"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting description.",
+            "examples": [
+              "The API token."
+            ],
+            "title": "Description"
+          },
+          "documentation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A URL to the documentation for this setting.",
+            "examples": [
+              "https://example.com/docs"
+            ],
+            "title": "Documentation"
+          },
+          "env": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The environment variable name.",
+            "title": "Env"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "const": "string",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting label.",
+            "examples": [
+              "API Token"
+            ],
+            "title": "Label"
+          },
+          "name": {
+            "description": "The setting name.",
+            "example": "token",
+            "title": "Name",
+            "type": "string"
+          },
+          "placeholder": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting placeholder.",
+            "examples": [
+              "my-api-token"
+            ],
+            "title": "Placeholder"
+          },
+          "sensitive": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the setting is sensitive.",
+            "title": "Sensitive"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "items": {},
+                "type": "array"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The setting value.",
+            "title": "Value"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "StringSetting",
+        "type": "object"
+      },
+      "TransformResponse": {
+        "additionalProperties": false,
+        "description": "Transform response model.",
+        "properties": {
+          "commands": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/components/schemas/Command"
+                }
+              ]
+            },
+            "description": "An object containing commands to be run by the plugin, the keys are the name of the command and the values are the arguments to be passed to the plugin executable.",
+            "title": "Commands",
+            "type": "object"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The plugin description",
+            "examples": [
+              "A Singer tap for CSV files."
+            ],
+            "title": "Description"
+          },
+          "docs": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A URL to the documentation for this plugin",
+            "title": "Docs"
+          },
+          "documentation": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "URL to the plugin's documentation",
+            "title": "Documentation"
+          },
+          "executable": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The plugin's executable name, as defined in setup.py (if a Python based plugin)",
+            "examples": [
+              "tap-stripe",
+              "tap-covid-19"
+            ],
+            "title": "Executable"
+          },
+          "ext_repo": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The URL to the repository where the plugin extension code lives.",
+            "title": "Ext Repo"
+          },
+          "hidden": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the plugin should be shown when listing or not.",
+            "title": "Hidden"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The plugin label",
+            "examples": [
+              "CSV Tap"
+            ],
+            "title": "Label"
+          },
+          "logo_url": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "URL to the plugin's logo",
+            "title": "Logo Url"
+          },
+          "name": {
+            "description": "The plugin name",
+            "examples": [
+              "tap-csv"
+            ],
+            "maxLength": 63,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9-_]+$",
+            "title": "Name",
+            "type": "string"
+          },
+          "namespace": {
+            "title": "Namespace",
+            "type": "string"
+          },
+          "pip_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A string containing the command line arguments to pass to `pip install`. See https://pip.pypa.io/en/stable/cli/pip_install/#usage for more information.",
+            "examples": [
+              "git+https://github.com/singer-io/tap-github.git",
+              "pipelinewise-tap-mysql",
+              "-e path/to/local/tap"
+            ],
+            "title": "Pip URL"
+          },
+          "python": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The python version to use for this plugin, specified as a path, or as the name of an executable to find within a directory in $PATH. If not specified, the top-level `python` setting will be used, or if it is not set, the python executable that was used to run Meltano will be used (within a separate virtual environment).",
+            "examples": [
+              "/usr/bin/python3.10",
+              "python",
+              "python3.11"
+            ],
+            "title": "Python"
+          },
+          "repo": {
+            "description": "The plugin repository",
+            "format": "uri",
+            "maxLength": 2083,
+            "minLength": 1,
+            "title": "Repo",
+            "type": "string"
+          },
+          "requires": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/PluginRequires"
+              },
+              "type": "array"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/PluginTypeEnum"
+            },
+            "title": "Requires",
+            "type": "object"
+          },
+          "settings": {
+            "items": {
+              "$ref": "#/components/schemas/PluginSetting"
+            },
+            "title": "Settings",
+            "type": "array"
+          },
+          "settings_group_validation": {
+            "description": "A list of lists of setting names that must be set together.",
+            "items": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Settings Group Validation",
+            "type": "array"
+          },
+          "variant": {
+            "description": "The plugin variant",
+            "examples": [
+              "meltanolabs"
+            ],
+            "title": "Variant",
+            "type": "string"
+          },
+          "vars": {
+            "additionalProperties": true,
+            "title": "Vars",
+            "type": "object"
+          }
+        },
+        "required": [
+          "name",
+          "namespace",
+          "variant",
+          "repo"
+        ],
+        "title": "TransformResponse",
+        "type": "object"
+      },
+      "TransformerResponse": {
+        "additionalProperties": false,
+        "description": "Transformer response model.",
+        "properties": {
+          "commands": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/components/schemas/Command"
+                }
+              ]
+            },
+            "description": "An object containing commands to be run by the plugin, the keys are the name of the command and the values are the arguments to be passed to the plugin executable.",
+            "title": "Commands",
+            "type": "object"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The plugin description",
+            "examples": [
+              "A Singer tap for CSV files."
+            ],
+            "title": "Description"
+          },
+          "docs": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A URL to the documentation for this plugin",
+            "title": "Docs"
+          },
+          "documentation": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "URL to the plugin's documentation",
+            "title": "Documentation"
+          },
+          "executable": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The plugin's executable name, as defined in setup.py (if a Python based plugin)",
+            "examples": [
+              "tap-stripe",
+              "tap-covid-19"
+            ],
+            "title": "Executable"
+          },
+          "ext_repo": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The URL to the repository where the plugin extension code lives.",
+            "title": "Ext Repo"
+          },
+          "hidden": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the plugin should be shown when listing or not.",
+            "title": "Hidden"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The plugin label",
+            "examples": [
+              "CSV Tap"
+            ],
+            "title": "Label"
+          },
+          "logo_url": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "URL to the plugin's logo",
+            "title": "Logo Url"
+          },
+          "name": {
+            "description": "The plugin name",
+            "examples": [
+              "tap-csv"
+            ],
+            "maxLength": 63,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9-_]+$",
+            "title": "Name",
+            "type": "string"
+          },
+          "namespace": {
+            "title": "Namespace",
+            "type": "string"
+          },
+          "pip_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A string containing the command line arguments to pass to `pip install`. See https://pip.pypa.io/en/stable/cli/pip_install/#usage for more information.",
+            "examples": [
+              "git+https://github.com/singer-io/tap-github.git",
+              "pipelinewise-tap-mysql",
+              "-e path/to/local/tap"
+            ],
+            "title": "Pip URL"
+          },
+          "python": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The python version to use for this plugin, specified as a path, or as the name of an executable to find within a directory in $PATH. If not specified, the top-level `python` setting will be used, or if it is not set, the python executable that was used to run Meltano will be used (within a separate virtual environment).",
+            "examples": [
+              "/usr/bin/python3.10",
+              "python",
+              "python3.11"
+            ],
+            "title": "Python"
+          },
+          "repo": {
+            "description": "The plugin repository",
+            "format": "uri",
+            "maxLength": 2083,
+            "minLength": 1,
+            "title": "Repo",
+            "type": "string"
+          },
+          "requires": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/PluginRequires"
+              },
+              "type": "array"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/PluginTypeEnum"
+            },
+            "title": "Requires",
+            "type": "object"
+          },
+          "settings": {
+            "items": {
+              "$ref": "#/components/schemas/PluginSetting"
+            },
+            "title": "Settings",
+            "type": "array"
+          },
+          "settings_group_validation": {
+            "description": "A list of lists of setting names that must be set together.",
+            "items": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Settings Group Validation",
+            "type": "array"
+          },
+          "variant": {
+            "description": "The plugin variant",
+            "examples": [
+              "meltanolabs"
+            ],
+            "title": "Variant",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "namespace",
+          "variant",
+          "repo"
+        ],
+        "title": "TransformerResponse",
+        "type": "object"
+      },
+      "UtilityResponse": {
+        "additionalProperties": false,
+        "description": "Utility response model.",
+        "properties": {
+          "commands": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/components/schemas/Command"
+                }
+              ]
+            },
+            "description": "An object containing commands to be run by the plugin, the keys are the name of the command and the values are the arguments to be passed to the plugin executable.",
+            "title": "Commands",
+            "type": "object"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The plugin description",
+            "examples": [
+              "A Singer tap for CSV files."
+            ],
+            "title": "Description"
+          },
+          "docs": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A URL to the documentation for this plugin",
+            "title": "Docs"
+          },
+          "documentation": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "URL to the plugin's documentation",
+            "title": "Documentation"
+          },
+          "executable": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The plugin's executable name, as defined in setup.py (if a Python based plugin)",
+            "examples": [
+              "tap-stripe",
+              "tap-covid-19"
+            ],
+            "title": "Executable"
+          },
+          "ext_repo": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The URL to the repository where the plugin extension code lives.",
+            "title": "Ext Repo"
+          },
+          "hidden": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the plugin should be shown when listing or not.",
+            "title": "Hidden"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The plugin label",
+            "examples": [
+              "CSV Tap"
+            ],
+            "title": "Label"
+          },
+          "logo_url": {
+            "anyOf": [
+              {
+                "format": "uri",
+                "maxLength": 2083,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "URL to the plugin's logo",
+            "title": "Logo Url"
+          },
+          "name": {
+            "description": "The plugin name",
+            "examples": [
+              "tap-csv"
+            ],
+            "maxLength": 63,
+            "minLength": 1,
+            "pattern": "^[A-Za-z0-9-_]+$",
+            "title": "Name",
+            "type": "string"
+          },
+          "namespace": {
+            "title": "Namespace",
+            "type": "string"
+          },
+          "pip_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A string containing the command line arguments to pass to `pip install`. See https://pip.pypa.io/en/stable/cli/pip_install/#usage for more information.",
+            "examples": [
+              "git+https://github.com/singer-io/tap-github.git",
+              "pipelinewise-tap-mysql",
+              "-e path/to/local/tap"
+            ],
+            "title": "Pip URL"
+          },
+          "python": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The python version to use for this plugin, specified as a path, or as the name of an executable to find within a directory in $PATH. If not specified, the top-level `python` setting will be used, or if it is not set, the python executable that was used to run Meltano will be used (within a separate virtual environment).",
+            "examples": [
+              "/usr/bin/python3.10",
+              "python",
+              "python3.11"
+            ],
+            "title": "Python"
+          },
+          "repo": {
+            "description": "The plugin repository",
+            "format": "uri",
+            "maxLength": 2083,
+            "minLength": 1,
+            "title": "Repo",
+            "type": "string"
+          },
+          "requires": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/PluginRequires"
+              },
+              "type": "array"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/PluginTypeEnum"
+            },
+            "title": "Requires",
+            "type": "object"
+          },
+          "settings": {
+            "items": {
+              "$ref": "#/components/schemas/PluginSetting"
+            },
+            "title": "Settings",
+            "type": "array"
+          },
+          "settings_group_validation": {
+            "description": "A list of lists of setting names that must be set together.",
+            "items": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Settings Group Validation",
+            "type": "array"
+          },
+          "variant": {
+            "description": "The plugin variant",
+            "examples": [
+              "meltanolabs"
+            ],
+            "title": "Variant",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "namespace",
+          "variant",
+          "repo"
+        ],
+        "title": "UtilityResponse",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "VariantReference": {
+        "additionalProperties": false,
+        "description": "Variant reference model.",
+        "properties": {
+          "ref": {
+            "description": "API URL for the variant",
+            "examples": [
+              "/meltano/api/v1/plugins/extractors/tap-github--singer-io"
+            ],
+            "title": "Ref",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ref"
+        ],
+        "title": "VariantReference",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "The Meltano Hub API provides access to Meltano's plugin registry. It allows you to search for plugins, view their details, and download the necessary files to install them.\n\n- The API is versioned, with the current version being v1.\n- The API is read-only, and no authentication is required.\n",
+    "title": "Meltano Hub API",
+    "version": "0.0.0.dev429+g849367e60.d20251031"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/meltano/api/v1/maintainers": {
+      "get": {
+        "description": "Retrieve global index of plugins.",
+        "operationId": "get_all_maintainers",
+        "parameters": [
+          {
+            "description": "The `If-None-Match` HTTP request header makes the request conditional.\nFor `GET` and `HEAD` methods, the server will return the requested resource, with a `200` status, only if it doesn't have an `ETag` matching the given ones.\nFor other methods, the request will be processed only if the eventually existing resource's `ETag` doesn't match any of the values listed.\n\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match\n",
+            "in": "header",
+            "name": "if-none-match",
+            "required": false,
+            "schema": {
+              "description": "The `If-None-Match` HTTP request header makes the request conditional.\nFor `GET` and `HEAD` methods, the server will return the requested resource, with a `200` status, only if it doesn't have an `ETag` matching the given ones.\nFor other methods, the request will be processed only if the eventually existing resource's `ETag` doesn't match any of the values listed.\n\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match\n",
+              "pattern": "^\"etag-[A-Za-z0-9-]+\"$",
+              "title": "If-None-Match",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MaintainersList"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get maintainers list",
+        "tags": [
+          "maintainers"
+        ]
+      }
+    },
+    "/meltano/api/v1/maintainers/top": {
+      "get": {
+        "description": "Retrieve top maintainers.",
+        "operationId": "get_top_maintainers",
+        "parameters": [
+          {
+            "description": "The number of maintainers to return",
+            "in": "query",
+            "name": "count",
+            "required": true,
+            "schema": {
+              "description": "The number of maintainers to return",
+              "exclusiveMaximum": 50,
+              "minimum": 1,
+              "title": "Count",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "The `If-None-Match` HTTP request header makes the request conditional.\nFor `GET` and `HEAD` methods, the server will return the requested resource, with a `200` status, only if it doesn't have an `ETag` matching the given ones.\nFor other methods, the request will be processed only if the eventually existing resource's `ETag` doesn't match any of the values listed.\n\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match\n",
+            "in": "header",
+            "name": "if-none-match",
+            "required": false,
+            "schema": {
+              "description": "The `If-None-Match` HTTP request header makes the request conditional.\nFor `GET` and `HEAD` methods, the server will return the requested resource, with a `200` status, only if it doesn't have an `ETag` matching the given ones.\nFor other methods, the request will be processed only if the eventually existing resource's `ETag` doesn't match any of the values listed.\n\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match\n",
+              "pattern": "^\"etag-[A-Za-z0-9-]+\"$",
+              "title": "If-None-Match",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MaintainerPluginCount"
+                  },
+                  "title": "Response Get Top Maintainers",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get top plugin maintainers",
+        "tags": [
+          "maintainers"
+        ]
+      }
+    },
+    "/meltano/api/v1/maintainers/{maintainer}": {
+      "get": {
+        "description": "Retrieve maintainer details.",
+        "operationId": "get_maintainer",
+        "parameters": [
+          {
+            "description": "The maintainer identifier",
+            "in": "path",
+            "name": "maintainer",
+            "required": true,
+            "schema": {
+              "description": "The maintainer identifier",
+              "examples": [
+                "meltanolabs",
+                "singer-io"
+              ],
+              "pattern": "^[A-Za-z0-9-_]+$",
+              "title": "Maintainer",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The `If-None-Match` HTTP request header makes the request conditional.\nFor `GET` and `HEAD` methods, the server will return the requested resource, with a `200` status, only if it doesn't have an `ETag` matching the given ones.\nFor other methods, the request will be processed only if the eventually existing resource's `ETag` doesn't match any of the values listed.\n\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match\n",
+            "in": "header",
+            "name": "if-none-match",
+            "required": false,
+            "schema": {
+              "description": "The `If-None-Match` HTTP request header makes the request conditional.\nFor `GET` and `HEAD` methods, the server will return the requested resource, with a `200` status, only if it doesn't have an `ETag` matching the given ones.\nFor other methods, the request will be processed only if the eventually existing resource's `ETag` doesn't match any of the values listed.\n\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match\n",
+              "pattern": "^\"etag-[A-Za-z0-9-]+\"$",
+              "title": "If-None-Match",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MaintainerDetails"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "description": "Maintainer not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get maintainer details",
+        "tags": [
+          "maintainers"
+        ]
+      }
+    },
+    "/meltano/api/v1/plugins/index": {
+      "get": {
+        "description": "Retrieve global index of plugins.",
+        "operationId": "get_plugin_index",
+        "parameters": [
+          {
+            "description": "The `If-None-Match` HTTP request header makes the request conditional.\nFor `GET` and `HEAD` methods, the server will return the requested resource, with a `200` status, only if it doesn't have an `ETag` matching the given ones.\nFor other methods, the request will be processed only if the eventually existing resource's `ETag` doesn't match any of the values listed.\n\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match\n",
+            "in": "header",
+            "name": "if-none-match",
+            "required": false,
+            "schema": {
+              "description": "The `If-None-Match` HTTP request header makes the request conditional.\nFor `GET` and `HEAD` methods, the server will return the requested resource, with a `200` status, only if it doesn't have an `ETag` matching the given ones.\nFor other methods, the request will be processed only if the eventually existing resource's `ETag` doesn't match any of the values listed.\n\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match\n",
+              "pattern": "^\"etag-[A-Za-z0-9-]+\"$",
+              "title": "If-None-Match",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PluginIndex"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get plugin index",
+        "tags": [
+          "plugins"
+        ]
+      }
+    },
+    "/meltano/api/v1/plugins/made-with-sdk": {
+      "get": {
+        "description": "Retrieve plugins made with the Singer SDK.",
+        "operationId": "get_sdk_plugins",
+        "parameters": [
+          {
+            "description": "The number of plugins to return",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "description": "The number of plugins to return",
+              "examples": [
+                10,
+                25,
+                100
+              ],
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "The plugin type",
+            "in": "query",
+            "name": "plugin_type",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PluginTypeOrAnyEnum",
+              "default": "any",
+              "description": "The plugin type",
+              "examples": [
+                "any",
+                "extractors",
+                "loaders"
+              ]
+            }
+          },
+          {
+            "description": "The `If-None-Match` HTTP request header makes the request conditional.\nFor `GET` and `HEAD` methods, the server will return the requested resource, with a `200` status, only if it doesn't have an `ETag` matching the given ones.\nFor other methods, the request will be processed only if the eventually existing resource's `ETag` doesn't match any of the values listed.\n\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match\n",
+            "in": "header",
+            "name": "if-none-match",
+            "required": false,
+            "schema": {
+              "description": "The `If-None-Match` HTTP request header makes the request conditional.\nFor `GET` and `HEAD` methods, the server will return the requested resource, with a `200` status, only if it doesn't have an `ETag` matching the given ones.\nFor other methods, the request will be processed only if the eventually existing resource's `ETag` doesn't match any of the values listed.\n\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match\n",
+              "pattern": "^\"etag-[A-Za-z0-9-]+\"$",
+              "title": "If-None-Match",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/PluginListElement"
+                  },
+                  "title": "Response Get Sdk Plugins",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get SDK plugins",
+        "tags": [
+          "plugins"
+        ]
+      }
+    },
+    "/meltano/api/v1/plugins/search": {
+      "get": {
+        "operationId": "get_plugin",
+        "parameters": [
+          {
+            "description": "The plugin name",
+            "in": "query",
+            "name": "name",
+            "required": true,
+            "schema": {
+              "description": "The plugin name",
+              "examples": [
+                "tap-github"
+              ],
+              "title": "Name",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The plugin type",
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/PluginTypeEnum",
+              "description": "The plugin type",
+              "examples": [
+                "extractors"
+              ]
+            }
+          },
+          {
+            "description": "The optional variant name",
+            "in": "query",
+            "name": "variant",
+            "required": false,
+            "schema": {
+              "description": "The optional variant name",
+              "examples": [
+                "meltanolabs"
+              ],
+              "title": "Variant",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The `If-None-Match` HTTP request header makes the request conditional.\nFor `GET` and `HEAD` methods, the server will return the requested resource, with a `200` status, only if it doesn't have an `ETag` matching the given ones.\nFor other methods, the request will be processed only if the eventually existing resource's `ETag` doesn't match any of the values listed.\n\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match\n",
+            "in": "header",
+            "name": "if-none-match",
+            "required": false,
+            "schema": {
+              "description": "The `If-None-Match` HTTP request header makes the request conditional.\nFor `GET` and `HEAD` methods, the server will return the requested resource, with a `200` status, only if it doesn't have an `ETag` matching the given ones.\nFor other methods, the request will be processed only if the eventually existing resource's `ETag` doesn't match any of the values listed.\n\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match\n",
+              "pattern": "^\"etag-[A-Za-z0-9-]+\"$",
+              "title": "If-None-Match",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PluginDetails"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "description": "Not a valid plugin type"
+          },
+          "404": {
+            "description": "Plugin not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Find a plugin",
+        "tags": [
+          "plugins"
+        ]
+      }
+    },
+    "/meltano/api/v1/plugins/stats": {
+      "get": {
+        "description": "Retrieve Hub plugin statistics.",
+        "operationId": "get_plugin_stats",
+        "parameters": [
+          {
+            "description": "The `If-None-Match` HTTP request header makes the request conditional.\nFor `GET` and `HEAD` methods, the server will return the requested resource, with a `200` status, only if it doesn't have an `ETag` matching the given ones.\nFor other methods, the request will be processed only if the eventually existing resource's `ETag` doesn't match any of the values listed.\n\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match\n",
+            "in": "header",
+            "name": "if-none-match",
+            "required": false,
+            "schema": {
+              "description": "The `If-None-Match` HTTP request header makes the request conditional.\nFor `GET` and `HEAD` methods, the server will return the requested resource, with a `200` status, only if it doesn't have an `ETag` matching the given ones.\nFor other methods, the request will be processed only if the eventually existing resource's `ETag` doesn't match any of the values listed.\n\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match\n",
+              "pattern": "^\"etag-[A-Za-z0-9-]+\"$",
+              "title": "If-None-Match",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "integer"
+                  },
+                  "propertyNames": {
+                    "$ref": "#/components/schemas/PluginTypeEnum"
+                  },
+                  "title": "Response Get Plugin Stats",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Hub statistics",
+        "tags": [
+          "plugins"
+        ]
+      }
+    },
+    "/meltano/api/v1/plugins/{plugin_type}/index": {
+      "get": {
+        "description": "Retrieve index of plugins of a given type.",
+        "operationId": "get_plugin_type_index",
+        "parameters": [
+          {
+            "description": "The plugin type",
+            "in": "path",
+            "name": "plugin_type",
+            "required": true,
+            "schema": {
+              "description": "The plugin type",
+              "examples": [
+                "extractors"
+              ],
+              "title": "Plugin Type",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The `If-None-Match` HTTP request header makes the request conditional.\nFor `GET` and `HEAD` methods, the server will return the requested resource, with a `200` status, only if it doesn't have an `ETag` matching the given ones.\nFor other methods, the request will be processed only if the eventually existing resource's `ETag` doesn't match any of the values listed.\n\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match\n",
+            "in": "header",
+            "name": "if-none-match",
+            "required": false,
+            "schema": {
+              "description": "The `If-None-Match` HTTP request header makes the request conditional.\nFor `GET` and `HEAD` methods, the server will return the requested resource, with a `200` status, only if it doesn't have an `ETag` matching the given ones.\nFor other methods, the request will be processed only if the eventually existing resource's `ETag` doesn't match any of the values listed.\n\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match\n",
+              "pattern": "^\"etag-[A-Za-z0-9-]+\"$",
+              "title": "If-None-Match",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PluginTypeIndex"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "description": "Not a valid plugin type"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get plugin type index",
+        "tags": [
+          "plugins"
+        ]
+      }
+    },
+    "/meltano/api/v1/plugins/{plugin_type}/{plugin_name}--{plugin_variant}": {
+      "get": {
+        "description": "Retrieve details of a specific plugin variant.",
+        "operationId": "get_plugin_variant",
+        "parameters": [
+          {
+            "description": "The plugin type",
+            "in": "path",
+            "name": "plugin_type",
+            "required": true,
+            "schema": {
+              "description": "The plugin type",
+              "examples": [
+                "extractors"
+              ],
+              "title": "Plugin Type",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The plugin name",
+            "in": "path",
+            "name": "plugin_name",
+            "required": true,
+            "schema": {
+              "description": "The plugin name",
+              "examples": [
+                "tap-github"
+              ],
+              "title": "Plugin Name",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The plugin variant",
+            "in": "path",
+            "name": "plugin_variant",
+            "required": true,
+            "schema": {
+              "description": "The plugin variant",
+              "examples": [
+                "meltanolabs"
+              ],
+              "title": "Plugin Variant",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The `If-None-Match` HTTP request header makes the request conditional.\nFor `GET` and `HEAD` methods, the server will return the requested resource, with a `200` status, only if it doesn't have an `ETag` matching the given ones.\nFor other methods, the request will be processed only if the eventually existing resource's `ETag` doesn't match any of the values listed.\n\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match\n",
+            "in": "header",
+            "name": "if-none-match",
+            "required": false,
+            "schema": {
+              "description": "The `If-None-Match` HTTP request header makes the request conditional.\nFor `GET` and `HEAD` methods, the server will return the requested resource, with a `200` status, only if it doesn't have an `ETag` matching the given ones.\nFor other methods, the request will be processed only if the eventually existing resource's `ETag` doesn't match any of the values listed.\n\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match\n",
+              "pattern": "^\"etag-[A-Za-z0-9-]+\"$",
+              "title": "If-None-Match",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PluginDetails"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "description": "Not a valid plugin type"
+          },
+          "404": {
+            "description": "Plugin variant not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get plugin variant",
+        "tags": [
+          "plugins"
+        ]
+      }
+    },
+    "/meltano/api/v1/plugins/{plugin_type}/{plugin_name}/default": {
+      "get": {
+        "description": "Retrieve details of the default plugin variant.",
+        "operationId": "get_default_plugin",
+        "parameters": [
+          {
+            "description": "The plugin type",
+            "in": "path",
+            "name": "plugin_type",
+            "required": true,
+            "schema": {
+              "description": "The plugin type",
+              "examples": [
+                "extractors"
+              ],
+              "title": "Plugin Type",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The plugin name",
+            "in": "path",
+            "name": "plugin_name",
+            "required": true,
+            "schema": {
+              "description": "The plugin name",
+              "examples": [
+                "tap-github"
+              ],
+              "title": "Plugin Name",
+              "type": "string"
+            }
+          },
+          {
+            "description": "The `If-None-Match` HTTP request header makes the request conditional.\nFor `GET` and `HEAD` methods, the server will return the requested resource, with a `200` status, only if it doesn't have an `ETag` matching the given ones.\nFor other methods, the request will be processed only if the eventually existing resource's `ETag` doesn't match any of the values listed.\n\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match\n",
+            "in": "header",
+            "name": "if-none-match",
+            "required": false,
+            "schema": {
+              "description": "The `If-None-Match` HTTP request header makes the request conditional.\nFor `GET` and `HEAD` methods, the server will return the requested resource, with a `200` status, only if it doesn't have an `ETag` matching the given ones.\nFor other methods, the request will be processed only if the eventually existing resource's `ETag` doesn't match any of the values listed.\n\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match\n",
+              "pattern": "^\"etag-[A-Za-z0-9-]+\"$",
+              "title": "If-None-Match",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "description": "Not a valid plugin type"
+          },
+          "404": {
+            "description": "Plugin not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get the default plugin variant",
+        "tags": [
+          "plugins"
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "description": "Local development server",
+      "url": "http://localhost:8000"
+    }
+  ]
+}
