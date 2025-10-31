@@ -9,7 +9,6 @@ https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
 """  # noqa: I002
 
 import http
-import textwrap
 import uuid
 from typing import TYPE_CHECKING, Annotated, override
 
@@ -54,20 +53,23 @@ class ETagMiddleware(BaseHTTPMiddleware):
         return response
 
 
+DESCRIPTION = """\
+The `If-None-Match` HTTP request header makes the request conditional.
+For `GET` and `HEAD` methods, the server will return the requested resource, \
+with a `200` status, only if it doesn't have an `ETag` matching the given ones.
+For other methods, the request will be processed only if the eventually existing \
+resource's `ETag` doesn't match any of the values listed.
+
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match
+"""
+
+
 def check_etag(
     request: Request,
     if_none_match: Annotated[
         str,  # noqa: RUF013
         Header(
-            description=textwrap.dedent("""\
-                The `If-None-Match` HTTP request header makes the request conditional. \
-                For `GET` and `HEAD` methods, the server will return the requested resource, \
-                with a `200` status, only if it doesn't have an `ETag` matching the given ones. \
-                For other methods, the request will be processed only if the eventually existing \
-                resource's `ETag` doesn't match any of the values listed.
-
-                https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/If-None-Match
-            """),
+            description=DESCRIPTION,
             # pattern=r'^"W/etag-[A-Za-z0-9-]+"$',
             pattern=r'^"etag-[A-Za-z0-9-]+"$',
         ),

@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import http
-import textwrap
 from importlib import metadata, resources
 
 import fastapi
@@ -13,16 +12,17 @@ from fastapi.middleware import gzip
 from hub_api import api, exceptions, static
 from hub_api.helpers import etag
 
+DESCRIPTION = """\
+The Meltano Hub API provides access to Meltano's plugin registry. It allows you to search for plugins, \
+view their details, and download the necessary files to install them.
+
+- The API is versioned, with the current version being v1.
+- The API is read-only, and no authentication is required.
+"""
+
 app = fastapi.FastAPI(
     title="Meltano Hub API",
-    description=textwrap.dedent("""\
-        The Meltano Hub API provides access to Meltano's plugin registry. \
-        It allows you to search for plugins, view their details, and download \
-        the necessary files to install them. \
-
-        - The API is versioned, with the current version being v1.
-        - The API is read-only, and no authentication is required.
-    """),
+    description=DESCRIPTION,
     version=metadata.version("hub-api"),
     dependencies=[fastapi.Depends(etag.check_etag)],
     servers=[
