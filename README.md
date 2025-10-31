@@ -34,7 +34,7 @@ Built with:
 
     ```bash
     meltano add extractor tap-github
-    meltano lock --all --update
+    meltano lock --update
     ```
 
 ## Additional Features
