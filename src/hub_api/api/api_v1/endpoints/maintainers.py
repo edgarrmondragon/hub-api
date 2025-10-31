@@ -16,6 +16,7 @@ router = fastapi.APIRouter()
     "",
     summary="Get maintainers list",
     response_model_exclude_none=True,
+    operation_id="get_all_maintainers",
 )
 async def get_maintainers(hub: dependencies.Hub) -> api_schemas.MaintainersList:
     """Retrieve global index of plugins."""
@@ -26,6 +27,7 @@ async def get_maintainers(hub: dependencies.Hub) -> api_schemas.MaintainersList:
     "/top",
     summary="Get top plugin maintainers",
     response_model_exclude_none=True,
+    operation_id="get_top_maintainers",
 )
 async def get_top_maintainers(
     hub: dependencies.Hub,
@@ -50,6 +52,7 @@ async def get_top_maintainers(
     responses={
         404: {"description": "Maintainer not found"},
     },
+    operation_id="get_maintainer",
 )
 async def get_maintainer(
     hub: dependencies.Hub,

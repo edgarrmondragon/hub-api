@@ -62,6 +62,7 @@ MeltanoVersion = Annotated[
     "/index",
     summary="Get plugin index",
     response_model_exclude_none=True,
+    operation_id="get_plugin_index",
 )
 async def get_index(hub: dependencies.Hub) -> api_schemas.PluginIndex:
     """Retrieve global index of plugins."""
@@ -75,6 +76,7 @@ async def get_index(hub: dependencies.Hub) -> api_schemas.PluginIndex:
     responses={
         400: {"description": "Not a valid plugin type"},
     },
+    operation_id="get_plugin_type_index",
 )
 async def get_type_index(hub: dependencies.Hub, plugin_type: PluginTypeParam) -> api_schemas.PluginTypeIndex:
     """Retrieve index of plugins of a given type."""
@@ -88,13 +90,14 @@ async def get_type_index(hub: dependencies.Hub, plugin_type: PluginTypeParam) ->
         400: {"description": "Not a valid plugin type"},
         404: {"description": "Plugin not found"},
     },
+    operation_id="get_default_plugin",
 )
 async def get_default_plugin(
     hub: dependencies.Hub,
     plugin_type: PluginTypeParam,
     plugin_name: PluginNameParam,
 ) -> fastapi.responses.RedirectResponse:
-    """Retrieve details of a plugin variant."""
+    """Retrieve details of the default plugin variant."""
     plugin_id = ids.PluginID.from_params(plugin_type=plugin_type, plugin_name=plugin_name)
     return fastapi.responses.RedirectResponse(url=await hub.get_default_variant_url(plugin_id))
 
@@ -107,6 +110,7 @@ async def get_default_plugin(
         400: {"description": "Not a valid plugin type"},
         404: {"description": "Plugin variant not found"},
     },
+    operation_id="get_plugin_variant",
 )
 async def get_plugin_variant(
     hub: dependencies.Hub,
@@ -115,7 +119,7 @@ async def get_plugin_variant(
     plugin_variant: PluginVariantParam,
     meltano_version: MeltanoVersion,
 ) -> api_schemas.PluginDetails:
-    """Retrieve details of a plugin variant."""
+    """Retrieve details of a specific plugin variant."""
     variant_id = ids.VariantID.from_params(
         plugin_type=plugin_type,
         plugin_name=plugin_name,
@@ -149,7 +153,7 @@ class MadeWithSDKParams(BaseModel):
     )
 
 
-@router.get("/made-with-sdk", summary="Get SDK plugins")
+@router.get("/made-with-sdk", summary="Get SDK plugins", operation_id="get_sdk_plugins")
 async def sdk(
     hub: dependencies.Hub,
     *,
@@ -159,7 +163,7 @@ async def sdk(
     return await hub.get_sdk_plugins(limit=filter_query.limit, plugin_type=filter_query.plugin_type)
 
 
-@router.get("/stats", summary="Hub statistics")
+@router.get("/stats", summary="Hub statistics", operation_id="get_plugin_stats")
 async def stats(hub: dependencies.Hub) -> dict[enums.PluginTypeEnum, int]:
     """Retrieve Hub plugin statistics."""
     return await hub.get_plugin_stats()
