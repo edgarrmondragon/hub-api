@@ -1,0 +1,173 @@
+{
+  "commands": {
+    "build": {
+      "args": "build",
+      "description": "Will run your models, tests, snapshots and seeds in DAG order."
+    },
+    "clean": {
+      "args": "clean",
+      "description": "Delete all folders in the clean-targets list (usually the dbt_modules and target directories.)"
+    },
+    "compile": {
+      "args": "compile",
+      "description": "Generates executable SQL from source model, test, and analysis files. Compiled SQL files are written to the target/ directory."
+    },
+    "debug": {
+      "args": "debug",
+      "description": "Debug your DBT project and warehouse connection."
+    },
+    "deps": {
+      "args": "deps",
+      "description": "Pull the most recent version of the dependencies listed in packages.yml"
+    },
+    "describe": {
+      "args": "describe",
+      "description": "Describe the",
+      "executable": "dbt_extension"
+    },
+    "docs-generate": {
+      "args": "docs generate",
+      "description": "Generate documentation for your project."
+    },
+    "docs-serve": {
+      "args": "docs serve",
+      "description": "Serve documentation for your project. Make sure you ran `docs-generate` first."
+    },
+    "freshness": {
+      "args": "source freshness",
+      "description": "Check the freshness of your source data."
+    },
+    "initialize": {
+      "args": "initialize",
+      "description": "Initialize a new dbt project. This will create a dbt_project.yml file, a profiles.yml file, and models directory.\n",
+      "executable": "dbt_extension"
+    },
+    "run": {
+      "args": "run",
+      "description": "Compile SQL and execute against the current target database."
+    },
+    "seed": {
+      "args": "seed",
+      "description": "Load data from csv files into your data warehouse."
+    },
+    "snapshot": {
+      "args": "snapshot",
+      "description": "Execute snapshots defined in your project."
+    },
+    "test": {
+      "args": "test",
+      "description": "Runs tests on data in deployed models."
+    }
+  },
+  "docs": "https://hub.meltano.com/utilities/dbt-postgres--dbt-labs",
+  "executable": "dbt_invoker",
+  "ext_repo": "https://github.com/meltano/dbt-ext",
+  "label": "dbt PostgreSQL",
+  "logo_url": "https://hub.meltano.com/assets/logos/utilities/dbt.png",
+  "name": "dbt-postgres",
+  "namespace": "dbt_postgres",
+  "pip_url": "dbt-core dbt-postgres meltano-dbt-ext~=0.3.0",
+  "repo": "https://github.com/dbt-labs/dbt-core",
+  "requires": {},
+  "settings": [
+    {
+      "aliases": [
+        "database"
+      ],
+      "description": "The db to connect to.\n",
+      "kind": "string",
+      "label": "Database",
+      "name": "dbname"
+    },
+    {
+      "description": "The postgres host to connect to.\n",
+      "kind": "string",
+      "label": "Host",
+      "name": "host"
+    },
+    {
+      "description": "Seconds between TCP keepalive packets.\n",
+      "kind": "integer",
+      "label": "Keep Alives Idle",
+      "name": "keepalives_idle"
+    },
+    {
+      "description": "The password to connect with.\n",
+      "kind": "password",
+      "label": "Password",
+      "name": "password",
+      "sensitive": true
+    },
+    {
+      "description": "The port to connect to.\n",
+      "kind": "integer",
+      "label": "Port",
+      "name": "port"
+    },
+    {
+      "env": "DBT_PROFILES_DIR",
+      "label": "Profiles Directory",
+      "name": "profiles_dir",
+      "value": "$MELTANO_PROJECT_ROOT/transform/profiles/postgres"
+    },
+    {
+      "env": "DBT_PROJECT_DIR",
+      "label": "Projects Directory",
+      "name": "project_dir",
+      "value": "$MELTANO_PROJECT_ROOT/transform"
+    },
+    {
+      "description": "Role for dbt to assume when executing queries.\n",
+      "kind": "string",
+      "label": "Role",
+      "name": "role"
+    },
+    {
+      "description": "The schema to use.\n",
+      "kind": "string",
+      "label": "Schema",
+      "name": "schema"
+    },
+    {
+      "description": "Overrides the default search path.\n",
+      "kind": "string",
+      "label": "Search Path",
+      "name": "search_path"
+    },
+    {
+      "description": "Whether to skip pre-invoke hooks which automatically run dbt clean and deps",
+      "env": "DBT_EXT_SKIP_PRE_INVOKE",
+      "kind": "boolean",
+      "label": "Skip Pre-invoke",
+      "name": "skip_pre_invoke",
+      "value": false
+    },
+    {
+      "description": "SSL Mode used to connect to the database.\n",
+      "kind": "array",
+      "label": "SSL Mode",
+      "name": "sslmode"
+    },
+    {
+      "env": "DBT_TARGET_PATH",
+      "kind": "string",
+      "label": "Target Path",
+      "name": "target_path",
+      "value": "$MELTANO_PROJECT_ROOT/.meltano/transformers/dbt/target"
+    },
+    {
+      "env": "DBT_EXT_TYPE",
+      "label": "dbt Profile type",
+      "name": "type",
+      "value": "postgres"
+    },
+    {
+      "description": "The user to connect as.\n",
+      "kind": "string",
+      "label": "User",
+      "name": "user"
+    }
+  ],
+  "settings_group_validation": [],
+  "variant": "dbt-labs"
+}
