@@ -4,14 +4,20 @@ from __future__ import annotations
 
 import http
 import unittest.mock
+from typing import TYPE_CHECKING
 
+import fastapi
 import httpx
 import pytest
 from starlette.datastructures import Headers
 from starlette.requests import Request
+from syrupy.extensions.json import JSONSnapshotExtension
 
 from hub_api import enums, main
 from hub_api.helpers import compatibility, etag
+
+if TYPE_CHECKING:
+    from syrupy.assertion import SnapshotAssertion
 
 
 @pytest.fixture(scope="session")
@@ -208,3 +214,10 @@ def test_get_client_version(ua_value: str, version: tuple[int, int]) -> None:
     mock_request = unittest.mock.Mock(spec=Request)
     mock_request.headers = Headers({"User-Agent": ua_value})
     assert compatibility.get_version_tuple(mock_request) == version
+
+
+def test_openapi_spec(snapshot: SnapshotAssertion) -> None:
+    """Test OpenAPI spec."""
+    snapshot_json = snapshot.with_defaults(extension_class=JSONSnapshotExtension)
+    spec = fastapi.FastAPI.openapi(main.app)
+    assert snapshot_json() == spec
