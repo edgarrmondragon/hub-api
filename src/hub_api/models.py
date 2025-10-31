@@ -85,14 +85,14 @@ class PluginVariant(EntityBase):
         return {cmd.name: cmd for cmd in self.plugin_commands}
 
     @property
-    def select(self) -> list[str]:
+    def select(self) -> list[str] | None:
         """The select expressions for the variant."""
-        return [s.expression for s in self.select_expressions]
+        return [s.expression for s in self.select_expressions] if self.select_expressions else None
 
     @property
-    def extractor_metadata(self) -> dict[str, dict[str, Any]]:
+    def extractor_metadata(self) -> dict[str, dict[str, Any]] | None:
         """The metadata for the variant."""
-        return {m.key: m.value for m in self.metadata_overrides}
+        return {m.key: m.value for m in self.metadata_overrides} if self.metadata_overrides else None
 
     @property
     def settings_group_validation(self) -> list[list[str]]:
