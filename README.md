@@ -24,10 +24,10 @@ Built with:
     uv run --no-dev granian hub_api.main:app
     ```
 
-3. [Configure Meltano to use the new API](https://docs.meltano.com/):
+3. [Configure Meltano (v4+) to use the new API](https://docs.meltano.com/):
 
     ```bash
-    meltano config meltano set hub_api_root "http://localhost:8000/meltano/api/v1"
+    meltano config set meltano hub_api_root "http://localhost:8000/meltano/api/v1"
     ```
 
 4. Run Meltano as usual.
