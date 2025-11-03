@@ -30,7 +30,7 @@ jobs:
     continue-on-error: false
     steps:
     - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-    - uses: astral-sh/setup-uv@2ddd2b9cb38ad8efd50337e8ab201519a34c9f24 # v7.1.1
+    - uses: astral-sh/setup-uv@85856786d1ce8acfbcc2f13a5f3fbd6b938f9f41 # v7.1.2
     - run: >
         uvx --with tox-uv
         tox -qq -e build -- --git-ref ${{ github.event.inputs.git-ref || 'main' }} --exit-zero >> _errors.md
@@ -68,7 +68,7 @@ jobs:
         - "3.14"
     steps:
     - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-    - uses: astral-sh/setup-uv@2ddd2b9cb38ad8efd50337e8ab201519a34c9f24 # v7.1.1
+    - uses: astral-sh/setup-uv@85856786d1ce8acfbcc2f13a5f3fbd6b938f9f41 # v7.1.2
     - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
       with:
         name: hub-data
@@ -85,7 +85,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
     - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-    - uses: astral-sh/setup-uv@2ddd2b9cb38ad8efd50337e8ab201519a34c9f24 # v7.1.1
+    - uses: astral-sh/setup-uv@85856786d1ce8acfbcc2f13a5f3fbd6b938f9f41 # v7.1.2
     - run: uvx --with tox-uv tox -e typing
 
   schemathesis:
@@ -96,7 +96,7 @@ jobs:
     - name: Start containers
       run: |
         docker compose up --build -d
-    - uses: astral-sh/setup-uv@2ddd2b9cb38ad8efd50337e8ab201519a34c9f24 # v7.1.1
+    - uses: astral-sh/setup-uv@85856786d1ce8acfbcc2f13a5f3fbd6b938f9f41 # v7.1.2
     - run: >
         uvx --from schemathesis
         st run
@@ -121,7 +121,7 @@ jobs:
     - name: Start containers
       run: |
         docker compose up --build -d
-    - uses: astral-sh/setup-uv@2ddd2b9cb38ad8efd50337e8ab201519a34c9f24 # v7.1.1
+    - uses: astral-sh/setup-uv@85856786d1ce8acfbcc2f13a5f3fbd6b938f9f41 # v7.1.2
     - run: >
         uvx --with offat
         offat
@@ -154,7 +154,7 @@ jobs:
       with:
         merge-multiple: true
         pattern: coverage-*
-    - uses: astral-sh/setup-uv@2ddd2b9cb38ad8efd50337e8ab201519a34c9f24 # v7.1.1
+    - uses: astral-sh/setup-uv@85856786d1ce8acfbcc2f13a5f3fbd6b938f9f41 # v7.1.2
     - run: uv tool install --with tox-uv tox
     - name: Combine coverage
       run: |
