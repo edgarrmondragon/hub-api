@@ -1,11 +1,17 @@
 from __future__ import annotations
 
+import importlib.resources
 import os
 import pathlib
 
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+import aiosqlite
 
 _DEFAULT_DB_PATH = "./plugins.db"
+
+
+def get_db_schema() -> str:
+    """Get database schema."""
+    return importlib.resources.files("hub_api").joinpath("schema.sql").read_text()
 
 
 def get_db_path() -> pathlib.Path:
@@ -13,10 +19,13 @@ def get_db_path() -> pathlib.Path:
     return pathlib.Path(os.getenv("DB_PATH", _DEFAULT_DB_PATH)).resolve()
 
 
-def get_session_maker() -> async_sessionmaker[AsyncSession]:
-    """Get session maker."""
-    engine = create_async_engine(
-        f"sqlite+aiosqlite:///file:{get_db_path()}?mode=ro&uri=true",
-        connect_args={"check_same_thread": False},
+async def open_db() -> aiosqlite.Connection:
+    """Open database connection."""
+    conn = await aiosqlite.connect(
+        f"file:{get_db_path()}?mode=ro&immutable=1&cache=shared",
+        uri=True,
     )
-    return async_sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    conn.row_factory = aiosqlite.Row
+    await conn.execute("PRAGMA query_only=ON;")
+    await conn.execute("PRAGMA foreign_keys=ON;")
+    return conn
