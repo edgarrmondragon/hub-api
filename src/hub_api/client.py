@@ -28,15 +28,13 @@ class PluginNotFoundError(exceptions.NotFoundError):
         self,
         *,
         plugin_name: str,
-        plugin_type: enums.PluginTypeEnum | None = None,
+        plugin_type: enums.PluginTypeEnum,
         variant_name: str | None = None,
     ) -> None:
         if variant_name is not None:
-            msg = f"Variant '{variant_name}' of '{plugin_name}' not found"
-        elif plugin_type is not None:
-            msg = f"No plugin '{plugin_name}' found in {plugin_type}"
+            msg = f"Variant '{variant_name}' of '{plugin_name}' not found in {plugin_type}"
         else:
-            msg = f"Plugin '{plugin_name}' not found"
+            msg = f"No plugin '{plugin_name}' found in {plugin_type}"
         super().__init__(msg)
 
 
