@@ -81,6 +81,7 @@ async def test_plugin_details(
     plugin: str,
     plugin_type: enums.PluginTypeEnum,
     variant: str,
+    snapshot: SnapshotAssertion,
 ) -> None:
     """Test /meltano/api/v1/plugins/extractors/<plugin>--<variant>."""
     path = f"/meltano/api/v1/plugins/{plugin_type}/{plugin}--{variant}"
@@ -89,6 +90,9 @@ async def test_plugin_details(
 
     details = response.json()
     assert details["name"] == plugin
+
+    snapshot_json = snapshot.with_defaults(extension_class=JSONSnapshotExtension)
+    assert snapshot_json(name=plugin) == details
 
 
 @pytest.mark.parametrize(
