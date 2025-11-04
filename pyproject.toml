@@ -134,6 +134,7 @@ env_list = [
     "format",
     "build",
     "py314",
+    "py314t",
     "combine",
     "coverage",
     "lint",
