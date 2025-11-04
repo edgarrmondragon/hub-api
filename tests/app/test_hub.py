@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+import aiosqlite
 import pytest
 import pytest_asyncio
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from hub_api import client, database, enums, ids, models
+from hub_api import client, database, enums, ids
 from hub_api.helpers import compatibility
 from hub_api.schemas import api as api_schemas
 
@@ -19,9 +19,11 @@ if TYPE_CHECKING:
 @pytest_asyncio.fixture
 async def hub() -> AsyncGenerator[client.MeltanoHub]:
     """Get a Meltano hub instance."""
-    session_maker = database.get_session_maker()
-    async with session_maker() as db:
+    db = await database.open_db()
+    try:
         yield client.MeltanoHub(db=db)
+    finally:
+        await db.close()
 
 
 def test_plugin_id() -> None:
@@ -184,60 +186,56 @@ async def test_get_default_variant_url(hub: client.MeltanoHub) -> None:
 
 
 @pytest_asyncio.fixture
-async def db() -> AsyncGenerator[AsyncSession]:
+async def db() -> AsyncGenerator[aiosqlite.Connection]:
     """Get a database session."""
-    engine = create_async_engine("sqlite+aiosqlite:///:memory:")
-    session_maker = async_sessionmaker(autocommit=False, autoflush=False, bind=engine)
-    async with session_maker() as session:
-        conn = await session.connection()
-        await conn.run_sync(models.EntityBase.metadata.create_all)
-        session.add(
-            models.Plugin(
-                id="extractors.tap-mock",
-                plugin_type="extractors",
-                name="tap-mock",
-                default_variant_id="tap-mock.singer",
-            )
-        )
-        session.add(
-            models.PluginVariant(
-                id="extractors.tap-mock.singer",
-                plugin_id="extractors.tap-mock",
-                name="singer",
-                namespace="tap_mock",
-                repo="https://github.com/singer-io/tap-mock",
-            ),
-        )
-        session.add_all([
-            models.Setting(
-                id="extractors.tap-mock.singer.setting_mock_string",
-                variant_id="extractors.tap-mock.singer",
-                name="mock_string",
-                kind="string",
-                sensitive=True,
-            ),
-            models.Setting(
-                id="extractors.tap-mock.singer.setting_mock_integer",
-                variant_id="extractors.tap-mock.singer",
-                name="mock_integer",
-                kind="integer",
-            ),
-            models.Setting(
-                id="extractors.tap-mock.singer.setting_mock_decimal",
-                variant_id="extractors.tap-mock.singer",
-                name="mock_decimal",
-                kind="decimal",
-            ),
-        ])
-        session.add(
-            models.SettingAlias(
-                id="extractors.tap-mock.singer.setting_mock_string.alias_mock_string_alias",
-                setting_id="extractors.tap-mock.singer.setting_mock_string",
-                name="mock_string_alias",
-            ),
-        )
-        await session.commit()
-        yield session
+    conn = await aiosqlite.connect(":memory:")
+    conn.row_factory = aiosqlite.Row
+
+    schema_sql = database.get_db_schema()
+
+    await conn.executescript(schema_sql)
+
+    await conn.execute("""
+        INSERT INTO plugins (id, plugin_type, name, default_variant_id)
+        VALUES ('extractors.tap-mock', 'extractors', 'tap-mock', 'extractors.tap-mock.singer')
+    """)
+    await conn.execute("""
+        INSERT INTO plugin_variants (id, plugin_id, name, namespace, repo)
+        VALUES ('extractors.tap-mock.singer', 'extractors.tap-mock', 'singer', 'tap_mock',
+                'https://github.com/singer-io/tap-mock')
+    """)
+    await conn.execute(
+        """
+        INSERT INTO settings (id, variant_id, name, kind, sensitive)
+        VALUES (?, ?, ?, ?, ?)
+        """,
+        ("extractors.tap-mock.singer.setting_mock_string", "extractors.tap-mock.singer", "mock_string", "string", 1),
+    )
+    await conn.execute(
+        """
+        INSERT INTO settings (id, variant_id, name, kind)
+        VALUES (?, ?, ?, ?)
+        """,
+        ("extractors.tap-mock.singer.setting_mock_integer", "extractors.tap-mock.singer", "mock_integer", "integer"),
+    )
+    await conn.execute(
+        """
+        INSERT INTO settings (id, variant_id, name, kind)
+        VALUES (?, ?, ?, ?)
+        """,
+        ("extractors.tap-mock.singer.setting_mock_decimal", "extractors.tap-mock.singer", "mock_decimal", "decimal"),
+    )
+    await conn.execute("""
+        INSERT INTO setting_aliases (id, setting_id, name)
+        VALUES ('extractors.tap-mock.singer.setting_mock_string.alias_mock_string_alias',
+                'extractors.tap-mock.singer.setting_mock_string', 'mock_string_alias')
+    """)
+
+    await conn.commit()
+    try:
+        yield conn
+    finally:
+        await conn.close()
 
 
 @pytest.mark.asyncio
@@ -326,11 +324,12 @@ async def db() -> AsyncGenerator[AsyncSession]:
     ],
 )
 async def test_get_plugin_details_meltano_version(
-    db: AsyncSession,
+    db: aiosqlite.Connection,
     meltano_version: tuple[int, int],
     settings_dict: dict[str, dict[str, Any]],
 ) -> None:
     """Test get_plugin_details."""
+
     hub = client.MeltanoHub(db=db)
     details = await hub.get_plugin_details(
         variant_id=ids.VariantID.from_params(

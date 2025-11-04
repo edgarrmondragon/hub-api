@@ -18,7 +18,7 @@ import pydantic
 import requests
 import yaml
 
-from hub_api import enums, models
+from hub_api import enums
 from hub_api.schemas import meltano, validation
 
 if TYPE_CHECKING:
@@ -403,9 +403,6 @@ def load_db(path: Path, connection: sqlite3.Connection) -> LoadResult:
 def main() -> int:
     import argparse  # noqa: PLC0415
 
-    from sqlalchemy.dialects import sqlite  # noqa: PLC0415
-    from sqlalchemy.schema import CreateTable  # noqa: PLC0415
-
     from hub_api import database  # noqa: PLC0415
 
     class CLINamespace(argparse.Namespace):
@@ -420,9 +417,10 @@ def main() -> int:
     args = parser.parse_args(namespace=CLINamespace())
     hub_dir = download_meltano_hub_archive(ref=args.git_ref, use_cache=args.cache)
 
+    schema_sql = database.get_db_schema()
+
     with tempfile.NamedTemporaryFile(suffix=".db") as tmp_file, sqlite3.connect(tmp_file.name) as connection:
-        for table in models.EntityBase.metadata.sorted_tables:
-            connection.execute(str(CreateTable(table).compile(dialect=sqlite.dialect())))
+        connection.executescript(schema_sql)
 
         result = load_db(hub_dir / "_data", connection)
         print(result.to_markdown())

@@ -7,7 +7,7 @@ Built with:
 - SQLite
 - [FastAPI]
 - [Granian]
-- [SQLAlchemy]
+- [aiosqlite]
 - [Schemathesis] (used for testing the OpenAPI spec)
 
 ## Usage
@@ -101,5 +101,5 @@ date: Sat, 18 Jan 2025 03:26:32 GMT
 [etag]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
 [fastapi]: https://fastapi.tiangolo.com/
 [granian]: https://github.com/emmett-framework/granian/
-[sqlalchemy]: https://github.com/sqlalchemy/sqlalchemy/
+[aiosqlite]: https://github.com/omnilib/aiosqlite/
 [schemathesis]: https://github.com/schemathesis/schemathesis/

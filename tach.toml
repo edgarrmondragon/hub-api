@@ -20,7 +20,6 @@ depends_on = [
     "hub_api.enums",
     "hub_api.exceptions",
     "hub_api.ids",
-    "hub_api.models",
     "hub_api.schemas",
 ]
 
@@ -57,12 +56,6 @@ depends_on = [
     "hub_api.exceptions",
     "hub_api.helpers.etag",
     "hub_api.static",
-]
-
-[[modules]]
-path = "hub_api.models"
-depends_on = [
-    "hub_api.enums",
 ]
 
 [[modules]]

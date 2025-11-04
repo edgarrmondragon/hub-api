@@ -14,9 +14,11 @@ if TYPE_CHECKING:
 
 async def get_hub(request: fastapi.Request) -> AsyncGenerator[client.MeltanoHub]:
     """Get a Meltano hub instance."""
-    session_maker = database.get_session_maker()
-    async with session_maker() as db:
+    db = await database.open_db()
+    try:
         yield client.MeltanoHub(db=db, base_url=request.base_url)
+    finally:
+        await db.close()
 
 
 Hub = Annotated[client.MeltanoHub, fastapi.Depends(get_hub)]
