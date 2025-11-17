@@ -32,8 +32,8 @@ app = fastapi.FastAPI(
         },
     ],
 )
-app.add_middleware(gzip.GZipMiddleware, minimum_size=1000)
-app.add_middleware(etag.ETagMiddleware)
+app.add_middleware(gzip.GZipMiddleware, minimum_size=1000)  # ty: ignore[invalid-argument-type]
+app.add_middleware(etag.ETagMiddleware)  # ty: ignore[invalid-argument-type]
 assets = resources.files(static) / "assets"
 
 
