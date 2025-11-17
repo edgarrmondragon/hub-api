@@ -1,5 +1,5 @@
 offat==0.19.4
-pre-commit==4.3.0
+pre-commit==4.4.0
 pre-commit-uv==4.2.0
 schemathesis==4.5.1
 tox==4.32.0
