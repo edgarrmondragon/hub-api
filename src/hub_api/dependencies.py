@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Annotated
+from collections.abc import AsyncGenerator  # noqa: TC003
+from typing import Annotated
 
 import fastapi
 
 from hub_api import client, database
-
-if TYPE_CHECKING:
-    from collections.abc import AsyncGenerator
 
 
 async def get_hub(request: fastapi.Request) -> AsyncGenerator[client.MeltanoHub]:
