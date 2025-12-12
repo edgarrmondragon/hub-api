@@ -10,12 +10,13 @@ import sqlite3
 import sys
 import tarfile
 import tempfile
+from http import HTTPStatus
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, assert_never
 
 import platformdirs
 import pydantic
-import requests
+import urllib3
 import yaml
 
 from hub_api import enums
@@ -44,11 +45,12 @@ def download_meltano_hub_archive(*, ref: str = "main", use_cache: bool = True) -
         url = f"https://github.com/meltano/hub/archive/{ref}.tar.gz"
         logger.info("Downloading archive %s", url)
 
-        response = requests.get(url, timeout=10)
-        response.raise_for_status()
+        response = urllib3.request("GET", url, timeout=10.0, retries=3)
+        if response.status != HTTPStatus.OK:
+            raise Exception(f"Failed to download archive: HTTP {response.status}")
 
         with tempfile.NamedTemporaryFile(suffix=".tar.gz") as tmp_file:
-            tmp_file.write(gzip.decompress(response.content))
+            tmp_file.write(gzip.decompress(response.data))
             tmp_file.seek(0)
             with tempfile.TemporaryDirectory() as extract_dir, tarfile.open(tmp_file.name) as tar:
                 tar.extractall(extract_dir, filter="data")
